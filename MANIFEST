@@ -1,8 +1,8 @@
 25275 COPYING.LIB
-34569 ChangeLog
+35032 ChangeLog
 7462 INSTALL
 5908 Makefile.in
-12711 README
+13159 README
 7 VERSION
 2955 acconfig.h
 9381 aclocal.m4
@@ -54,7 +54,7 @@
 2562 lib/input.c
 1088 lib/kind.c
 1214 lib/libelf.def
-8389 lib/libelf.h
+9050 lib/libelf.h
 1505 lib/memset.c
 1098 lib/ndxscn.c
 1558 lib/newdata.c
@@ -80,7 +80,7 @@
 1614 lib/verdef_64_tom.c
 7135 lib/verneed.h
 1435 lib/version.c
-4238 lib/x.elfext.c
+4425 lib/x.elfext.c
 2721 lib/x.movscn.c
 2870 lib/x.remscn.c
 238 libelf.pc.in

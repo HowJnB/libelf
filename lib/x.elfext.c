@@ -20,43 +20,43 @@
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: x.elfext.c,v 1.4 2008/05/23 08:15:35 michael Exp $";
+static const char rcsid[] = "@(#) $Id: x.elfext.c,v 1.5 2009/07/07 17:57:43 michael Exp $";
 #endif /* lint */
 
 int
-elf_getphnum(Elf *elf, size_t *resultp) {
+elf_getphdrnum(Elf *elf, size_t *resultp) {
     if (!elf) {
-	return LIBELF_FAILURE;
+	return -1;
     }
     elf_assert(elf->e_magic == ELF_MAGIC);
     if (elf->e_kind != ELF_K_ELF) {
 	seterr(ERROR_NOTELF);
-	return LIBELF_FAILURE;
+	return -1;
     }
     if (!elf->e_ehdr && !_elf_cook(elf)) {
-	return LIBELF_FAILURE;
+	return -1;
     }
     if (resultp) {
 	*resultp = elf->e_phnum;
     }
-    return LIBELF_SUCCESS;
+    return 0;
 }
 
 int
-elf_getshnum(Elf *elf, size_t *resultp) {
+elf_getshdrnum(Elf *elf, size_t *resultp) {
     size_t num = 0;
     Elf_Scn *scn;
 
     if (!elf) {
-	return LIBELF_FAILURE;
+	return -1;
     }
     elf_assert(elf->e_magic == ELF_MAGIC);
     if (elf->e_kind != ELF_K_ELF) {
 	seterr(ERROR_NOTELF);
-	return LIBELF_FAILURE;
+	return -1;
     }
     if (!elf->e_ehdr && !_elf_cook(elf)) {
-	return LIBELF_FAILURE;
+	return -1;
     }
     if ((scn = elf->e_scn_n)) {
 	num = scn->s_index + 1;
@@ -64,17 +64,17 @@ elf_getshnum(Elf *elf, size_t *resultp) {
     if (resultp) {
 	*resultp = num;
     }
-    return LIBELF_SUCCESS;
+    return 0;
 }
 
 int
-elf_getshstrndx(Elf *elf, size_t *resultp) {
+elf_getshdrstrndx(Elf *elf, size_t *resultp) {
     size_t num = 0;
     size_t dummy;
     Elf_Scn *scn;
 
     if (!elf) {
-	return LIBELF_FAILURE;
+	return -1;
     }
     elf_assert(elf->e_magic == ELF_MAGIC);
     if (resultp == NULL) {
@@ -82,10 +82,10 @@ elf_getshstrndx(Elf *elf, size_t *resultp) {
     }
     if (elf->e_kind != ELF_K_ELF) {
 	seterr(ERROR_NOTELF);
-	return LIBELF_FAILURE;
+	return -1;
     }
     if (!elf->e_ehdr && !_elf_cook(elf)) {
-	return LIBELF_FAILURE;
+	return -1;
     }
     if (elf->e_class == ELFCLASS32) {
 	num = ((Elf32_Ehdr*)elf->e_ehdr)->e_shstrndx;
@@ -102,28 +102,43 @@ elf_getshstrndx(Elf *elf, size_t *resultp) {
 	else {
 	    seterr(ERROR_UNKNOWN_CLASS);
 	}
-	return LIBELF_FAILURE;
+	return -1;
     }
     if (num != SHN_XINDEX) {
 	*resultp = num;
-	return LIBELF_SUCCESS;
+	return 0;
     }
     /*
      * look at first section header
      */
     if (!(scn = elf->e_scn_1)) {
 	seterr(ERROR_NOSUCHSCN);
-	return LIBELF_FAILURE;
+	return -1;
     }
     elf_assert(scn->s_magic == SCN_MAGIC);
 #if __LIBELF64
     if (elf->e_class == ELFCLASS64) {
 	*resultp = scn->s_shdr64.sh_link;
-	return LIBELF_SUCCESS;
+	return 0;
     }
 #endif /* __LIBELF64 */
     *resultp = scn->s_shdr32.sh_link;
-    return LIBELF_SUCCESS;
+    return 0;
+}
+
+int
+elf_getphnum(Elf *elf, size_t *resultp) {
+    return elf_getphdrnum(elf, resultp) ? LIBELF_FAILURE : LIBELF_SUCCESS;
+}
+
+int
+elf_getshnum(Elf *elf, size_t *resultp) {
+    return elf_getshdrnum(elf, resultp) ? LIBELF_FAILURE : LIBELF_SUCCESS;
+}
+
+int
+elf_getshstrndx(Elf *elf, size_t *resultp) {
+    return elf_getshdrstrndx(elf, resultp) ? LIBELF_FAILURE : LIBELF_SUCCESS;
 }
 
 int

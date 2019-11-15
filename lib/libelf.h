@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-/* @(#) $Id: libelf.h,v 1.28 2009/05/22 17:08:09 michael Exp $ */
+/* @(#) $Id: libelf.h,v 1.29 2009/07/07 17:57:43 michael Exp $ */
 
 #ifndef _LIBELF_H
 #define _LIBELF_H
@@ -30,6 +30,12 @@
 #else /* __LIBELF_INTERNAL__ */
 #include <libelf/sys_elf.h>
 #endif /* __LIBELF_INTERNAL__ */
+
+#if defined __GNUC__ && !defined __cplusplus
+#define DEPRECATED	__attribute__((deprecated))
+#else
+#define DEPRECATED	/* nothing */
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -245,11 +251,20 @@ extern long elf64_checksum __P((Elf *__elf));
 /*
  * ELF format extensions
  *
- * These functions return 0 on failure, 1 on success.
+ * These functions return 0 on failure, 1 on success.  Since other
+ * implementations of libelf may behave differently (there was quite
+ * some confusion about the correct values), they are now officially
+ * deprecated and should be replaced with the three new functions below.
  */
-extern int elf_getphnum __P((Elf *__elf, size_t *__resultp));
-extern int elf_getshnum __P((Elf *__elf, size_t *__resultp));
-extern int elf_getshstrndx __P((Elf *__elf, size_t *__resultp));
+DEPRECATED extern int elf_getphnum __P((Elf *__elf, size_t *__resultp));
+DEPRECATED extern int elf_getshnum __P((Elf *__elf, size_t *__resultp));
+DEPRECATED extern int elf_getshstrndx __P((Elf *__elf, size_t *__resultp));
+/*
+ * Replacement functions (return -1 on failure, 0 on success).
+ */
+extern int elf_getphdrnum __P((Elf *__elf, size_t *__resultp));
+extern int elf_getshdrnum __P((Elf *__elf, size_t *__resultp));
+extern int elf_getshdrstrndx __P((Elf *__elf, size_t *__resultp));
 
 /*
  * Convenience functions

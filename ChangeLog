@@ -1,3 +1,28 @@
+Tue Jul  7 19:45:12 CEST 2009, Michael Riepe <libelf@mr511.de>
+
+	* README:
+	* VERSION:
+		update for 0.8.12 release.
+
+	* lib/libelf.h:
+	* lib/x.elfext.c:
+		add new and deprecate old functions.
+ 
+Fri May 22 19:17:14 CEST 2009, Michael Riepe <libelf@mr511.de>
+
+	* README:
+	* VERSION:
+		update for 0.8.11 release.
+
+	* lib/libelf.h:
+		add ELF_F_LAYOUT_OVERLAP flag.
+
+	* lib/rawfile.c:
+		fix re-read zero size bug.
+
+	* lib/update.c:
+		honor ELF_F_LAYOUT_OVERLAP flag.
+
 Fri Sep  7 14:04:20 CEST 2007, Michael Riepe <libelf@mr511.de>
 
 	* acconfig.h:
