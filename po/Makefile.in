@@ -1,5 +1,5 @@
 # po/Makefile for libelf.
-# Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+# Copyright (C) 1995 - 2001, 2004 Michael Riepe
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -13,9 +13,9 @@
 # 
 # You should have received a copy of the GNU Library General Public
 # License along with this library; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# @(#) $Id: Makefile.in,v 1.11 2003/12/05 15:36:00 michael Exp $
+# @(#) $Id: Makefile.in,v 1.16 2005/05/21 15:39:28 michael Exp $
 
 instroot =
 
@@ -40,6 +40,7 @@ CPPFLAGS = @CPPFLAGS@
 DEFS = -DHAVE_CONFIG_H
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
+LIBINTL = @LIBINTL@
 
 # no user serviceable parts below
 
@@ -148,15 +149,14 @@ stamp-po: $(PACKAGE).pot
 
 .gmo.msg:
 	$(MAKE) $(srcdir)/gmo2msg
-	LANGUAGE=`echo $*|sed 's,.*/,,'`; export LANGUAGE; \
-	  cd $(srcdir) && $(RM) $$LANGUAGE.msg && ./gmo2msg > $$LANGUAGE.msg
+	cd $(srcdir) && ./gmo2msg `echo $*|sed 's,.*/,,'`
 
 .SUFFIXES: .c
 
 .c:
 	@$(RM) $@
 	$(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(XCFLAGS) \
-	  $(LDFLAGS) $*.c $(LIBS) -lintl -o $@
+	  $(LDFLAGS) $*.c $(LIBS) $(LIBINTL) -o $@
 
 INCLUDES = -I$(topdir) -I. -I$(topdir)/lib -I$(srcdir) -I$(top_srcdir)/lib
 

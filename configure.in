@@ -1,8 +1,22 @@
 # configure.in - Configure template for libelf.
-# Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
 # Process this file with autoconf to produce a configure script.
+# Copyright (C) 1995 - 2005 Michael Riepe
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# @(#) $Id: configure.in,v 1.28 2003/11/06 16:49:54 michael Exp $
+# @(#) $Id: configure.in,v 1.36 2005/05/21 15:39:19 michael Exp $
 
 AC_INIT(VERSION)
 AC_CONFIG_HEADER(config.h lib/sys_elf.h)
@@ -33,7 +47,23 @@ dnl Checks for libraries.
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(unistd.h fcntl.h elf.h sys/elf.h link.h sys/link.h)
+AC_CHECK_HEADERS(unistd.h stdint.h fcntl.h)
+AC_CHECK_HEADERS(elf.h sys/elf.h link.h sys/link.h)
+AC_CACHE_CHECK([if ${CC} can compile elf.h], libelf_cv_elf_h_works, [
+  AC_TRY_COMPILE(
+    [#if HAVE_ELF_H
+    #include <elf.h>
+    #elif HAVE_SYS_ELF_H
+    #include <sys/elf.h>
+    #endif],
+    [Elf32_Ehdr dummy],
+    [libelf_cv_elf_h_works=yes],
+    [libelf_cv_elf_h_works=no])
+])
+if test "$libelf_cv_elf_h_works" = no; then
+  ac_cv_header_elf_h=no
+  ac_cv_header_sys_elf_h=no
+fi
 if test "$ac_cv_header_elf_h" = yes; then
   AC_DEFINE(__LIBELF_HEADER_ELF_H, [<elf.h>])
 elif test "$ac_cv_header_sys_elf_h" = yes; then
@@ -61,6 +91,8 @@ AC_CHECK_SIZEOF(short,2)
 AC_CHECK_SIZEOF(int,4)
 AC_CHECK_SIZEOF(long,4)
 AC_CHECK_SIZEOF(long long,0)
+# Windows port
+AC_CHECK_SIZEOF(__int64, 0)
 
 if test "$ac_cv_header_elf_h" = yes \
 || test "$ac_cv_header_sys_elf_h" = yes; then
@@ -182,6 +214,8 @@ fi
 AC_CACHE_CHECK([for 64-bit integer], libelf_cv_int64, [
   if test "$ac_cv_sizeof_long" = 8; then
     libelf_cv_int64='long'
+  elif test "$ac_cv_sizeof___int64" = 8; then
+    libelf_cv_int64='__int64'
   elif test "$ac_cv_sizeof_long_long" = 8; then
     libelf_cv_int64='long long'
   else
@@ -305,6 +339,10 @@ fi
 
 dnl Check for NLS support.
 mr_ENABLE_NLS
+dnl this is for gmo2msg...
+LIBINTL=
+AC_CHECK_LIB(intl, gettext, [LIBINTL=-lintl])
+AC_SUBST(LIBINTL)
 
 dnl Check for shared library support.
 mr_ENABLE_SHARED
@@ -312,7 +350,7 @@ mr_ENABLE_SHARED
 dnl Check for debug support.
 mr_ENABLE_DEBUG
 
-AC_OUTPUT([Makefile lib/Makefile po/Makefile], [echo timestamp > stamp-h
-echo timestamp > lib/stamp-h])
+AC_OUTPUT([Makefile lib/Makefile po/Makefile w32/Makefile libelf.pc],
+  [echo timestamp > stamp-h; echo timestamp > lib/stamp-h])
 
 # vi: set ts=8 sw=2 :

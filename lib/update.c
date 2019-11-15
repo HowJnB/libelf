@@ -1,26 +1,26 @@
 /*
-update.c - implementation of the elf_update(3) function.
-Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+ * update.c - implementation of the elf_update(3) function.
+ * Copyright (C) 1995 - 2004 Michael Riepe
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: update.c,v 1.24 2003/05/12 13:36:19 michael Exp $";
+static const char rcsid[] = "@(#) $Id: update.c,v 1.30 2005/05/21 15:39:26 michael Exp $";
 #endif /* lint */
 
 #if HAVE_MMAP
@@ -36,6 +36,7 @@ static const unsigned short __encoding = ELFDATA2LSB + (ELFDATA2MSB << 8);
 #define align(var,val)		\
     do{if((val)>1){(var)+=(val)-1;(var)-=(var)%(val);}}while(0)
 
+#undef max
 #define max(a,b)		((a)>(b)?(a):(b))
 
 static off_t
@@ -546,14 +547,6 @@ _elf_update_pointers(Elf *elf, char *outbuf, size_t len) {
 	return 0;
     }
     /* adjust internal pointers */
-    if (elf->e_ehdr && !elf->e_free_ehdr) {
-	elf_assert(ptrinside(elf->e_ehdr, elf->e_data, elf->e_dsize));
-	newptr(elf->e_ehdr, elf->e_data, data);
-    }
-    if (elf->e_phdr && !elf->e_free_phdr) {
-	elf_assert(ptrinside(elf->e_phdr, elf->e_data, elf->e_dsize));
-	newptr(elf->e_phdr, elf->e_data, data);
-    }
     for (scn = elf->e_scn_1; scn; scn = scn->s_link) {
 	elf_assert(scn->s_magic == SCN_MAGIC);
 	elf_assert(scn->s_elf == elf);
@@ -878,6 +871,7 @@ _elf_output(Elf *elf, int fd, size_t len, off_t (*_elf_write)(Elf*, char*, size_
      * Make sure the file is (at least) len bytes long
      */
 #if HAVE_FTRUNCATE
+    lseek(fd, (off_t)len, SEEK_SET);
     if (ftruncate(fd, len)) {
 #else /* HAVE_FTRUNCATE */
     {

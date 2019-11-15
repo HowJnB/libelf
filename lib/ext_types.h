@@ -1,6 +1,6 @@
 /*
 ext_types.h - external representation of ELF data types.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 1998 Michael Riepe
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -14,10 +14,10 @@ Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* @(#) $Id: ext_types.h,v 1.5 2001/10/05 16:00:50 michael Exp $ */
+/* @(#) $Id: ext_types.h,v 1.8 2005/05/21 15:39:22 michael Exp $ */
 
 #ifndef _EXT_TYPES_H
 #define _EXT_TYPES_H

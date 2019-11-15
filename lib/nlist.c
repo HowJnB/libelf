@@ -1,32 +1,36 @@
 /*
-nlist.c - implementation of the nlist(3) function.
-Copyright (C) 1995 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+ * nlist.c - implementation of the nlist(3) function.
+ * Copyright (C) 1995 - 2004 Michael Riepe
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #include <private.h>
 #include <nlist.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: nlist.c,v 1.7 2002/06/11 18:53:55 michael Exp $";
+static const char rcsid[] = "@(#) $Id: nlist.c,v 1.13 2005/05/21 15:39:25 michael Exp $";
 #endif /* lint */
 
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif /* HAVE_FCNTL_H */
+
+#if !HAVE_FCNTL_H || defined(_WIN32)	/* W32 seems to lack `open()' in <fcntl.h> */
+extern int open();
+#endif /* !HAVE_FCNTL_H || defined(_WIN32) */
 
 #ifndef O_RDONLY
 #define O_RDONLY	0
@@ -190,7 +194,7 @@ _elf_nlist(Elf *elf, struct nlist *nl) {
 	}
 	if (*name != '\0') {
 	    table[i].name = name;
-	    table[i].hash = elf_hash(name);
+	    table[i].hash = elf_hash((unsigned char*)name);
 	    hash = table[i].hash % PRIME;
 	    table[i].next = first[hash];
 	    first[hash] = i;
@@ -201,7 +205,7 @@ _elf_nlist(Elf *elf, struct nlist *nl) {
      * Lookup symbols, one by one.
      */
     for (np = nl; (name = np->n_name) && *name; np++) {
-	hash = elf_hash(name);
+	hash = elf_hash((unsigned char*)name);
 	for (i = first[hash % PRIME]; i; i = table[i].next) {
 	    if (table[i].hash == hash && !strcmp(table[i].name, name)) {
 		break;

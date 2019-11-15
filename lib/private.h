@@ -1,23 +1,23 @@
 /*
-private.h - private definitions for libelf.
-Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
+ * private.h - private definitions for libelf.
+ * Copyright (C) 1995 - 2004 Michael Riepe
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
-
-/* @(#) $Id: private.h,v 1.26 2003/05/24 16:55:58 michael Exp $ */
+/* @(#) $Id: private.h,v 1.31 2005/05/21 15:39:25 michael Exp $ */
 
 #ifndef _PRIVATE_H
 #define _PRIVATE_H
@@ -28,6 +28,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+/*
+ * Workaround for GLIBC bug:
+ * include <stdint.h> before <sys/types.h>
+ */
+#if HAVE_STDINT_H
+#include <stdint.h>
+#endif
 #include <sys/types.h>
 
 #if STDC_HEADERS
@@ -139,8 +146,6 @@ struct Elf {
     unsigned	e_disabled : 1;		/* e_fd has been disabled */
     unsigned	e_cooked : 1;		/* e_data was modified */
     unsigned	e_free_syms : 1;	/* e_symtab is malloc'ed */
-    unsigned	e_free_ehdr : 1;	/* e_ehdr is malloc'ed */
-    unsigned	e_free_phdr : 1;	/* e_phdr is malloc'ed */
     unsigned	e_unmap_data : 1;	/* e_data is mmap'ed */
     unsigned	e_memory : 1;		/* created by elf_memory() */
     /* magic number for debugging */
@@ -185,8 +190,6 @@ struct Elf {
     /* e_disabled */	0,\
     /* e_cooked */	0,\
     /* e_free_syms */	0,\
-    /* e_free_ehdr */	0,\
-    /* e_free_phdr */	0,\
     /* e_unmap_data */	0,\
     /* e_memory */	0,\
     /* e_magic */	ELF_MAGIC\
@@ -340,7 +343,7 @@ extern const size_t _elf_fmsize[2][EV_CURRENT - EV_NONE][ELF_T_NUM][2];
 #define valid_class(c)		((c) >= ELFCLASS32 && (c) <= ELFCLASS64)
 #define valid_encoding(e)	((e) >= ELFDATA2LSB && (e) <= ELFDATA2MSB)
 #define valid_version(v)	((v) > EV_NONE && (v) <= EV_CURRENT)
-#define valid_type(t)		((t) >= ELF_T_BYTE && (t) < ELF_T_NUM)
+#define valid_type(t)		((unsigned)(t) < ELF_T_NUM)
 
 /*
  * Error codes

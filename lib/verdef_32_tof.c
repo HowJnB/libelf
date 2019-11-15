@@ -1,6 +1,6 @@
 /*
 verdef_32_tof.c - copy 32-bit versioning information.
-Copyright (C) 2001 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 2001 Michael Riepe
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -14,7 +14,7 @@ Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 #include <private.h>
@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #if __LIBELF_SYMBOL_VERSIONS
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: verdef_32_tof.c,v 1.1 2001/10/07 20:03:02 michael Exp $";
+static const char rcsid[] = "@(#) $Id: verdef_32_tof.c,v 1.4 2005/05/21 15:39:26 michael Exp $";
 #endif /* lint */
 
 typedef Elf32_Verdaux		verdaux_mtype;

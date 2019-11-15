@@ -1,5 +1,5 @@
 # Makefile for libelf.
-# Copyright (C) 1995 - 2001, 2003 Michael Riepe <michael@stud.uni-hannover.de>
+# Copyright (C) 1995 - 2005 Michael Riepe
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -13,13 +13,23 @@
 # 
 # You should have received a copy of the GNU Library General Public
 # License along with this library; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# @(#) $Id: Makefile.in,v 1.18 2003/11/06 17:35:00 michael Exp $
+# @(#) $Id: Makefile.in,v 1.27 2005/08/15 14:27:21 michael Exp $
+
+instroot =
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+libdir = @libdir@
+
+pkgdir = $(libdir)/pkgconfig
 
 MV = mv -f
 RM = rm -f
 LN_S = @LN_S@
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
 
 CC = @CC@
 CFLAGS = @CFLAGS@
@@ -39,12 +49,12 @@ srcdir = @srcdir@
 VPATH = @srcdir@
 
 SUBDIRS = lib @POSUB@
-DISTSUBDIRS = lib po
+DISTSUBDIRS = lib po w32
 
 DISTFILES = \
 	acconfig.h aclocal.m4 ChangeLog config.guess config.h.in \
 	config.sub configure configure.in COPYING.LIB INSTALL install-sh \
-	Makefile.in mkinstalldirs README stamp-h.in VERSION
+	Makefile.in mkinstalldirs README stamp-h.in VERSION libelf.pc.in
 
 all: all-recursive all-local
 check: check-recursive check-local
@@ -71,9 +81,12 @@ all-local:
 
 check-local:
 
-install-local:
+install-local: $(srcdir)/mkinstalldirs libelf.pc
+	$(SHELL) $(srcdir)/mkinstalldirs $(instroot)$(pkgdir)
+	$(INSTALL_DATA) libelf.pc $(instroot)$(pkgdir)
 
 uninstall-local:
+	$(RM) $(instroot)$(pkgdir)/libelf.pc
 
 mostlyclean-local:
 	$(RM) *~ core errlist
@@ -83,6 +96,7 @@ clean-local: mostlyclean-local
 distclean-local: clean-local
 	$(RM) config.cache config.h config.log config.status stamp-h
 	$(RM) Makefile
+	$(RM) libelf.pc
 
 maintainer-clean-local: distclean-local
 	@echo "This command is intended for maintainers to use;"
@@ -109,10 +123,10 @@ $(MAINT)./stamp-dist: $(DISTFILES)
 	done
 	cd $(distdir) && \
 	    find . -type f ! -name MANIFEST -exec wc -c {} \; | \
-	    sort +1 >MANIFEST
+	    sed 's, \./, ,' | sort -k2 >MANIFEST
 	-$(RM) $(distdir).tar.gz.bak $(PACKAGE).tar.gz
 	-$(MV) $(distdir).tar.gz $(distdir).tar.gz.bak
-	tar cvhfz $(distdir).tar.gz $(DISTPERMS) $(distdir)
+	tar cvohfz $(distdir).tar.gz $(DISTPERMS) $(distdir)
 	$(LN_S) $(distdir).tar.gz $(PACKAGE).tar.gz
 	$(RM) stamp-dist && echo timestamp > stamp-dist
 
@@ -120,15 +134,15 @@ $(MAINT)check-dist:
 	$(RM) -r disttest
 	mkdir disttest
 	@echo 'unset CC CFLAGS CPPFLAGS LDFLAGS LIBS' >disttest/config.site
-	@echo 'unset I_AM_THE_$(PACKAGE)_MAINTAINER' >>disttest/config.site
 	cd disttest && CONFIG_SITE=config.site ../$(distdir)/configure
 	$(MAKE) -C disttest
 	$(MAKE) -C disttest check
+	$(MAKE) -C disttest dist
 
+.PHONY: tags
 tags:
 	rm -f tags
-	ctags -vst lib/*.c
-	ctags -ast lib/*.h
+	ctags lib/*.c lib/*.h
 
 # For the justification of the following Makefile rules, see node
 # `Automatic Remaking' in GNU Autoconf documentation.
@@ -160,6 +174,9 @@ $(MAINT)lib/stamp-h: lib/sys_elf.h.in config.status
 	$(RM) lib/stamp-h && echo timestamp > lib/stamp-h
 
 $(MAINT)po/Makefile: po/Makefile.in config.status
+	CONFIG_FILES=$@ CONFIG_HEADERS= ./config.status
+
+$(MAINT)libelf.pc: libelf.pc.in config.status
 	CONFIG_FILES=$@ CONFIG_HEADERS= ./config.status
 
 RECHECK_FLAGS = CC='$(CC)' CPPFLAGS='$(CPPFLAGS)' \

@@ -1,6 +1,6 @@
 /*
 gelfshdr.c - gelf_* translation functions.
-Copyright (C) 2000 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 2000 - 2001 Michael Riepe
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -14,7 +14,7 @@ Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 #include <private.h>
@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #if __LIBELF64
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: gelfshdr.c,v 1.4 2001/10/07 19:33:03 michael Exp $";
+static const char rcsid[] = "@(#) $Id: gelfshdr.c,v 1.7 2005/05/21 15:39:22 michael Exp $";
 #endif /* lint */
 
 #define check_and_copy(type, d, s, name, eret)		\

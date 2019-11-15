@@ -1,26 +1,26 @@
 /*
-32.newehdr.c - implementation of the elf{32,64}_newehdr(3) functions.
-Copyright (C) 1995 - 2000 Michael Riepe <michael@stud.uni-hannover.de>
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+ * 32.newehdr.c - implementation of the elf{32,64}_newehdr(3) functions.
+ * Copyright (C) 1995 - 2004 Michael Riepe
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: 32.newehdr.c,v 1.9 2000/03/31 12:42:32 michael Exp $";
+static const char rcsid[] = "@(#) $Id: 32.newehdr.c,v 1.13 2005/05/21 15:39:19 michael Exp $";
 #endif /* lint */
 
 static char*
@@ -39,7 +39,6 @@ _elf_newehdr(Elf *elf, unsigned cls) {
 	elf_assert(size);
 	if ((elf->e_ehdr = (char*)malloc(size))) {
 	    memset(elf->e_ehdr, 0, size);
-	    elf->e_free_ehdr = 1;
 	    elf->e_ehdr_flags |= ELF_F_DIRTY;
 	    elf->e_kind = ELF_K_ELF;
 	    elf->e_class = cls;

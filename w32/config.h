@@ -1,4 +1,23 @@
-/* config.h.in.  Generated automatically from configure.in by autoheader.  */
+/*
+ * w32/config.h - configuration file for W32 port
+ * Copyright (C) 2004 Michael Riepe
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * @(#) $Id: config.h,v 1.5 2005/05/21 15:39:28 michael Exp $
+ */
 
 /* Define to empty if the keyword does not work.  */
 #undef const
@@ -13,10 +32,10 @@
 #undef size_t
 
 /* Define if you have the ANSI C header files.  */
-#undef STDC_HEADERS
+#define STDC_HEADERS 1
 
 /* Define if you want to include extra debugging code */
-#undef ENABLE_DEBUG
+#define ENABLE_DEBUG 1
 
 /* Define if memmove() does not copy overlapping arrays correctly */
 #undef HAVE_BROKEN_MEMMOVE
@@ -28,7 +47,7 @@
 #undef HAVE_DGETTEXT
 
 /* Define if you have the memset function.  */
-#undef HAVE_MEMSET
+#define HAVE_MEMSET 1
 
 /* Define if struct nlist is declared in <elf.h> or <sys/elf.h> */
 #undef HAVE_STRUCT_NLIST_DECLARATION
@@ -40,7 +59,7 @@
 #undef __LIBELF_HEADER_ELF_H
 
 /* Define if you want 64-bit support (and your system supports it) */
-#undef __LIBELF64
+#define __LIBELF64 1
 
 /* Define if you want 64-bit support, and are running IRIX */
 #undef __LIBELF64_IRIX
@@ -49,46 +68,46 @@
 #undef __LIBELF64_LINUX
 
 /* Define if you want symbol versioning (and your system supports it) */
-#undef __LIBELF_SYMBOL_VERSIONS
+#define __LIBELF_SYMBOL_VERSIONS 1
 
 /* Define if symbol versioning uses Sun section type (SHT_SUNW_*) */
-#undef __LIBELF_SUN_SYMBOL_VERSIONS
+#define __LIBELF_SUN_SYMBOL_VERSIONS 1
 
 /* Define if symbol versioning uses GNU section types (SHT_GNU_*) */
 #undef __LIBELF_GNU_SYMBOL_VERSIONS
 
 /* Define to a 64-bit signed integer type if one exists */
-#undef __libelf_i64_t
+#define __libelf_i64_t __int64
 
 /* Define to a 64-bit unsigned integer type if one exists */
-#undef __libelf_u64_t
+#define __libelf_u64_t unsigned __int64
 
 /* Define to a 32-bit signed integer type if one exists */
-#undef __libelf_i32_t
+#define __libelf_i32_t int
 
 /* Define to a 32-bit unsigned integer type if one exists */
-#undef __libelf_u32_t
+#define __libelf_u32_t unsigned int
 
 /* Define to a 16-bit signed integer type if one exists */
-#undef __libelf_i16_t
+#define __libelf_i16_t short int
 
 /* Define to a 16-bit unsigned integer type if one exists */
-#undef __libelf_u16_t
+#define __libelf_u16_t unsigned short int
 
 /* The number of bytes in a __int64.  */
-#undef SIZEOF___INT64
+#define SIZEOF___INT64 8
 
 /* The number of bytes in a int.  */
-#undef SIZEOF_INT
+#define SIZEOF_INT 4
 
 /* The number of bytes in a long.  */
-#undef SIZEOF_LONG
+#define SIZEOF_LONG 4
 
 /* The number of bytes in a long long.  */
-#undef SIZEOF_LONG_LONG
+#define SIZEOF_LONG_LONG 0
 
 /* The number of bytes in a short.  */
-#undef SIZEOF_SHORT
+#define SIZEOF_SHORT 2
 
 /* Define if you have the ftruncate function.  */
 #undef HAVE_FTRUNCATE
@@ -97,16 +116,16 @@
 #undef HAVE_GETPAGESIZE
 
 /* Define if you have the memcmp function.  */
-#undef HAVE_MEMCMP
+#define HAVE_MEMCMP 1
 
 /* Define if you have the memcpy function.  */
-#undef HAVE_MEMCPY
+#define HAVE_MEMCPY 1
 
 /* Define if you have the memmove function.  */
-#undef HAVE_MEMMOVE
+#define HAVE_MEMMOVE 1
 
 /* Define if you have the memset function.  */
-#undef HAVE_MEMSET
+#define HAVE_MEMSET 1
 
 /* Define if you have the <ar.h> header file.  */
 #undef HAVE_AR_H
@@ -128,9 +147,6 @@
 
 /* Define if you have the <nlist.h> header file.  */
 #undef HAVE_NLIST_H
-
-/* Define if you have the <stdint.h> header file.  */
-#undef HAVE_STDINT_H
 
 /* Define if you have the <sys/elf.h> header file.  */
 #undef HAVE_SYS_ELF_H

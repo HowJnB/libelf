@@ -1,6 +1,6 @@
 /*
 errors.h - exhaustive list of all error codes and messages for libelf.
-Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2003 Michael Riepe
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -14,10 +14,10 @@ Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* @(#) $Id: errors.h,v 1.13 2003/05/22 18:55:29 michael Exp $ */
+/* @(#) $Id: errors.h,v 1.16 2005/05/21 15:39:21 michael Exp $ */
 
 /* dummy for xgettext */
 #define _(str) str

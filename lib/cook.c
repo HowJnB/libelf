@@ -1,26 +1,26 @@
 /*
-cook.c - read and translate ELF files.
-Copyright (C) 1995 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+ * cook.c - read and translate ELF files.
+ * Copyright (C) 1995 - 2004 Michael Riepe
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: cook.c,v 1.21 2003/01/02 16:40:22 michael Exp $";
+static const char rcsid[] = "@(#) $Id: cook.c,v 1.26 2005/05/21 15:39:21 michael Exp $";
 #endif /* lint */
 
 const Elf_Scn _elf_scn_init = INIT_SCN;
@@ -78,10 +78,9 @@ _elf_xlatetom(const Elf *elf, Elf_Data *dst, const Elf_Data *src) {
 }
 
 static char*
-_elf_item(Elf *elf, Elf_Type type, size_t n, size_t off, int *flag) {
+_elf_item(Elf *elf, Elf_Type type, size_t n, size_t off) {
     Elf_Data src, dst;
 
-    *flag = 0;
     elf_assert(n);
     elf_assert(valid_type(type));
     if (off < 0 || off > elf->e_size) {
@@ -102,18 +101,12 @@ _elf_item(Elf *elf, Elf_Type type, size_t n, size_t off, int *flag) {
     dst.d_size = n * _msize(elf->e_class, dst.d_version, type);
     elf_assert(dst.d_size);
 
-    elf_assert(elf->e_data);
-    if (elf->e_rawdata != elf->e_data && dst.d_size <= src.d_size) {
-	dst.d_buf = elf->e_data + off;
-    }
-    else if (!(dst.d_buf = malloc(dst.d_size))) {
+    if (!(dst.d_buf = malloc(dst.d_size))) {
 	seterr(memerr(type));
 	return NULL;
     }
-    else {
-	*flag = 1;
-    }
 
+    elf_assert(elf->e_data);
     if (elf->e_rawdata) {
 	src.d_buf = elf->e_rawdata + off;
     }
@@ -122,16 +115,9 @@ _elf_item(Elf *elf, Elf_Type type, size_t n, size_t off, int *flag) {
     }
 
     if (_elf_xlatetom(elf, &dst, &src)) {
-	if (!*flag) {
-	    elf->e_cooked = 1;
-	}
 	return (char*)dst.d_buf;
     }
-
-    if (*flag) {
-	free(dst.d_buf);
-	*flag = 0;
-    }
+    free(dst.d_buf);
     return NULL;
 }
 
@@ -140,18 +126,12 @@ _elf_item(Elf *elf, Elf_Type type, size_t n, size_t off, int *flag) {
 
 static int
 _elf_cook_file(Elf *elf) {
-    size_t num, off, align_addr;
-    int flag;
+    size_t num, off;
 
-    elf->e_ehdr = _elf_item(elf, ELF_T_EHDR, 1, 0, &flag);
+    elf->e_ehdr = _elf_item(elf, ELF_T_EHDR, 1, 0);
     if (!elf->e_ehdr) {
 	return 0;
     }
-    if (flag) {
-	elf->e_free_ehdr = 1;
-    }
-    align_addr = _fsize(elf->e_class, elf->e_version, ELF_T_ADDR);
-    elf_assert(align_addr);
     if (elf->e_class == ELFCLASS32) {
 	num = ((Elf32_Ehdr*)elf->e_ehdr)->e_phnum;
 	off = ((Elf32_Ehdr*)elf->e_ehdr)->e_phoff;
@@ -174,16 +154,9 @@ _elf_cook_file(Elf *elf) {
 	return 0;
     }
     if (num && off) {
-	if (off % align_addr) {
-	    seterr(ERROR_ALIGN_PHDR);
-	    return 0;
-	}
-	elf->e_phdr = _elf_item(elf, ELF_T_PHDR, num, off, &flag);
+	elf->e_phdr = _elf_item(elf, ELF_T_PHDR, num, off);
 	if (!elf->e_phdr) {
 	    return 0;
-	}
-	if (flag) {
-	    elf->e_free_phdr = 1;
 	}
 	elf->e_phnum = num;
     }
@@ -220,10 +193,6 @@ _elf_cook_file(Elf *elf) {
 	Scn_Data *sd;
 	unsigned i;
 
-	if (off % align_addr) {
-	    seterr(ERROR_ALIGN_SHDR);
-	    return 0;
-	}
 	if (off < 0 || off > elf->e_size) {
 	    seterr(ERROR_OUTSIDE);
 	    return 0;
@@ -231,6 +200,9 @@ _elf_cook_file(Elf *elf) {
 
 	src.d_type = ELF_T_SHDR;
 	src.d_version = elf->e_version;
+	/*
+	 * XXX: use ehdr->e_shentsize?
+	 */
 	src.d_size = _fsize(elf->e_class, src.d_version, ELF_T_SHDR);
 	elf_assert(src.d_size);
 	dst.d_version = EV_CURRENT;
@@ -238,7 +210,9 @@ _elf_cook_file(Elf *elf) {
 	if (num == 0) {
 	    union {
 		Elf32_Shdr sh32;
+#if __LIBELF64
 		Elf64_Shdr sh64;
+#endif /* __LIBELF64 */
 	    } u;
 
 	    /*
@@ -257,7 +231,7 @@ _elf_cook_file(Elf *elf) {
 	    }
 	    dst.d_buf = &u;
 	    dst.d_size = sizeof(u);
-	    if (!(_elf_xlatetom(elf, &dst, &src))) {
+	    if (!_elf_xlatetom(elf, &dst, &src)) {
 		return 0;
 	    }
 	    elf_assert(dst.d_size == _msize(elf->e_class, EV_CURRENT, ELF_T_SHDR));
@@ -311,7 +285,7 @@ _elf_cook_file(Elf *elf) {
 	    }
 	    dst.d_buf = &scn->s_uhdr;
 	    dst.d_size = sizeof(scn->s_uhdr);
-	    if (!(_elf_xlatetom(elf, &dst, &src))) {
+	    if (!_elf_xlatetom(elf, &dst, &src)) {
 		elf->e_scn_n = NULL;
 		free(head);
 		return 0;

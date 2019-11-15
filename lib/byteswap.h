@@ -1,6 +1,6 @@
 /*
 byteswap.h - functions and macros for byte swapping.
-Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2001 Michael Riepe
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -14,10 +14,10 @@ Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* @(#) $Id: byteswap.h,v 1.3 2001/10/03 20:48:16 michael Exp $ */
+/* @(#) $Id: byteswap.h,v 1.6 2005/05/21 15:39:20 michael Exp $ */
 
 #ifndef _BYTESWAP_H
 #define _BYTESWAP_H

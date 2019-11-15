@@ -1,6 +1,6 @@
 /*
 elf_repl.h - public header file for systems that lack it.
-Copyright (C) 1995 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2002 Michael Riepe
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -14,10 +14,10 @@ Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* @(#) $Id: elf_repl.h,v 1.13 2003/10/25 15:22:59 michael Exp $ */
+/* @(#) $Id: elf_repl.h,v 1.18 2005/05/21 15:39:21 michael Exp $ */
 
 /*
  * NEVER INCLUDE THIS FILE DIRECTLY - USE <libelf.h> INSTEAD!
@@ -166,6 +166,7 @@ typedef struct {
 #define ELFOSABI_OPENBSD	12	/* Open BSD */
 #define ELFOSABI_OPENVMS	13	/* Open VMS */
 #define ELFOSABI_NSK		14	/* Hewlett-Packard Non-Stop Kernel */
+#define ELFOSABI_AROS	 	15 	/* Amiga Research OS */
 /* these are probably obsolete: */
 #define ELFOSABI_ARM		97	/* ARM */
 #define ELFOSABI_STANDALONE	255	/* standalone (embedded) application */
@@ -270,7 +271,17 @@ typedef struct {
 #define EM_TPC		98	/* Tenor Network TPC processor */
 #define EM_SNP1K	99	/* Trebia SNP 1000 processor */
 #define EM_ST200	100	/* STMicroelectronics (www.st.com) ST200 microcontroller */
-#define EM_NUM		101
+#define EM_IP2K 	101 	/* Ubicom IP2xxx microcontroller family */
+#define EM_MAX 		102 	/* MAX Processor */
+#define EM_CR 		103 	/* National Semiconductor CompactRISC microprocessor */
+#define EM_F2MC16 	104 	/* Fujitsu F2MC16 */
+#define EM_MSP430 	105 	/* Texas Instruments embedded microcontroller msp430 */
+#define EM_BLACKFIN	106 	/* Analog Devices Blackfin (DSP) processor */
+#define EM_SE_C33 	107 	/* S1C33 Family of Seiko Epson processors */
+#define EM_SEP 		108 	/* Sharp embedded microprocessor */
+#define EM_ARCA 	109 	/* Arca RISC Microprocessor */
+#define EM_UNICORE 	110 	/* Microprocessor series from PKU-Unity Ltd. and MPRC of Peking University */
+#define EM_NUM		111
 
 /*
  * e_ident[EI_VERSION], e_version
@@ -528,7 +539,7 @@ typedef struct {
 
 #if __LIBELF64
 /* Solaris and GNU use this layout.  Be compatible. */
-/* XXX: Latest ELF specs say it's 64-bit?! */
+/* XXX: Latest ELF specs say it's 64-bit!!! */
 typedef struct {
     Elf64_Word		n_namesz;	/* name size */
     Elf64_Word		n_descsz;	/* descriptor size */

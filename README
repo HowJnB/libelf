@@ -1,4 +1,4 @@
-This is the public release of libelf-0.8.5, a free ELF object
+This is the public release of libelf-0.8.6, a free ELF object
 file access library. If you have problems with applications
 that use libelf and work with the commercial (SVR4, Solaris)
 version but not with this one, please contact me.
@@ -9,7 +9,7 @@ have a file .../include/elf.h that contains the single line
 configure.
 
 Installation is straightforward - the package is autoconf'ed.  Just do
-``cd libelf-0.8.5; ./configure; make; make install''.  Header files
+``cd libelf-0.8.6; ./configure; make; make install''.  Header files
 will be installed in .../include/libelf/.  If your system does not
 provide its own versions of libelf.h, nlist.h or gelf.h, ``make
 install'' will add the missing headers.  If you prefer not to have
@@ -35,7 +35,7 @@ On some systems (in particular, Solaris and all variants of Linux),
 ``make'' will try to build a shared library. If you run into problems
 on your system, please pass ``--disable-shared'' to configure.
 If you build a shared library and want it to be installed as
-``libelf-0.8.5.so'' rather than ``libelf.so.0.8.5'', please use
+``libelf-0.8.6.so'' rather than ``libelf.so.0.8.6'', please use
 ``./configure --enable-gnu-names''. Other files, e.g. ``libelf.so'' and
 ``libelf.so.0'' are NOT affected.
 
@@ -140,6 +140,16 @@ versioning; if that check fails, you can use
 
 to turn off versioning translation support.
 
+*** W32 Support ***
+
+There is now some support for building on W32 systems (requires Microsoft
+VC++).  In order to build a W32 DLL, cd into the `w32' subdirectory, edit
+build.bat if necessary (it needs the path to your compiler binaries) and
+run it.  If you're lucky, libelf.dll and the import/export libraries will
+be built in the ..\lib directory.
+
+I tested it on XP Pro (SP2), using VC++ 2005 Express Edition Beta 2.
+
 *** Missing things ***
 
 	* There is no documentation.  You can use the Solaris
@@ -164,6 +174,12 @@ to turn off versioning translation support.
 	* Libelf does not translate Solaris' `Move' and `Syminfo'
 	  sections. You can read them using elf_getdata(), but you'll
 	  only get raw (untranslated) bytes.
+
+Changes since 0.8.5:
+
+	* added W32 support.
+	* added workaround for alignment errors in archive members.
+	* my email address has changed again ;)
 
 Changes since 0.8.4:
 
@@ -237,8 +253,7 @@ Changes since 0.5.2:
 Where to get libelf:
 
 	ftp://ftp.ibiblio.org/pub/Linux/libs/
-	http://www.stud.uni-hannover.de/~michael/software/
+	http://www.mr511.de/software/
 
 Michael "Tired" Riepe
-<michael@stud.uni-hannover.de>
-<michael@han.de>
+<libelf@mr511.de>

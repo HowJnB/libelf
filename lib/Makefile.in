@@ -1,5 +1,5 @@
 # lib/Makefile for libelf.
-# Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
+# Copyright (C) 1995 - 2004 Michael Riepe
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -13,9 +13,9 @@
 # 
 # You should have received a copy of the GNU Library General Public
 # License along with this library; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# @(#) $Id: Makefile.in,v 1.25 2003/12/05 15:36:00 michael Exp $
+# @(#) $Id: Makefile.in,v 1.32 2005/06/21 01:58:47 michael Exp $
 
 instroot =
 
@@ -79,9 +79,9 @@ subdir = lib
 .SUFFIXES:
 .SUFFIXES: .c .o
 .c.o:
-	@$(RM) $@ pic/$@
+	@$(RM) $@ $(@:.o=.os)
 	if test -n "$(PICFLAGS)"; then \
-	  $(COMPILE) $(PICFLAGS) $< && $(MV) $@ pic/$@; \
+	  $(COMPILE) $(PICFLAGS) $< && $(MV) $@ $(@:.o=.os); \
 	else true; fi
 	$(COMPILE) $<
 
@@ -138,18 +138,14 @@ HDRS = libelf.h nlist.h gelf.h
 AUXHDRS = sys_elf.h
 
 # private header files
-PRIVHDRS = byteswap.h errors.h ext_types.h private.h elf_repl.h $(HDRS_V)
+PRIVHDRS = byteswap.h errors.h ext_types.h private.h elf_repl.h \
+	$(HDRS_V)
 
 DISTFILES = $(SRCS) $(LIBSRCS) $(HDRS) $(PRIVHDRS) Makefile.in sys_elf.h.in
 
-all: objdirs libelf.a shared-$(DO_SHLIB)
+all: libelf.a shared-$(DO_SHLIB)
 
 check:
-
-objdirs:
-	@for d in pic; do \
-	    test -d $$d || mkdir $$d || exit 1; \
-	done
 
 shared-yes: $(SHLIB)
 shared-no:
@@ -159,10 +155,9 @@ libelf.a: $(OBJS) $(LIBOBJS)
 	$(AR) rcv $@ $(OBJS) $(LIBOBJS)
 	$(RANLIB) $@
 
-$(SHLIB): $(OBJS) $(LIBOBJS)
+$(SHLIB): $(OBJS:.o=.os) $(LIBOBJS:.o=.os)
 	@$(RM) $(SHLIB)
-	cd pic && \
-	  $(LINK_SHLIB) -o ../$(SHLIB) $(OBJS) $(LIBOBJS) $(DEPSHLIBS)
+	$(LINK_SHLIB) -o $(SHLIB) $(OBJS:.o=.os) $(LIBOBJS:.o=.os) $(DEPSHLIBS)
 	if test "$(SONAME)" = "$(SHLIB)"; then true; else \
 	  $(RM) $(SONAME) && $(LN_S) $(SHLIB) $(SONAME); \
 	fi
@@ -231,14 +226,13 @@ uninstall-compat:
 	done
 
 mostlyclean:
-	$(RM) *.o *.a pic/*.o $(SHLIB) $(SONAME) $(SHLINK)
+	$(RM) *.o *.a *.os $(SHLIB) $(SONAME) $(SHLINK)
 	$(RM) *~ core a.out errlist
 
 clean: mostlyclean
 
 distclean: clean
 	$(RM) stamp-h $(AUXHDRS)
-	$(RM) -r pic
 	$(RM) Makefile
 
 maintainer-clean: distclean
@@ -281,7 +275,3 @@ memset.o: $(topdir)/config.h
 nlist.o: nlist.h
 swap64.o: byteswap.h
 $(OBJS_V): byteswap.h ext_types.h $(HDRS_V)
-verdef_32_tof.o: verdef.h verneed.h
-verdef_32_tom.o: verdef.h verneed.h
-verdef_64_tof.o: verdef.h verneed.h
-verdef_64_tom.o: verdef.h verneed.h

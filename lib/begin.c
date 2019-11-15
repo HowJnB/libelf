@@ -1,26 +1,26 @@
 /*
-begin.c - implementation of the elf_begin(3) and elf_memory(3) functions.
-Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+ * begin.c - implementation of the elf_begin(3) and elf_memory(3) functions.
+ * Copyright (C) 1995 - 2004 Michael Riepe
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: begin.c,v 1.13 2003/01/15 21:50:53 michael Exp $";
+static const char rcsid[] = "@(#) $Id: begin.c,v 1.19 2005/08/15 23:48:17 michael Exp $";
 #endif /* lint */
 
 #if HAVE_AR_H
@@ -100,11 +100,17 @@ _elf_init_ar(Elf *elf) {
 	    elf->e_strlen = size;
 	    break;
 	}
-	if (elf->e_symtab || hdr->ar_name[1] != ' ') {
+	if (hdr->ar_name[1] != ' ') {
 	    break;
 	}
-	elf->e_symtab = elf->e_data + offset;
-	elf->e_symlen = size;
+	/*
+	 * Windows (.lib) archives provide two symbol tables
+	 * The first one is the one we want.
+	 */
+	if (!elf->e_symtab) {
+	    elf->e_symtab = elf->e_data + offset;
+	    elf->e_symlen = size;
+	}
 	offset += size + (size & 1);
     }
 }
@@ -283,7 +289,8 @@ elf_begin(int fd, Elf_Cmd cmd, Elf *ref) {
 	}
 	size = arhdr->ar_size;
     }
-    else if ((off = lseek(fd, (off_t)0, SEEK_END)) == (off_t)-1 || (size = off) != off) {
+    else if ((off = lseek(fd, (off_t)0, SEEK_END)) == (off_t)-1
+	  || (off_t)(size = off) != off) {
 	seterr(ERROR_IO_GETSIZE);
 	return NULL;
     }
@@ -334,6 +341,17 @@ elf_begin(int fd, Elf_Cmd cmd, Elf *ref) {
 	if (size == 0) {
 	    elf->e_data = NULL;
 	}
+#if 1
+	else {
+	    /*
+	     * Archive members may be misaligned.  Freezing them will
+	     * cause libelf to allocate buffers for translated data,
+	     * which should be properly aligned in all cases.
+	     */
+	    elf_assert(!ref->e_cooked);
+	    elf->e_data = elf->e_rawdata = ref->e_data + offset;
+	}
+#else
 	else if (ref->e_data == ref->e_rawdata) {
 	    elf_assert(!ref->e_cooked);
 	    /*
@@ -359,6 +377,7 @@ elf_begin(int fd, Elf_Cmd cmd, Elf *ref) {
 		return NULL;
 	    }
 	}
+#endif
 	elf->e_next = offset + size + (size & 1);
 	elf->e_disabled = ref->e_disabled;
 	elf->e_memory = ref->e_memory;

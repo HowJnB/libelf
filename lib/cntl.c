@@ -1,6 +1,6 @@
 /*
 cntl.c - implementation of the elf_cntl(3) function.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 1998 Michael Riepe
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -14,13 +14,13 @@ Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: cntl.c,v 1.3 1998/06/12 19:42:18 michael Exp $";
+static const char rcsid[] = "@(#) $Id: cntl.c,v 1.6 2005/05/21 15:39:21 michael Exp $";
 #endif /* lint */
 
 int

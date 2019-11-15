@@ -1,46 +1,53 @@
 /*
-32.xlatetof.c - implementation of the elf32_xlateto[fm](3) functions.
-Copyright (C) 1995 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+ * 32.xlatetof.c - implementation of the elf32_xlateto[fm](3) functions.
+ * Copyright (C) 1995 - 2004 Michael Riepe
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #include <private.h>
 #include <ext_types.h>
 #include <byteswap.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.17 2002/12/22 20:08:48 michael Exp $";
+static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.24 2005/05/21 15:39:20 michael Exp $";
 #endif /* lint */
 
 /*
  * Ugly, ugly
  */
-#define x
-#if defined/**/x
+#ifdef _WIN32
 # define Cat2(a,b)a##b
 # define Cat3(a,b,c)a##b##c
 # define Ex1(m1,m2,a,b)m1##m2(a##b)
 # define Ex2(m1,m2,a,b,c)m1##m2(a,b##c)
-#else
-# define Cat2(a,b)a/**/b
-# define Cat3(a,b,c)a/**/b/**/c
-# define Ex1(m1,m2,a,b)m1/**/m2(a/**/b)
-# define Ex2(m1,m2,a,b,c)m1/**/m2(a,b/**/c)
-#endif
-#undef x
+#else /* _WIN32 */
+# define x
+# if defined/**/x
+#  define Cat2(a,b)a##b
+#  define Cat3(a,b,c)a##b##c
+#  define Ex1(m1,m2,a,b)m1##m2(a##b)
+#  define Ex2(m1,m2,a,b,c)m1##m2(a,b##c)
+# else
+#  define Cat2(a,b)a/**/b
+#  define Cat3(a,b,c)a/**/b/**/c
+#  define Ex1(m1,m2,a,b)m1/**/m2(a/**/b)
+#  define Ex2(m1,m2,a,b,c)m1/**/m2(a,b/**/c)
+# endif
+# undef x
+#endif /* _WIN32 */
 
 /*
  * auxiliary macros for execution order reversal
@@ -267,14 +274,14 @@ xlate32_11[/*encoding*/] = {
 	{ sword_32L__tom,   sword_32L__tof  },
 	{ sym_32L11_tom,    sym_32L11_tof   },
 	{ word_32L__tom,    word_32L__tof   },
-	{ NULL,             NULL            },	/* there is no Sxword */
-	{ NULL,             NULL            },	/* there is no Xword */
+	{ 0,                0               },	/* there is no Sxword */
+	{ 0,                0               },	/* there is no Xword */
 #if __LIBELF_SYMBOL_VERSIONS
 	{ _elf_verdef_32L11_tom,  _elf_verdef_32L11_tof  },
 	{ _elf_verneed_32L11_tom, _elf_verneed_32L11_tof },
 #else /* __LIBELF_SYMBOL_VERSIONS */
-	{ NULL,             NULL            },
-	{ NULL,             NULL            },
+	{ 0,                0               },
+	{ 0,                0               },
 #endif /* __LIBELF_SYMBOL_VERSIONS */
     },
     {
@@ -291,14 +298,14 @@ xlate32_11[/*encoding*/] = {
 	{ sword_32M__tom,   sword_32M__tof  },
 	{ sym_32M11_tom,    sym_32M11_tof   },
 	{ word_32M__tom,    word_32M__tof   },
-	{ NULL,             NULL            },	/* there is no Sxword */
-	{ NULL,             NULL            },	/* there is no Xword */
+	{ 0,                0               },	/* there is no Sxword */
+	{ 0,                0               },	/* there is no Xword */
 #if __LIBELF_SYMBOL_VERSIONS
 	{ _elf_verdef_32M11_tom,  _elf_verdef_32M11_tof  },
 	{ _elf_verneed_32M11_tom, _elf_verneed_32M11_tof },
 #else /* __LIBELF_SYMBOL_VERSIONS */
-	{ NULL,             NULL            },
-	{ NULL,             NULL            },
+	{ 0,                0               },
+	{ 0,                0               },
 #endif /* __LIBELF_SYMBOL_VERSIONS */
     },
 };

@@ -1,6 +1,6 @@
 /*
 swap64.c - 64-bit byte swapping functions.
-Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2001 Michael Riepe
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -14,7 +14,7 @@ Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 #include <private.h>
@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #if __LIBELF64
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: swap64.c,v 1.2 2001/10/07 19:33:03 michael Exp $";
+static const char rcsid[] = "@(#) $Id: swap64.c,v 1.5 2005/05/21 15:39:26 michael Exp $";
 #endif /* lint */
 
 __libelf_u64_t

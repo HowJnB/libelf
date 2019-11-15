@@ -1,6 +1,6 @@
 /*
 32.fsize.c - implementation of the elf{32,64}_fsize(3) functions.
-Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2001 Michael Riepe
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -14,14 +14,14 @@ Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 #include <private.h>
 #include <ext_types.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: 32.fsize.c,v 1.9 2001/10/05 19:05:25 michael Exp $";
+static const char rcsid[] = "@(#) $Id: 32.fsize.c,v 1.12 2005/05/21 15:39:19 michael Exp $";
 #endif /* lint */
 
 const size_t

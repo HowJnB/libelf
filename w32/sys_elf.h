@@ -1,23 +1,23 @@
 /*
-sys_elf.h.in - configure template for private "switch" file.
-Copyright (C) 1998 - 2001 Michael Riepe
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
-
-/* @(#) $Id: sys_elf.h.in,v 1.11 2005/05/21 15:39:26 michael Exp $ */
+ * w32/sys_elf.h - internal configuration file for W32 port
+ * Copyright (C) 2004 Michael Riepe
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * @(#) $Id: sys_elf.h,v 1.4 2005/05/21 15:39:29 michael Exp $
+ */
 
 /*
  * DO NOT USE THIS IN APPLICATIONS - #include <libelf.h> INSTEAD!
@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #undef __LIBELF_NEED_LINK_H
 
 /* Define if you want 64-bit support (and your system supports it) */
-#undef __LIBELF64
+#define __LIBELF64 1
 
 /* Define if you want 64-bit support, and are running IRIX */
 #undef __LIBELF64_IRIX
@@ -39,25 +39,25 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #undef __LIBELF64_LINUX
 
 /* Define if you want symbol versioning (and your system supports it) */
-#undef __LIBELF_SYMBOL_VERSIONS
+#define __LIBELF_SYMBOL_VERSIONS 1
 
 /* Define to a 64-bit signed integer type if one exists */
-#undef __libelf_i64_t
+#define __libelf_i64_t __int64
 
 /* Define to a 64-bit unsigned integer type if one exists */
-#undef __libelf_u64_t
+#define __libelf_u64_t unsigned __int64
 
 /* Define to a 32-bit signed integer type if one exists */
-#undef __libelf_i32_t
+#define __libelf_i32_t int
 
 /* Define to a 32-bit unsigned integer type if one exists */
-#undef __libelf_u32_t
+#define __libelf_u32_t unsigned int
 
 /* Define to a 16-bit signed integer type if one exists */
-#undef __libelf_i16_t
+#define __libelf_i16_t short int
 
 /* Define to a 16-bit unsigned integer type if one exists */
-#undef __libelf_u16_t
+#define __libelf_u16_t unsigned short int
 
 /*
  * Ok, now get the correct instance of elf.h...

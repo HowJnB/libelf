@@ -1,24 +1,24 @@
 /*
-gmo2msg.c - create X/Open message source file for libelf.
-Copyright (C) 1996 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+ * gmo2msg.c - create X/Open message source file for libelf.
+ * Copyright (C) 1996 - 2005 Michael Riepe
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: gmo2msg.c,v 1.6 2002/12/14 17:43:13 michael Exp $";
+static const char rcsid[] = "@(#) $Id: gmo2msg.c,v 1.10 2005/05/21 15:39:28 michael Exp $";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -39,6 +39,9 @@ int
 main(int argc, char **argv) {
     char buf[1024], *lang, *progname, *s;
     unsigned i;
+    FILE *fp;
+
+    setlocale(LC_ALL, "");
 
     if (*argv && (progname = strrchr(argv[0], '/'))) {
 	progname++;
@@ -47,44 +50,65 @@ main(int argc, char **argv) {
 	progname = "gmo2msg";
     }
 
-    if (!(lang = getenv("LANGUAGE"))
-     && !(lang = getenv("LC_ALL"))
-     && !(lang = getenv("LC_MESSAGES"))
-     && !(lang = getenv("LANG"))) {
-	fprintf(stderr, "LANG variable not set.\n");
+    if (argc <= 1 || !(lang = argv[1])) {
+	fprintf(stderr, "Usage: gmo2msg <language>\n");
 	exit(1);
     }
 
     /*
      * Fool gettext...
      */
+    unlink(DOMAIN ".mo");
+    unlink("LC_MESSAGES");
+    unlink(lang);
+    sprintf(buf, "%s.gmo", lang);
+    if (link(buf, DOMAIN ".mo") == -1) {
+	fprintf(stderr, "Cannot link %s to " DOMAIN ".mo\n", buf);
+	perror("");
+	exit(1);
+    }
+    symlink(".", "LC_MESSAGES");
+    symlink(".", lang);
+    textdomain(DOMAIN);
     getcwd(buf, sizeof(buf));
     bindtextdomain(DOMAIN, buf);
-    sprintf(buf, "%s.gmo", lang);
-    unlink(DOMAIN ".mo"); symlink(buf, DOMAIN ".mo");
-    unlink("LC_MESSAGES"); symlink(".", "LC_MESSAGES");
-    unlink(lang); symlink(".", lang);
-    printf("$set 1 Automatically created from %s by %s\n", buf, progname);
+
+    sprintf(buf, "%s.msg", lang);
+    unlink(buf);
+    if (!(fp = fopen(buf, "w"))) {
+	perror(buf);
+	exit(1);
+    }
+
+    fprintf(fp, "$set 1 Automatically created from %s.gmo by %s\n", lang, progname);
 
     /*
-     * Get translated messages.
-     * Assume that messages contain printable ASCII characters ONLY.
-     * That means no tabs, linefeeds etc.
+     * Translate messages.
      */
-    textdomain(DOMAIN);
+    setlocale(LC_MESSAGES, lang);
     if ((s = gettext("")) && (s = strdup(s))) {
 	s = strtok(s, "\n");
 	while (s) {
-	    printf("$ %s\n", s);
+	    fprintf(fp, "$ %s\n", s);
 	    s = strtok(NULL, "\n");
 	}
     }
+    /*
+     * Assume that messages contain printable ASCII characters ONLY.
+     * That means no tabs, linefeeds etc.
+     */
     for (i = 0; i < sizeof(msgs)/sizeof(*msgs); i++) {
 	s = gettext(msgs[i]);
-	if (s != msgs[i] && strcmp(s, msgs[i])) {
-	    printf("$ \n$ Original message: %s\n", msgs[i]);
-	    printf("%u %s\n", i + 1, s);
+	if (s != msgs[i] && strcmp(s, msgs[i]) != 0) {
+	    fprintf(fp, "$ \n$ Original message: %s\n", msgs[i]);
+	    fprintf(fp, "%u %s\n", i + 1, s);
 	}
+    }
+    setlocale(LC_MESSAGES, "");
+
+    if (fclose(fp)) {
+	perror("writing output file");
+	exit(1);
     }
 
     /*

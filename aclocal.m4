@@ -1,13 +1,26 @@
-# Local additions to Autoconf macros.
-# Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
+# aclocal.m4 - Local additions to Autoconf macros.
+# Copyright (C) 1995 - 2004 Michael Riepe
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# @(#) $Id: aclocal.m4,v 1.17 2003/12/05 15:36:00 michael Exp $
+# @(#) $Id: aclocal.m4,v 1.24 2005/05/21 15:39:19 michael Exp $
 
 AC_PREREQ(2.13)
 
 dnl mr_PACKAGE(package-name)
 AC_DEFUN(mr_PACKAGE, [changequote(<<, >>)dnl
-  define(<<mr_MAINT>>, <<I_AM_THE_>>translit($1, [a-z-], [A-Z_])<<_MAINTAINER>>)dnl
   changequote([, ])dnl
   PACKAGE=$1
   VERSION=`cat $srcdir/VERSION`
@@ -15,16 +28,18 @@ AC_DEFUN(mr_PACKAGE, [changequote(<<, >>)dnl
   AC_SUBST(VERSION)
   AC_ARG_ENABLE(maintainer-mode,
     [  --enable-maintainer-mode
-                          enable maintainer-specific make rules (default: no)],
+                          enable maintainer-specific make rules (default: auto)],
     [mr_enable_maintainer_mode="$enableval"],
-    [mr_enable_maintainer_mode="${mr_MAINT-no}"])
+    [case :${I_AM_THE_MAINTAINER_OF}: in
+      *:$1:*) mr_enable_maintainer_mode=yes;;
+      *) mr_enable_maintainer_mode=no;;
+    esac])
   if test x"$mr_enable_maintainer_mode" = x"yes"; then
     MAINT=
   else
     MAINT='maintainer-only-'
   fi
   AC_SUBST(MAINT)
-  undefine(<<mr_MAINT>>)dnl
 ])
 
 AC_DEFUN(mr_ENABLE_NLS, [
@@ -55,14 +70,14 @@ AC_DEFUN(mr_ENABLE_NLS, [
   localedir=
   if test "$mr_enable_nls" = yes; then
     mr_PATH=`echo ":$PATH" | sed -e 's,:[^:]*openwin[^:]*,,g' -e 's,^:,,'`
-    AC_CACHE_CHECK([for gettext],
-      mr_cv_func_gettext, [
+    AC_CACHE_CHECK([for dgettext],
+      mr_cv_func_dgettext, [
 	AC_TRY_LINK([#include <libintl.h>],
-	  [char *s = gettext(""); return 0],
-	  [mr_cv_func_gettext=yes],
-	  [mr_cv_func_gettext=no])
+	  [char *s = dgettext("", ""); return 0],
+	  [mr_cv_func_dgettext=yes],
+	  [mr_cv_func_dgettext=no])
     ])
-    if test "$mr_cv_func_gettext" = yes; then
+    if test "$mr_cv_func_dgettext" = yes; then
       AC_PATH_PROG(MSGFMT, msgfmt, no, $mr_PATH)
       if test "$MSGFMT" != no; then
 	AC_PATH_PROG(GMSGFMT, gmsgfmt, $MSGFMT, $mr_PATH)
@@ -85,7 +100,7 @@ AC_DEFUN(mr_ENABLE_NLS, [
 	  if test "$mr_cv_catgets_based_gettext" = yes; then
 	    # This loses completely. Turn it off and use catgets.
 	    LIBS=`echo $LIBS | sed 's,-lintl,,g'`
-	    mr_cv_func_gettext=no
+	    mr_cv_func_dgettext=no
 	  else
 	    # Is there a better test for this case?
 	    AC_CACHE_CHECK([for pure GNU gettext],
@@ -112,11 +127,11 @@ AC_DEFUN(mr_ENABLE_NLS, [
 	fi
       else
 	# Gettext but no msgfmt. Try catgets.
-	mr_cv_func_gettext=no
+	mr_cv_func_dgettext=no
       fi
     fi
-    if test "$mr_cv_func_gettext" = yes; then
-      AC_DEFINE(HAVE_GETTEXT)
+    if test "$mr_cv_func_dgettext" = yes; then
+      AC_DEFINE(HAVE_DGETTEXT)
     else
       AC_CACHE_CHECK([for catgets], mr_cv_func_catgets, [
 	AC_TRY_LINK([#include <nl_types.h>],
@@ -225,10 +240,8 @@ AC_DEFUN(mr_ENABLE_SHARED, [
 	  if test "$mr_cv_target_elf" = yes; then
 	    PICFLAGS='-fPIC -DPIC'
 	    if test "$mr_enable_gnu_names" = yes
-	    then
-	      SHLIB_SFX='-$(VERSION).so'
-	    else
-	      SHLIB_SFX='.so.$(VERSION)'
+	    then SHLIB_SFX='-$(VERSION).so'
+	    else SHLIB_SFX='.so.$(VERSION)'
 	    fi
 	    SHLINK_SFX='.so'
 	    SONAME_SFX='.so.$(MAJOR)'
@@ -239,6 +252,18 @@ AC_DEFUN(mr_ENABLE_SHARED, [
 	    AC_MSG_WARN([shared libraries not supported for $host])
 	    mr_enable_shared=no
 	  fi
+	elif ${CC} -V 2>&1 | grep 'Intel(R) C++ Compiler' >/dev/null 2>&1; then
+	  AC_MSG_WARN([Use --disable-shared if $CC fails to build the shared library])
+	  PICFLAGS='-fPIC -DPIC'
+	  if test "$mr_enable_gnu_names" = yes
+	  then SHLIB_SFX='-$(VERSION).so'
+	  else SHLIB_SFX='.so.$(VERSION)'
+	  fi
+	  SHLINK_SFX='.so'
+	  SONAME_SFX='.so.$(MAJOR)'
+	  LINK_SHLIB='$(CC) -shared -Wl,-soname,$(SONAME)'
+	  INSTALL_SHLIB='$(INSTALL_PROGRAM)'
+	  DEPSHLIBS='-lc'
 	else
 	  AC_MSG_WARN([GNU CC required for building shared libraries])
 	  mr_enable_shared=no
@@ -251,10 +276,8 @@ AC_DEFUN(mr_ENABLE_SHARED, [
 	  PICFLAGS='-K PIC -DPIC'
 	fi
 	if test "$mr_enable_gnu_names" = yes
-	then
-	  SHLIB_SFX='-$(MAJOR).so'
-	else
-	  SHLIB_SFX='.so.$(MAJOR)'
+	then SHLIB_SFX='-$(MAJOR).so'
+	else SHLIB_SFX='.so.$(MAJOR)'
 	fi
 	SONAME_SFX='.so.$(MAJOR)'
 	SHLINK_SFX='.so'

@@ -1,23 +1,23 @@
 /*
-nlist.h - public header file for nlist(3).
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+ * nlist.h - public header file for nlist(3).
+ * Copyright (C) 1995 - 1998, 2004 Michael Riepe
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
-
-/* @(#) $Id: nlist.h,v 1.3 1998/06/01 19:47:24 michael Exp $ */
+/* @(#) $Id: nlist.h,v 1.7 2005/05/21 15:39:25 michael Exp $ */
 
 #ifndef _NLIST_H
 #define _NLIST_H
@@ -35,7 +35,7 @@ struct nlist {
     char		n_numaux;
 };
 
-#if __STDC__ || defined(__cplusplus)
+#if __STDC__ || defined(__cplusplus) || defined(_WIN32)
 extern int nlist(const char *__filename, struct nlist *__nl);
 #else /* __STDC__ || defined(__cplusplus) */
 extern int nlist();
