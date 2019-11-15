@@ -1,6 +1,6 @@
 /*
  * private.h - private definitions for libelf.
- * Copyright (C) 1995 - 2004 Michael Riepe
+ * Copyright (C) 1995 - 2006 Michael Riepe
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* @(#) $Id: private.h,v 1.31 2005/05/21 15:39:25 michael Exp $ */
+/* @(#) $Id: private.h,v 1.35 2006/07/07 22:17:25 michael Exp $ */
 
 #ifndef _PRIVATE_H
 #define _PRIVATE_H
@@ -301,6 +301,7 @@ extern Elf_Type _elf_scn_type __P((unsigned));
 extern size_t _elf32_xltsize __P((const Elf_Data *__src, unsigned __dv, unsigned __encode, int __tof));
 extern size_t _elf64_xltsize __P((const Elf_Data *__src, unsigned __dv, unsigned __encode, int __tof));
 extern int _elf_update_shnum(Elf *__elf, size_t __shnum);
+extern Elf_Scn *_elf_first_scn(Elf *__elf);
 
 /*
  * Special translators
@@ -383,14 +384,22 @@ ERROR_NUM
  */
 #ifndef SHT_SYMTAB_SHNDX
 #define SHT_SYMTAB_SHNDX	18
-#endif
+#endif /* SHT_SYMTAB_SHNDX */
+
+#ifndef SHN_XINDEX
+#define SHN_XINDEX		0xffff
+#endif /* SHN_XINDEX */
+
+#ifndef PN_XNUM
+#define PN_XNUM			0xffff
+#endif /* PN_XNUM */
 
 /*
  * Debugging
  */
 #if ENABLE_DEBUG
 extern void __elf_assert __P((const char*, unsigned, const char*));
-# if __STDC__
+# if (__STDC__ + 0)
 #  define elf_assert(x)	do{if(!(x))__elf_assert(__FILE__,__LINE__,#x);}while(0)
 # else /* __STDC__ */
 #  define elf_assert(x)	do{if(!(x))__elf_assert(__FILE__,__LINE__,"x");}while(0)
@@ -398,5 +407,11 @@ extern void __elf_assert __P((const char*, unsigned, const char*));
 #else /* ENABLE_DEBUG */
 # define elf_assert(x)	do{}while(0)
 #endif /* ENABLE_DEBUG */
+
+/*
+ * Return values for certain functions
+ */
+#define LIBELF_SUCCESS	1
+#define LIBELF_FAILURE	0
 
 #endif /* _PRIVATE_H */

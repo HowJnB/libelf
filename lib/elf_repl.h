@@ -1,23 +1,23 @@
 /*
-elf_repl.h - public header file for systems that lack it.
-Copyright (C) 1995 - 2002 Michael Riepe
+ * elf_repl.h - public header file for systems that lack it.
+ * Copyright (C) 1995 - 2006 Michael Riepe
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
-
-/* @(#) $Id: elf_repl.h,v 1.18 2005/05/21 15:39:21 michael Exp $ */
+/* @(#) $Id: elf_repl.h,v 1.20 2006/07/07 22:16:15 michael Exp $ */
 
 /*
  * NEVER INCLUDE THIS FILE DIRECTLY - USE <libelf.h> INSTEAD!
@@ -235,6 +235,7 @@ typedef struct {
 #define EM_ST100	60	/* STMicroelectronics ST100 processor */
 #define EM_TINYJ	61	/* Advanced Logic Corp. TinyJ embedded processor family */
 #define EM_X86_64	62	/* AMD x86-64 architecture */
+#define EM_AMD64	EM_X86_64
 #define EM_PDSP		63	/* Sony DSP Processor */
 #define EM_FX66		66	/* Siemens FX66 microcontroller */
 #define EM_ST9PLUS	67	/* STMicroelectronics ST9+ 8/16 bit microcontroller */
@@ -366,12 +367,23 @@ typedef struct {
 /*
  * Solaris extensions
  */
+#define SHT_LOSUNW		0x6ffffff4
+#define SHT_SUNW_dof		0x6ffffff4
+#define SHT_SUNW_cap		0x6ffffff5
+#define SHT_SUNW_SIGNATURE	0x6ffffff6
+#define SHT_SUNW_ANNOTATE	0x6ffffff7
+#define SHT_SUNW_DEBUGSTR	0x6ffffff8
+#define SHT_SUNW_DEBUG		0x6ffffff9
 #define SHT_SUNW_move		0x6ffffffa
 #define SHT_SUNW_COMDAT		0x6ffffffb
 #define SHT_SUNW_syminfo	0x6ffffffc
 #define SHT_SUNW_verdef		0x6ffffffd
 #define SHT_SUNW_verneed	0x6ffffffe
 #define SHT_SUNW_versym		0x6fffffff
+#define SHT_HISUNW		0x6fffffff
+
+#define SHT_SPARC_GOTDATA	0x70000000
+#define SHT_AMD64_UNWIND	0x70000001 
 
 /*
  * GNU extensions
@@ -397,11 +409,18 @@ typedef struct {
 #define SHF_MASKPROC		0xf0000000
 
 /*
+ * Solaris extensions
+ */
+#define SHF_AMD64_LARGE		0x10000000
+#define SHF_ORDERED		0x40000000
+#define SHF_EXCLUDE		0x80000000
+
+/*
  * Section group flags
  */
-#define GRP_COMDAT	0x1
-#define GRP_MASKOS	0x0ff00000
-#define GRP_MASKPROC	0xf0000000
+#define GRP_COMDAT		0x1
+#define GRP_MASKOS		0x0ff00000
+#define GRP_MASKPROC		0xf0000000
 
 /*
  * Symbol table
@@ -582,6 +601,11 @@ typedef struct {
 #endif /* __LIBELF64 */
 
 /*
+ * Special numbers
+ */
+#define PN_XNUM		0xffff
+
+/*
  * p_type
  */
 #define PT_NULL		0
@@ -597,6 +621,18 @@ typedef struct {
 #define PT_HIOS		0x6fffffff
 #define PT_LOPROC	0x70000000
 #define PT_HIPROC	0x7fffffff
+
+/*
+ * Solaris extensions
+ */
+
+#define PT_SUNW_UNWIND	0x6464e550
+#define PT_LOSUNW	0x6ffffffa
+#define PT_SUNWBSS	0x6ffffffa
+#define PT_SUNWSTACK	0x6ffffffb
+#define PT_SUNWDTRACE	0x6ffffffc
+#define PT_SUNWCAP	0x6ffffffd
+#define PT_HISUNW	0x6fffffff 
 
 /*
  * p_flags
@@ -891,6 +927,10 @@ typedef Elf64_Half	Elf64_Versym;
 #define VER_NDX_GLOBAL	1
 
 /*
+ * Solaris extensions
+ */
+
+/*
  * Move section
  */
 #if __LIBELF64
@@ -920,6 +960,30 @@ typedef struct {
 #define ELF64_M_INFO(sym, sz)	(((Elf64_Xword)(sym)<<8)+(unsigned char)(sz))
 
 #endif /* __LIBELF64 */
+
+/*
+ * Capabilities
+ */
+
+typedef struct {
+    Elf32_Word      	c_tag;
+    union {
+	Elf32_Word      c_val;
+	Elf32_Addr      c_ptr;
+    } c_un;
+} Elf32_Cap;
+
+typedef struct {
+    Elf64_Xword     	c_tag;
+    union {
+	Elf64_Xword     c_val;
+	Elf64_Addr      c_ptr;
+    } c_un;
+} Elf64_Cap;
+
+#define CA_SUNW_NULL	0	/* c_un ignored */
+#define CA_SUNW_HW_1	1	/* c_un.c_val */
+#define CA_SUNW_SF_1	2	/* c_un.c_val */
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,6 @@
 /*
  * libelf.h - public header file for libelf.
- * Copyright (C) 1995 - 2004 Michael Riepe
+ * Copyright (C) 1995 - 2006 Michael Riepe
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* @(#) $Id: libelf.h,v 1.19 2005/05/21 15:39:24 michael Exp $ */
+/* @(#) $Id: libelf.h,v 1.24 2006/07/07 22:16:27 michael Exp $ */
 
 #ifndef _LIBELF_H
 #define _LIBELF_H
@@ -36,7 +36,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 #ifndef __P
-# if __STDC__ || defined(__cplusplus) || defined(_WIN32)
+# if (__STDC__ + 0) || defined(__cplusplus) || defined(_WIN32)
 #  define __P(args) args
 # else /* __STDC__ || defined(__cplusplus) */
 #  define __P(args) ()
@@ -235,6 +235,25 @@ extern Elf_Data *elf64_xlatetom __P((Elf_Data *__dst, const Elf_Data *__src,
 extern long elf64_checksum __P((Elf *__elf));
 
 #endif /* __LIBELF64 */
+
+/*
+ * ELF format extensions
+ *
+ * These functions return 0 on failure, 1 on success.
+ */
+extern int elf_getphnum(Elf *__elf, size_t *__resultp);
+extern int elf_getshnum(Elf *__elf, size_t *__resultp);
+extern int elf_getshstrndx(Elf *__elf, size_t *__resultp);
+
+/*
+ * Convenience functions
+ *
+ * elfx_update_shstrndx is elf_getshstrndx's counterpart.
+ * It should be used to set the e_shstrndx member.
+ * There is no update function for e_shnum or e_phnum
+ * because libelf handles them internally.
+ */
+extern int elfx_update_shstrndx(Elf *__elf, size_t __value);
 
 /*
  * Experimental extensions:

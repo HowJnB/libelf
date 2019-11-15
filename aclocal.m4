@@ -1,5 +1,5 @@
 # aclocal.m4 - Local additions to Autoconf macros.
-# Copyright (C) 1995 - 2004 Michael Riepe
+# Copyright (C) 1995 - 2006 Michael Riepe
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# @(#) $Id: aclocal.m4,v 1.24 2005/05/21 15:39:19 michael Exp $
+# @(#) $Id: aclocal.m4,v 1.25 2006/04/21 17:17:30 michael Exp $
 
 AC_PREREQ(2.13)
 
@@ -82,6 +82,7 @@ AC_DEFUN(mr_ENABLE_NLS, [
       if test "$MSGFMT" != no; then
 	AC_PATH_PROG(GMSGFMT, gmsgfmt, $MSGFMT, $mr_PATH)
 	AC_PATH_PROG(XGETTEXT, xgettext, xgettext, $mr_PATH)
+	AC_PATH_PROG(MSGMERGE, msgmerge, msgmerge, $mr_PATH)
 	AC_CACHE_CHECK([for GNU gettext],
 	  mr_cv_gnu_gettext, [
 	    AC_TRY_LINK([],

@@ -1,7 +1,83 @@
+Sat Jul  8 00:17:00 CEST 2006, Michael Riepe <libelf@mr511.de>
+
+	* lib/32.newehdr.c:
+		make return value compatible with Solaris.
+	* lib/32.newphdr.c:
+		handle 65535+ segments.
+		make return value compatible with Solaris.
+	* lib/cook.c:
+		handle 65535+ segments.
+	* lib/elf_repl.h:
+		add new definitions.
+	* lib/libelf.h:
+		add/rename functions.
+	* lib/newscn.c:
+		fix section creation (was broken in 0.8.7).
+	* lib/private.h:
+		add SHN_XINDEX and PN_XNUM in case they're missing.
+		centrally define LIBELF_SUCCESS and LIBELF_FAILURE.
+	* lib/update.c:
+		handle 65535+ segments.
+		use elf->e_phnum internally.
+	* lib/x.elfext.c:
+		add elf_getphnum().
+		rename elfx_get_shnum() and elfx_get_shstrndx().
+		make return values compatible with Solaris.
+
+Fri Jul  7 19:01:04 CEST 2006, Michael Riepe <libelf@mr511.de>
+
+	* VERSION:
+		bump up to 0.8.8.
+
+Fri Jul  7 18:27:25 CEST 2006, Michael Riepe <libelf@mr511.de>
+
+	* lib/Makefile.in:
+		add lib/x.elfext.c.
+	* lib/libelf.h:
+		add functions from lib/x.elfext.c.
+	* lib/newscn.c:
+		simplify _elf_update_shnum().
+
+Tue Apr 25 16:26:39 CEST 2006, Michael Riepe <libelf@mr511.de>
+
+	* lib/gelf.h:
+	* lib/libelf.h:
+	* lib/nlist.h:
+	* lib/private.h:
+		add workaround for broken compilers.
+
+Mon Apr 24 16:24:32 CEST 2006, Michael Riepe <libelf@mr511.de>
+
+	* po/de.po:
+		update.
+
+Fri Apr 21 19:17:46 CEST 2006, Michael Riepe <libelf@mr511.de>
+
+	* acconfig.h:
+	* configure.in:
+		add --enable-extended-format.
+	* aclocal.m4:
+		search for msgmerge.
+	* lib/cook.c:
+		change _elf_item buffering.
+		handle extended format (with unusual entsize).
+	* lib/errors.h:
+	 	add ERROR_EHDR_SHENTSIZE and ERROR_EHDR_PHENTSIZE.
+	* po/Makefile.in:
+		use msgmerge instead of tupdate.
+ 
+Thu Oct 20 21:08:02 CEST 2005, Michael Riepe <libelf@mr511.de>
+
+	* lib/input.c:
+	* lib/update.c:
+		handle partial reads and writes.
+
 Tue Aug 16 01:48:17 CEST 2005, Michael Riepe <libelf@mr511.de>
 
 	* lib/begin.c:
 		add workaround for archive member misalignment.
+	* VERSION:
+		bump up to 0.8.7
 
 Tue Jul 19 11:56:26 CEST 2005, Michael Riepe <libelf@mr511.de>
 

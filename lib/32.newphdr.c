@@ -1,6 +1,6 @@
 /*
  * 32.newphdr.c - implementation of the elf{32,64}_newphdr(3) functions.
- * Copyright (C) 1995 - 2004 Michael Riepe
+ * Copyright (C) 1995 - 2006 Michael Riepe
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,11 +20,13 @@
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: 32.newphdr.c,v 1.13 2005/05/21 15:39:20 michael Exp $";
+static const char rcsid[] = "@(#) $Id: 32.newphdr.c,v 1.15 2006/07/07 22:15:41 michael Exp $";
 #endif /* lint */
 
 static char*
 _elf_newphdr(Elf *elf, size_t count, unsigned cls) {
+    size_t extcount = 0;
+    Elf_Scn *scn = NULL;
     char *phdr = NULL;
     size_t size;
 
@@ -44,6 +46,9 @@ _elf_newphdr(Elf *elf, size_t count, unsigned cls) {
     else if (elf->e_ehdr || _elf_cook(elf)) {
 	size = _msize(cls, _elf_version, ELF_T_PHDR);
 	elf_assert(size);
+	if (!(scn = _elf_first_scn(elf))) {
+	    return NULL;
+	}
 	if (count) {
 	    if (!(phdr = (char*)malloc(count * size))) {
 		seterr(ERROR_MEM_PHDR);
@@ -52,12 +57,22 @@ _elf_newphdr(Elf *elf, size_t count, unsigned cls) {
 	    memset(phdr, 0, count * size);
 	}
 	elf_assert(elf->e_ehdr);
+	elf->e_phnum = count;
+	if (count >= PN_XNUM) {
+	    /*
+	     * get NULL section (create it if necessary)
+	     */
+	    extcount = count;
+	    count = PN_XNUM;
+	}
 	if (cls == ELFCLASS32) {
-	    ((Elf32_Ehdr*)elf->e_ehdr)->e_phnum = elf->e_phnum = count;
+	    ((Elf32_Ehdr*)elf->e_ehdr)->e_phnum = count;
+	    scn->s_shdr32.sh_info = extcount;
 	}
 #if __LIBELF64
 	else if (cls == ELFCLASS64) {
-	    ((Elf64_Ehdr*)elf->e_ehdr)->e_phnum = elf->e_phnum = count;
+	    ((Elf64_Ehdr*)elf->e_ehdr)->e_phnum = count;
+	    scn->s_shdr64.sh_info = extcount;
 	}
 #endif /* __LIBELF64 */
 	else {
@@ -73,6 +88,7 @@ _elf_newphdr(Elf *elf, size_t count, unsigned cls) {
 	elf->e_phdr = phdr;
 	elf->e_phdr_flags |= ELF_F_DIRTY;
 	elf->e_ehdr_flags |= ELF_F_DIRTY;
+	scn->s_scn_flags |= ELF_F_DIRTY;
 	return phdr;
     }
     return NULL;
@@ -96,10 +112,7 @@ gelf_newphdr(Elf *elf, size_t phnum) {
 	seterr(ERROR_UNKNOWN_CLASS);
 	return 0;
     }
-    if (!_elf_newphdr(elf, phnum, elf->e_class)) {
-	return 0;
-    }
-    return 1;	/* really? */
+    return (unsigned long)_elf_newphdr(elf, phnum, elf->e_class);
 }
 
 #endif /* __LIBELF64 */

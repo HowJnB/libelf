@@ -1,6 +1,6 @@
 /*
  * cook.c - read and translate ELF files.
- * Copyright (C) 1995 - 2004 Michael Riepe
+ * Copyright (C) 1995 - 2006 Michael Riepe
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: cook.c,v 1.26 2005/05/21 15:39:21 michael Exp $";
+static const char rcsid[] = "@(#) $Id: cook.c,v 1.28 2006/07/07 22:15:50 michael Exp $";
 #endif /* lint */
 
 const Elf_Scn _elf_scn_init = INIT_SCN;
@@ -78,10 +78,9 @@ _elf_xlatetom(const Elf *elf, Elf_Data *dst, const Elf_Data *src) {
 }
 
 static char*
-_elf_item(Elf *elf, Elf_Type type, size_t n, size_t off) {
+_elf_item(void *buf, Elf *elf, Elf_Type type, size_t off) {
     Elf_Data src, dst;
 
-    elf_assert(n);
     elf_assert(valid_type(type));
     if (off < 0 || off > elf->e_size) {
 	seterr(ERROR_OUTSIDE);
@@ -90,7 +89,7 @@ _elf_item(Elf *elf, Elf_Type type, size_t n, size_t off) {
 
     src.d_type = type;
     src.d_version = elf->e_version;
-    src.d_size = n * _fsize(elf->e_class, src.d_version, type);
+    src.d_size = _fsize(elf->e_class, src.d_version, type);
     elf_assert(src.d_size);
     if ((elf->e_size - off) < src.d_size) {
 	seterr(truncerr(type));
@@ -98,10 +97,10 @@ _elf_item(Elf *elf, Elf_Type type, size_t n, size_t off) {
     }
 
     dst.d_version = _elf_version;
-    dst.d_size = n * _msize(elf->e_class, dst.d_version, type);
+    dst.d_size = _msize(elf->e_class, dst.d_version, type);
     elf_assert(dst.d_size);
 
-    if (!(dst.d_buf = malloc(dst.d_size))) {
+    if (!(dst.d_buf = buf) && !(dst.d_buf = malloc(dst.d_size))) {
 	seterr(memerr(type));
 	return NULL;
     }
@@ -117,29 +116,26 @@ _elf_item(Elf *elf, Elf_Type type, size_t n, size_t off) {
     if (_elf_xlatetom(elf, &dst, &src)) {
 	return (char*)dst.d_buf;
     }
-    free(dst.d_buf);
+    if (dst.d_buf != buf) {
+	free(dst.d_buf);
+    }
     return NULL;
 }
 
-#undef truncerr
-#undef memerr
-
 static int
-_elf_cook_file(Elf *elf) {
-    size_t num, off;
+_elf_cook_phdr(Elf *elf) {
+    size_t num, off, entsz;
 
-    elf->e_ehdr = _elf_item(elf, ELF_T_EHDR, 1, 0);
-    if (!elf->e_ehdr) {
-	return 0;
-    }
     if (elf->e_class == ELFCLASS32) {
 	num = ((Elf32_Ehdr*)elf->e_ehdr)->e_phnum;
 	off = ((Elf32_Ehdr*)elf->e_ehdr)->e_phoff;
+	entsz = ((Elf32_Ehdr*)elf->e_ehdr)->e_phentsize;
     }
 #if __LIBELF64
     else if (elf->e_class == ELFCLASS64) {
 	num = ((Elf64_Ehdr*)elf->e_ehdr)->e_phnum;
 	off = ((Elf64_Ehdr*)elf->e_ehdr)->e_phoff;
+	entsz = ((Elf64_Ehdr*)elf->e_ehdr)->e_phentsize;
 	/*
 	 * Check for overflow on 32-bit systems
 	 */
@@ -153,21 +149,79 @@ _elf_cook_file(Elf *elf) {
 	seterr(ERROR_UNIMPLEMENTED);
 	return 0;
     }
-    if (num && off) {
-	elf->e_phdr = _elf_item(elf, ELF_T_PHDR, num, off);
-	if (!elf->e_phdr) {
+    if (off) {
+	Elf_Scn *scn;
+	size_t size;
+	unsigned i;
+	char *p;
+
+	if (num == PN_XNUM) {
+	    /*
+	     * Overflow in ehdr->e_phnum.
+	     * Get real value from first SHDR.
+	     */
+	    if (!(scn = elf->e_scn_1)) {
+		seterr(ERROR_NOSUCHSCN);
+		return 0;
+	    }
+	    if (elf->e_class == ELFCLASS32) {
+		num = scn->s_shdr32.sh_info;
+	    }
+#if __LIBELF64
+	    else if (elf->e_class == ELFCLASS64) {
+		num = scn->s_shdr64.sh_info;
+	    }
+#endif /* __LIBELF64 */
+	    /* we already had this
+	    else {
+		seterr(ERROR_UNIMPLEMENTED);
+		return 0;
+	    }
+	    */
+	}
+
+	size = _fsize(elf->e_class, elf->e_version, ELF_T_PHDR);
+	elf_assert(size);
+#if ENABLE_EXTENDED_FORMAT
+	if (entsz < size) {
+#else /* ENABLE_EXTENDED_FORMAT */
+	if (entsz != size) {
+#endif /* ENABLE_EXTENDED_FORMAT */
+	    seterr(ERROR_EHDR_PHENTSIZE);
 	    return 0;
 	}
+	size = _msize(elf->e_class, _elf_version, ELF_T_PHDR);
+	elf_assert(size);
+	if (!(p = malloc(num * size))) {
+	    seterr(memerr(ELF_T_PHDR));
+	    return 0;
+	}
+	for (i = 0; i < num; i++) {
+	    if (!_elf_item(p + i * size, elf, ELF_T_PHDR, off + i * entsz)) {
+		free(p);
+		return 0;
+	    }
+	}
+	elf->e_phdr = p;
 	elf->e_phnum = num;
     }
+    return 1;
+}
+
+static int
+_elf_cook_shdr(Elf *elf) {
+    size_t num, off, entsz;
+
     if (elf->e_class == ELFCLASS32) {
 	num = ((Elf32_Ehdr*)elf->e_ehdr)->e_shnum;
 	off = ((Elf32_Ehdr*)elf->e_ehdr)->e_shoff;
+	entsz = ((Elf32_Ehdr*)elf->e_ehdr)->e_shentsize;
     }
 #if __LIBELF64
     else if (elf->e_class == ELFCLASS64) {
 	num = ((Elf64_Ehdr*)elf->e_ehdr)->e_shnum;
 	off = ((Elf64_Ehdr*)elf->e_ehdr)->e_shoff;
+	entsz = ((Elf64_Ehdr*)elf->e_ehdr)->e_shentsize;
 	/*
 	 * Check for overflow on 32-bit systems
 	 */
@@ -177,12 +231,10 @@ _elf_cook_file(Elf *elf) {
 	}
     }
 #endif /* __LIBELF64 */
-    /* we already had this
     else {
 	seterr(ERROR_UNIMPLEMENTED);
 	return 0;
     }
-    */
     if (off) {
 	struct tmp {
 	    Elf_Scn	scn;
@@ -200,11 +252,16 @@ _elf_cook_file(Elf *elf) {
 
 	src.d_type = ELF_T_SHDR;
 	src.d_version = elf->e_version;
-	/*
-	 * XXX: use ehdr->e_shentsize?
-	 */
 	src.d_size = _fsize(elf->e_class, src.d_version, ELF_T_SHDR);
 	elf_assert(src.d_size);
+#if ENABLE_EXTENDED_FORMAT
+	if (entsz < src.d_size) {
+#else /* ENABLE_EXTENDED_FORMAT */
+	if (entsz != src.d_size) {
+#endif /* ENABLE_EXTENDED_FORMAT */
+	    seterr(ERROR_EHDR_SHENTSIZE);
+	    return 0;
+	}
 	dst.d_version = EV_CURRENT;
 
 	if (num == 0) {
@@ -219,7 +276,7 @@ _elf_cook_file(Elf *elf) {
 	     * Overflow in ehdr->e_shnum.
 	     * Get real value from first SHDR.
 	     */
-	    if (elf->e_size - off < src.d_size) {
+	    if (elf->e_size - off < entsz) {
 		seterr(ERROR_TRUNC_SHDR);
 		return 0;
 	    }
@@ -251,14 +308,9 @@ _elf_cook_file(Elf *elf) {
 		}
 	    }
 #endif /* __LIBELF64 */
-	    if (num < SHN_LORESERVE) {
-		/* XXX: shall we tolerate this? */
-		seterr(ERROR_EHDR_SHNUM);
-		return 0;
-	    }
 	}
 
-	if ((elf->e_size - off) / src.d_size < num) {
+	if ((elf->e_size - off) / entsz < num) {
 	    seterr(ERROR_TRUNC_SHDR);
 	    return 0;
 	}
@@ -278,10 +330,10 @@ _elf_cook_file(Elf *elf) {
 	    sd = &head[i].data;
 
 	    if (elf->e_rawdata) {
-		src.d_buf = elf->e_rawdata + off + i * src.d_size;
+		src.d_buf = elf->e_rawdata + off + i * entsz;
 	    }
 	    else {
-		src.d_buf = elf->e_data + off + i * src.d_size;
+		src.d_buf = elf->e_data + off + i * entsz;
 	    }
 	    dst.d_buf = &scn->s_uhdr;
 	    dst.d_size = sizeof(scn->s_uhdr);
@@ -403,6 +455,24 @@ _elf_cook_file(Elf *elf) {
 	elf_assert(scn == &head[0].scn);
 	elf->e_scn_1 = &head[0].scn;
 	head[0].scn.s_freeme = 1;
+    }
+    return 1;
+}
+
+static int
+_elf_cook_file(Elf *elf) {
+    elf->e_ehdr = _elf_item(NULL, elf, ELF_T_EHDR, 0);
+    if (!elf->e_ehdr) {
+	return 0;
+    }
+    /*
+     * Note: _elf_cook_phdr may require the first section header!
+     */
+    if (!_elf_cook_shdr(elf)) {
+	return 0;
+    }
+    if (!_elf_cook_phdr(elf)) {
+	return 0;
     }
     return 1;
 }

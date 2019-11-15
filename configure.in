@@ -1,6 +1,6 @@
 # configure.in - Configure template for libelf.
 # Process this file with autoconf to produce a configure script.
-# Copyright (C) 1995 - 2005 Michael Riepe
+# Copyright (C) 1995 - 2006 Michael Riepe
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -16,7 +16,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# @(#) $Id: configure.in,v 1.36 2005/05/21 15:39:19 michael Exp $
+# @(#) $Id: configure.in,v 1.37 2006/04/21 17:17:46 michael Exp $
 
 AC_INIT(VERSION)
 AC_CONFIG_HEADER(config.h lib/sys_elf.h)
@@ -346,6 +346,15 @@ AC_SUBST(LIBINTL)
 
 dnl Check for shared library support.
 mr_ENABLE_SHARED
+
+dnl Check for extended ELF format support
+AC_ARG_ENABLE(extended_format,
+  [  --enable-extended-format    support extended file formats (default: no)],
+  [mr_enable_extended_format="$enableval"],
+  [mr_enable_extended_format=no])
+if test "$mr_enable_extended_format" = yes; then
+  AC_DEFINE(ENABLE_EXTENDED_FORMAT)
+fi
 
 dnl Check for debug support.
 mr_ENABLE_DEBUG

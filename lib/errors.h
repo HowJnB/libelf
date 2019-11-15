@@ -1,23 +1,23 @@
 /*
-errors.h - exhaustive list of all error codes and messages for libelf.
-Copyright (C) 1995 - 2003 Michael Riepe
+ * errors.h - exhaustive list of all error codes and messages for libelf.
+ * Copyright (C) 1995 - 2003, 2006 Michael Riepe
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
-
-/* @(#) $Id: errors.h,v 1.16 2005/05/21 15:39:21 michael Exp $ */
+/* @(#) $Id: errors.h,v 1.17 2006/04/21 17:17:46 michael Exp $ */
 
 /* dummy for xgettext */
 #define _(str) str
@@ -76,6 +76,8 @@ __err__(ERROR_VERDEF_VERSION,	_("Format error: unknown Verdef version"))
 __err__(ERROR_VERNEED_FORMAT,	_("Format error: bad parameter in Verneed record"))
 __err__(ERROR_VERNEED_VERSION,	_("Format error: unknown Verneed version"))
 __err__(ERROR_EHDR_SHNUM,	_("Format error: bad e_shnum value"))
+__err__(ERROR_EHDR_SHENTSIZE,	_("Format error: bad e_shentsize value"))
+__err__(ERROR_EHDR_PHENTSIZE,	_("Format error: bad e_phentsize value"))
 __err__(ERROR_UNTERM,		_("Format error: unterminated string in string table"))
 __err__(ERROR_SCN2SMALL,	_("Layout error: section size too small for data"))
 __err__(ERROR_SCN_OVERLAP,	_("Layout error: overlapping sections"))

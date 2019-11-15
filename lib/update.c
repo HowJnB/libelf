@@ -1,6 +1,6 @@
 /*
  * update.c - implementation of the elf_update(3) function.
- * Copyright (C) 1995 - 2004 Michael Riepe
+ * Copyright (C) 1995 - 2006 Michael Riepe
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,8 +20,10 @@
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: update.c,v 1.30 2005/05/21 15:39:26 michael Exp $";
+static const char rcsid[] = "@(#) $Id: update.c,v 1.32 2006/07/07 22:15:50 michael Exp $";
 #endif /* lint */
+
+#include <errno.h>
 
 #if HAVE_MMAP
 #include <sys/mman.h>
@@ -127,6 +129,7 @@ _elf32_layout(Elf *elf, unsigned *flag) {
     unsigned encoding;
     size_t align_addr;
     size_t entsize;
+    unsigned phnum;
     unsigned shnum;
     Elf_Scn *scn;
 
@@ -154,16 +157,16 @@ _elf32_layout(Elf *elf, unsigned *flag) {
     align_addr = _fsize(ELFCLASS32, version, ELF_T_ADDR);
     elf_assert(align_addr);
 
-    if (elf->e_phnum) {
+    if ((phnum = elf->e_phnum)) {
 	entsize = _fsize(ELFCLASS32, version, ELF_T_PHDR);
 	elf_assert(entsize);
 	if (layout) {
 	    align(off, align_addr);
 	    rewrite(ehdr->e_phoff, off, elf->e_ehdr_flags);
-	    off += elf->e_phnum * entsize;
+	    off += phnum * entsize;
 	}
 	else {
-	    off = max(off, ehdr->e_phoff + elf->e_phnum * entsize);
+	    off = max(off, ehdr->e_phoff + phnum * entsize);
 	}
     }
     else {
@@ -172,7 +175,17 @@ _elf32_layout(Elf *elf, unsigned *flag) {
 	    rewrite(ehdr->e_phoff, 0, elf->e_ehdr_flags);
 	}
     }
-    rewrite(ehdr->e_phnum, elf->e_phnum, elf->e_ehdr_flags);
+    if (phnum >= PN_XNUM) {
+	Elf_Scn *scn = elf->e_scn_1;
+	Elf32_Shdr *shdr = &scn->s_shdr32;
+
+	elf_assert(scn);
+	elf_assert(scn->s_index == 0);
+	rewrite(shdr->sh_info, phnum, scn->s_shdr_flags);
+	*flag |= scn->s_shdr_flags;
+	phnum = PN_XNUM;
+    }
+    rewrite(ehdr->e_phnum, phnum, elf->e_ehdr_flags);
     rewrite(ehdr->e_phentsize, entsize, elf->e_ehdr_flags);
 
     for (scn = elf->e_scn_1, shnum = 0; scn; scn = scn->s_link, ++shnum) {
@@ -317,6 +330,7 @@ _elf64_layout(Elf *elf, unsigned *flag) {
     unsigned encoding;
     size_t align_addr;
     size_t entsize;
+    unsigned phnum;
     unsigned shnum;
     Elf_Scn *scn;
 
@@ -344,16 +358,16 @@ _elf64_layout(Elf *elf, unsigned *flag) {
     align_addr = _fsize(ELFCLASS64, version, ELF_T_ADDR);
     elf_assert(align_addr);
 
-    if (elf->e_phnum) {
+    if ((phnum = elf->e_phnum)) {
 	entsize = _fsize(ELFCLASS64, version, ELF_T_PHDR);
 	elf_assert(entsize);
 	if (layout) {
 	    align(off, align_addr);
 	    rewrite(ehdr->e_phoff, off, elf->e_ehdr_flags);
-	    off += elf->e_phnum * entsize;
+	    off += phnum * entsize;
 	}
 	else {
-	    off = max(off, ehdr->e_phoff + elf->e_phnum * entsize);
+	    off = max(off, ehdr->e_phoff + phnum * entsize);
 	}
     }
     else {
@@ -362,7 +376,18 @@ _elf64_layout(Elf *elf, unsigned *flag) {
 	    rewrite(ehdr->e_phoff, 0, elf->e_ehdr_flags);
 	}
     }
-    rewrite(ehdr->e_phnum, elf->e_phnum, elf->e_ehdr_flags);
+    if (phnum >= PN_XNUM) {
+	Elf_Scn *scn = elf->e_scn_1;
+	Elf32_Shdr *shdr = &scn->s_shdr32;
+
+	/* modify first section header, too! */
+	elf_assert(scn);
+	elf_assert(scn->s_index == 0);
+	rewrite(shdr->sh_info, phnum, scn->s_shdr_flags);
+	*flag |= scn->s_shdr_flags;
+	phnum = PN_XNUM;
+    }
+    rewrite(ehdr->e_phnum, phnum, elf->e_ehdr_flags);
     rewrite(ehdr->e_phentsize, entsize, elf->e_ehdr_flags);
 
     for (scn = elf->e_scn_1, shnum = 0; scn; scn = scn->s_link, ++shnum) {
@@ -629,13 +654,13 @@ _elf32_write(Elf *elf, char *outbuf, size_t len) {
 	return -1;
     }
 
-    if (ehdr->e_phnum) {
+    if (elf->e_phnum) {
 	src.d_buf = elf->e_phdr;
 	src.d_type = ELF_T_PHDR;
-	src.d_size = ehdr->e_phnum * _msize(ELFCLASS32, _elf_version, ELF_T_PHDR);
+	src.d_size = elf->e_phnum * _msize(ELFCLASS32, _elf_version, ELF_T_PHDR);
 	src.d_version = _elf_version;
 	dst.d_buf = outbuf + ehdr->e_phoff;
-	dst.d_size = ehdr->e_phnum * ehdr->e_phentsize;
+	dst.d_size = elf->e_phnum * ehdr->e_phentsize;
 	dst.d_version = ehdr->e_version;
 	if (!elf32_xlatetof(&dst, &src, encode)) {
 	    return -1;
@@ -756,13 +781,13 @@ _elf64_write(Elf *elf, char *outbuf, size_t len) {
 	return -1;
     }
 
-    if (ehdr->e_phnum) {
+    if (elf->e_phnum) {
 	src.d_buf = elf->e_phdr;
 	src.d_type = ELF_T_PHDR;
-	src.d_size = ehdr->e_phnum * _msize(ELFCLASS64, _elf_version, ELF_T_PHDR);
+	src.d_size = elf->e_phnum * _msize(ELFCLASS64, _elf_version, ELF_T_PHDR);
 	src.d_version = _elf_version;
 	dst.d_buf = outbuf + ehdr->e_phoff;
-	dst.d_size = ehdr->e_phnum * ehdr->e_phentsize;
+	dst.d_size = elf->e_phnum * ehdr->e_phentsize;
 	dst.d_version = ehdr->e_version;
 	if (!elf64_xlatetof(&dst, &src, encode)) {
 	    return -1;
@@ -857,6 +882,29 @@ _elf64_write(Elf *elf, char *outbuf, size_t len) {
 
 #endif /* __LIBELF64 */
 
+static int
+xwrite(int fd, char *buffer, size_t len) {
+    size_t done = 0;
+    size_t n;
+
+    while (done < len) {
+	n = write(fd, buffer + done, len - done);
+	if (n == 0) {
+	    /* file system full */
+	    return -1;
+	}
+	else if (n != (size_t)-1) {
+	    /* some bytes written, continue */
+	    done += n;
+	}
+	else if (errno != EAGAIN && errno != EINTR) {
+	    /* real error */
+	    return -1;
+	}
+    }
+    return 0;
+}
+
 static off_t
 _elf_output(Elf *elf, int fd, size_t len, off_t (*_elf_write)(Elf*, char*, size_t)) {
     char *buf;
@@ -880,7 +928,7 @@ _elf_output(Elf *elf, int fd, size_t len, off_t (*_elf_write)(Elf*, char*, size_
 	    seterr(ERROR_IO_SEEK);
 	    return -1;
 	}
-	if (write(fd, "", 1) != 1) {
+	if (xwrite(fd, "", 1)) {
 	    seterr(ERROR_IO_WRITE);
 	    return -1;
 	}
@@ -906,7 +954,7 @@ _elf_output(Elf *elf, int fd, size_t len, off_t (*_elf_write)(Elf*, char*, size_
 	    seterr(ERROR_IO_SEEK);
 	    err = -1;
 	}
-	else if (write(fd, buf, len) != len) {
+	else if (xwrite(fd, buf, len)) {
 	    seterr(ERROR_IO_WRITE);
 	    err = -1;
 	}

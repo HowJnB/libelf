@@ -1,5 +1,5 @@
 # po/Makefile for libelf.
-# Copyright (C) 1995 - 2001, 2004 Michael Riepe
+# Copyright (C) 1995 - 2006 Michael Riepe
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# @(#) $Id: Makefile.in,v 1.16 2005/05/21 15:39:28 michael Exp $
+# @(#) $Id: Makefile.in,v 1.17 2006/04/21 17:16:51 michael Exp $
 
 instroot =
 
@@ -33,7 +33,7 @@ GENCAT = @GENCAT@
 GMSGFMT = @GMSGFMT@
 MSGFMT = @MSGFMT@
 XGETTEXT = @XGETTEXT@
-TUPDATE = tupdate
+MSGMERGE = @MSGMERGE@
 
 CFLAGS = @CFLAGS@
 CPPFLAGS = @CPPFLAGS@
@@ -135,11 +135,11 @@ update-po: stamp-po
 stamp-po: $(PACKAGE).pot
 	pofiles="$(POFILES)"; cd $(srcdir) && for po in $$pofiles; do \
 	  $(RM) $$po.tmp; \
-	  if $(TUPDATE) $(PACKAGE).pot $$po > $$po.tmp; then \
+	  if $(MSGMERGE) $$po $(PACKAGE).pot > $$po.tmp; then \
 	    $(RM) $$po; \
 	    $(MV) $$po.tmp $$po; \
 	  else \
-	    echo "tupdate for $$po failed!"; \
+	    echo "update for $$po failed!"; \
 	    $(RM) $$po.tmp; \
 	  fi; \
 	done

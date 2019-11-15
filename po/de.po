@@ -15,13 +15,15 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-# @(#) $Id: de.po,v 1.14 2005/05/21 15:39:28 michael Exp $
+# @(#) $Id: de.po,v 1.16 2006/04/24 16:24:32 michael Exp $
 #
 msgid ""
 msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-04-21 19:18+0200\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
 "Date: 2001-10-06 20:40:10+0200\n"
 "From: Michael Riepe <michael@thrai>\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
 "Xgettext-Options: -c -dlibelf -k_\n"
 "Files: ../lib/errors.h\n"
 
@@ -119,7 +121,8 @@ msgstr "Aufruffehler: Sie versuchen, den \"Null\"-Abschnitt zu bearbeiten"
 
 #: ../lib/errors.h:48
 msgid "Request error: data does not belong to section"
-msgstr "Aufruffehler: Dieser Datenblock gehört nicht zum angegebenen Dateiabschnitt"
+msgstr ""
+"Aufruffehler: Dieser Datenblock gehört nicht zum angegebenen Dateiabschnitt"
 
 #: ../lib/errors.h:49
 msgid "Request error: no string table"
@@ -167,7 +170,9 @@ msgstr "Falsche Reihenfolge: Sie müssen zuerst elf{32,64}_newehdr() aufrufen"
 
 #: ../lib/errors.h:60
 msgid "Format error: reference outside file"
-msgstr "Fehler in der Datei: Eine Positionsangabe zeigt auf einen Punkt außerhalb der Datei"
+msgstr ""
+"Fehler in der Datei: Eine Positionsangabe zeigt auf einen Punkt außerhalb "
+"der Datei"
 
 #: ../lib/errors.h:61
 msgid "Format error: archive header truncated"
@@ -195,7 +200,9 @@ msgstr "Fehler in der Datei: Die Archiv-Namenliste ist defekt"
 
 #: ../lib/errors.h:67
 msgid "Format error: archive special name unknown"
-msgstr "Fehler in der Datei: Es existiert ein internes Archiv-Objekt mit unbekanntem Namen"
+msgstr ""
+"Fehler in der Datei: Es existiert ein internes Archiv-Objekt mit unbekanntem "
+"Namen"
 
 #: ../lib/errors.h:68
 msgid "Format error: ELF header truncated"
@@ -215,11 +222,15 @@ msgstr "Fehler in der Datei: Ein Datenblock ist unvollständig"
 
 #: ../lib/errors.h:72
 msgid "Format error: program header table alignment"
-msgstr "Fehler in der Datei: Die ELF Program Header Table liegt nicht auf einer Wortgrenze"
+msgstr ""
+"Fehler in der Datei: Die ELF Program Header Table liegt nicht auf einer "
+"Wortgrenze"
 
 #: ../lib/errors.h:73
 msgid "Format error: section header table alignment"
-msgstr "Fehler in der Datei: Die ELF Section Header Table liegt nicht auf einer Wortgrenze"
+msgstr ""
+"Fehler in der Datei: Die ELF Section Header Table liegt nicht auf einer "
+"Wortgrenze"
 
 #: ../lib/errors.h:74
 msgid "Format error: bad parameter in Verdef record"
@@ -242,81 +253,93 @@ msgid "Format error: bad e_shnum value"
 msgstr "Fehler in der Datei: e_shnum enthält einen ungültigen Wert"
 
 #: ../lib/errors.h:79
-msgid "Format error: unterminated string in string table"
-msgstr "Fehler in der Datei: Der Eintrag in der String-Tabelle ist nicht terminiert"
+#, fuzzy
+msgid "Format error: bad e_shentsize value"
+msgstr "Fehler in der Datei: e_shentsize enthält einen ungültigen Wert"
 
 #: ../lib/errors.h:80
-msgid "Layout error: section size too small for data"
-msgstr "Layout-Fehler: Ein Dateiabschnitt ist zu kurz für die darin enthaltenen Daten"
+#, fuzzy
+msgid "Format error: bad e_phentsize value"
+msgstr "Fehler in der Datei: e_phentsize enthält einen ungültigen Wert"
 
 #: ../lib/errors.h:81
+msgid "Format error: unterminated string in string table"
+msgstr ""
+"Fehler in der Datei: Der Eintrag in der String-Tabelle ist nicht terminiert"
+
+#: ../lib/errors.h:82
+msgid "Layout error: section size too small for data"
+msgstr ""
+"Layout-Fehler: Ein Dateiabschnitt ist zu kurz für die darin enthaltenen Daten"
+
+#: ../lib/errors.h:83
 msgid "Layout error: overlapping sections"
 msgstr "Layout-Fehler: Zwei (oder mehr) Dateiabschnitte überlappen sich"
 
-#: ../lib/errors.h:82
+#: ../lib/errors.h:84
 msgid "Memory error: elf descriptor"
 msgstr "Zu wenig Speicher: für den Elf-Deskriptor"
 
-#: ../lib/errors.h:83
+#: ../lib/errors.h:85
 msgid "Memory error: archive symbol table"
 msgstr "Zu wenig Speicher: für die Archiv-Symboltabelle"
 
-#: ../lib/errors.h:84
+#: ../lib/errors.h:86
 msgid "Memory error: archive member header"
 msgstr "Zu wenig Speicher: für die Archiv-Verwaltungsinformationen"
 
-#: ../lib/errors.h:85
+#: ../lib/errors.h:87
 msgid "Memory error: ELF header"
 msgstr "Zu wenig Speicher: für den ELF-Header"
 
-#: ../lib/errors.h:86
+#: ../lib/errors.h:88
 msgid "Memory error: program header table"
 msgstr "Zu wenig Speicher: für die Program Header Table"
 
-#: ../lib/errors.h:87
+#: ../lib/errors.h:89
 msgid "Memory error: section header table"
 msgstr "Zu wenig Speicher: für die Section Header Table"
 
-#: ../lib/errors.h:88
+#: ../lib/errors.h:90
 msgid "Memory error: section descriptor"
 msgstr "Zu wenig Speicher: für den Elf_Scn-Deskriptor"
 
-#: ../lib/errors.h:89
+#: ../lib/errors.h:91
 msgid "Memory error: section data"
 msgstr "Zu wenig Speicher: für die Daten dieses Abschnitts"
 
-#: ../lib/errors.h:90
+#: ../lib/errors.h:92
 msgid "Memory error: output file space"
 msgstr "Zu wenig Speicher: für die Ausgabe"
 
-#: ../lib/errors.h:91
+#: ../lib/errors.h:93
 msgid "Memory error: temporary buffer"
 msgstr "Zu wenig Speicher: für einen temporären Puffer"
 
-#: ../lib/errors.h:92
+#: ../lib/errors.h:94
 msgid "GElf error: value out of range"
 msgstr "GElf-Fehler: eine Zahl ist außerhalb des darstellbaren Bereichs"
 
-#: ../lib/errors.h:93
+#: ../lib/errors.h:95
 msgid "GElf error: index out of range"
 msgstr "GElf-Fehler: Index außerhalb des erlaubten Bereichs"
 
-#: ../lib/errors.h:94
+#: ../lib/errors.h:96
 msgid "GElf error: type mismatch"
 msgstr "GElf-Fehler: Typfehler"
 
-#: ../lib/errors.h:95
+#: ../lib/errors.h:97
 msgid "GElf error: not enough memory for GElf_Sym"
 msgstr "GElf-Fehler: zu wenig Speicher für eine Variable vom Typ GElf_Sym"
 
-#: ../lib/errors.h:96
+#: ../lib/errors.h:98
 msgid "GElf error: not enough memory for GElf_Dyn"
 msgstr "GElf-Fehler: zu wenig Speicher für eine Variable vom Typ GElf_Dyn"
 
-#: ../lib/errors.h:97
+#: ../lib/errors.h:99
 msgid "GElf error: not enough memory for GElf_Rela"
 msgstr "GElf-Fehler: zu wenig Speicher für eine Variable vom Typ GElf_Rela"
 
-#: ../lib/errors.h:98
+#: ../lib/errors.h:100
 msgid "GElf error: not enough memory for GElf_Rel"
 msgstr "GElf-Fehler: zu wenig Speicher für eine Variable vom Typ GElf_Rel"

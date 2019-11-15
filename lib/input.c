@@ -1,31 +1,56 @@
 /*
-input.c - low-level input for libelf.
-Copyright (C) 1995 - 2001 Michael Riepe
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ * input.c - low-level input for libelf.
+ * Copyright (C) 1995 - 2001, 2005 Michael Riepe
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: input.c,v 1.9 2005/05/21 15:39:24 michael Exp $";
+static const char rcsid[] = "@(#) $Id: input.c,v 1.10 2005/10/20 21:08:02 michael Exp $";
 #endif /* lint */
+
+#include <errno.h>
 
 #if HAVE_MMAP
 #include <sys/mman.h>
 #endif /* HAVE_MMAP */
+
+static int
+xread(int fd, char *buffer, size_t len) {
+    size_t done = 0;
+    size_t n;
+
+    while (done < len) {
+	n = read(fd, buffer + done, len - done);
+	if (n == 0) {
+	    /* premature end of file */
+	    return -1;
+	}
+	else if (n != (size_t)-1) {
+	    /* some bytes read, continue */
+	    done += n;
+	}
+	else if (errno != EAGAIN && errno != EINTR) {
+	    /* real error */
+	    return -1;
+	}
+    }
+    return 0;
+}
 
 void*
 _elf_read(Elf *elf, void *buffer, size_t off, size_t len) {
@@ -45,7 +70,7 @@ _elf_read(Elf *elf, void *buffer, size_t off, size_t len) {
 	else if (!(tmp = buffer) && !(tmp = malloc(len))) {
 	    seterr(ERROR_IO_2BIG);
 	}
-	else if (read(elf->e_fd, tmp, len) != (int)len) {
+	else if (xread(elf->e_fd, tmp, len)) {
 	    seterr(ERROR_IO_READ);
 	    if (tmp != buffer) {
 		free(tmp);

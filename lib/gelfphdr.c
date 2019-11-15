@@ -1,28 +1,28 @@
 /*
-gelfphdr.c - gelf_* translation functions.
-Copyright (C) 2000 - 2001 Michael Riepe
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ * gelfphdr.c - gelf_* translation functions.
+ * Copyright (C) 2000 - 2006 Michael Riepe
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #include <private.h>
 
 #if __LIBELF64
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: gelfphdr.c,v 1.6 2005/05/21 15:39:22 michael Exp $";
+static const char rcsid[] = "@(#) $Id: gelfphdr.c,v 1.8 2006/07/07 22:16:43 michael Exp $";
 #endif /* lint */
 
 #define check_and_copy(type, d, s, name, eret)		\
@@ -76,12 +76,13 @@ gelf_getphdr(Elf *elf, int ndx, GElf_Phdr *dst) {
 	check_and_copy(GElf_Xword, dst, src, p_memsz,  NULL);
 	check_and_copy(GElf_Xword, dst, src, p_align,  NULL);
     }
-    else if (valid_class(elf->e_class)) {
-	seterr(ERROR_UNIMPLEMENTED);
-	return NULL;
-    }
     else {
-	seterr(ERROR_UNKNOWN_CLASS);
+	if (valid_class(elf->e_class)) {
+	    seterr(ERROR_UNIMPLEMENTED);
+	}
+	else {
+	    seterr(ERROR_UNKNOWN_CLASS);
+	}
 	return NULL;
     }
     if (dst == &buf) {
@@ -132,12 +133,13 @@ gelf_update_phdr(Elf *elf, int ndx, GElf_Phdr *src) {
 	check_and_copy(Elf32_Word, dst, src, p_flags,  0);
 	check_and_copy(Elf32_Word, dst, src, p_align,  0);
     }
-    else if (valid_class(elf->e_class)) {
-	seterr(ERROR_UNIMPLEMENTED);
-	return 0;
-    }
     else {
-	seterr(ERROR_UNKNOWN_CLASS);
+	if (valid_class(elf->e_class)) {
+	    seterr(ERROR_UNIMPLEMENTED);
+	}
+	else {
+	    seterr(ERROR_UNKNOWN_CLASS);
+	}
 	return 0;
     }
     return 1;

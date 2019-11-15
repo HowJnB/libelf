@@ -1,6 +1,6 @@
 /*
  * gelf.h - public header file for libelf.
- * Copyright (C) 2000 - 2004 Michael Riepe
+ * Copyright (C) 2000 - 2006 Michael Riepe
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* @(#) $Id: gelf.h,v 1.12 2005/05/21 15:39:22 michael Exp $ */
+/* @(#) $Id: gelf.h,v 1.14 2006/04/25 16:26:39 michael Exp $ */
 
 #ifndef _GELF_H
 #define _GELF_H
@@ -37,7 +37,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 #ifndef __P
-# if __STDC__ || defined(__cplusplus) || defined(_WIN32)
+# if (__STDC__ + 0) || defined(__cplusplus) || defined(_WIN32)
 #  define __P(args) args
 # else /* __STDC__ || defined(__cplusplus) */
 #  define __P(args) ()

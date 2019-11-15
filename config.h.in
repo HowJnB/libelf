@@ -18,6 +18,9 @@
 /* Define if you want to include extra debugging code */
 #undef ENABLE_DEBUG
 
+/* Define if you want to support extended ELF formats */
+#undef ENABLE_EXTENDED_FORMAT
+
 /* Define if memmove() does not copy overlapping arrays correctly */
 #undef HAVE_BROKEN_MEMMOVE
 

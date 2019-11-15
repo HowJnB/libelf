@@ -1,6 +1,6 @@
 /*
  * acconfig.h - Special definitions for libelf, processed by autoheader.
- * Copyright (C) 1995 - 2001, 2004 Michael Riepe
+ * Copyright (C) 1995 - 2001, 2004, 2006 Michael Riepe
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,10 +17,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* @(#) $Id: acconfig.h,v 1.12 2005/05/21 15:39:19 michael Exp $ */
+/* @(#) $Id: acconfig.h,v 1.13 2006/04/21 17:17:46 michael Exp $ */
 
 /* Define if you want to include extra debugging code */
 #undef ENABLE_DEBUG
+
+/* Define if you want to support extended ELF formats */
+#undef ENABLE_EXTENDED_FORMAT
 
 /* Define if memmove() does not copy overlapping arrays correctly */
 #undef HAVE_BROKEN_MEMMOVE

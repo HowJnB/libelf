@@ -1,6 +1,6 @@
 /*
  * nlist.h - public header file for nlist(3).
- * Copyright (C) 1995 - 1998, 2004 Michael Riepe
+ * Copyright (C) 1995 - 2006 Michael Riepe
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* @(#) $Id: nlist.h,v 1.7 2005/05/21 15:39:25 michael Exp $ */
+/* @(#) $Id: nlist.h,v 1.9 2006/04/25 16:26:39 michael Exp $ */
 
 #ifndef _NLIST_H
 #define _NLIST_H
@@ -35,7 +35,7 @@ struct nlist {
     char		n_numaux;
 };
 
-#if __STDC__ || defined(__cplusplus) || defined(_WIN32)
+#if (__STDC__ + 0) || defined(__cplusplus) || defined(_WIN32)
 extern int nlist(const char *__filename, struct nlist *__nl);
 #else /* __STDC__ || defined(__cplusplus) */
 extern int nlist();
