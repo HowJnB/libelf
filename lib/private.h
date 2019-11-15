@@ -14,10 +14,10 @@
  * 
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-/* @(#) $Id: private.h,v 1.38 2007/09/07 12:07:59 michael Exp $ */
+/* @(#) $Id: private.h,v 1.39 2008/05/23 08:15:35 michael Exp $ */
 
 #ifndef _PRIVATE_H
 #define _PRIVATE_H

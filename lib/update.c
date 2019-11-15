@@ -14,13 +14,13 @@
  * 
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: update.c,v 1.32 2006/07/07 22:15:50 michael Exp $";
+static const char rcsid[] = "@(#) $Id: update.c,v 1.34 2009/05/22 17:08:09 michael Exp $";
 #endif /* lint */
 
 #include <errno.h>
@@ -123,6 +123,7 @@ scn_entsize(const Elf *elf, unsigned version, unsigned stype) {
 static off_t
 _elf32_layout(Elf *elf, unsigned *flag) {
     int layout = (elf->e_elf_flags & ELF_F_LAYOUT) == 0;
+    int allow_overlap = (elf->e_elf_flags & ELF_F_LAYOUT_OVERLAP) != 0;
     Elf32_Ehdr *ehdr = (Elf32_Ehdr*)elf->e_ehdr;
     size_t off = 0;
     unsigned version;
@@ -249,7 +250,7 @@ _elf32_layout(Elf *elf, unsigned *flag) {
 	    if (shdr->sh_type != SHT_NOBITS) {
 		end1 += shdr->sh_size;
 	    }
-	    if (shdr->sh_offset < off) {
+	    if (!allow_overlap && shdr->sh_offset < off) {
 		/*
 		 * check for overlapping sections
 		 */
@@ -324,6 +325,7 @@ _elf32_layout(Elf *elf, unsigned *flag) {
 static off_t
 _elf64_layout(Elf *elf, unsigned *flag) {
     int layout = (elf->e_elf_flags & ELF_F_LAYOUT) == 0;
+    int allow_overlap = (elf->e_elf_flags & ELF_F_LAYOUT_OVERLAP) != 0;
     Elf64_Ehdr *ehdr = (Elf64_Ehdr*)elf->e_ehdr;
     size_t off = 0;
     unsigned version;
@@ -451,7 +453,7 @@ _elf64_layout(Elf *elf, unsigned *flag) {
 	    if (shdr->sh_type != SHT_NOBITS) {
 		end1 += shdr->sh_size;
 	    }
-	    if (shdr->sh_offset < off) {
+	    if (!allow_overlap && shdr->sh_offset < off) {
 		/*
 		 * check for overlapping sections
 		 */

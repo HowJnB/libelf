@@ -14,7 +14,7 @@
  * 
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
 #if HAVE_CONFIG_H
@@ -22,7 +22,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: memset.c,v 1.10 2005/05/21 15:39:24 michael Exp $";
+static const char rcsid[] = "@(#) $Id: memset.c,v 1.11 2008/05/23 08:15:35 michael Exp $";
 #endif /* lint */
 
 #include <stddef.h>	/* for size_t */

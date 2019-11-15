@@ -13,14 +13,14 @@
 # 
 # You should have received a copy of the GNU Library General Public
 # License along with this library; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 #
-# @(#) $Id: de.po,v 1.16 2006/04/24 16:24:32 michael Exp $
+# @(#) $Id: de.po,v 1.18 2008/05/23 08:57:07 michael Exp $
 #
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-21 19:18+0200\n"
+"POT-Creation-Date: 2008-05-23 10:18+0200\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Date: 2001-10-06 20:40:10+0200\n"
 "From: Michael Riepe <michael@thrai>\n"

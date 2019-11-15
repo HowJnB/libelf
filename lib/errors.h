@@ -14,10 +14,10 @@
  * 
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-/* @(#) $Id: errors.h,v 1.17 2006/04/21 17:17:46 michael Exp $ */
+/* @(#) $Id: errors.h,v 1.18 2008/05/23 08:15:34 michael Exp $ */
 
 /* dummy for xgettext */
 #define _(str) str

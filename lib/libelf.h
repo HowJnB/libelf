@@ -1,6 +1,6 @@
 /*
  * libelf.h - public header file for libelf.
- * Copyright (C) 1995 - 2006 Michael Riepe
+ * Copyright (C) 1995 - 2008 Michael Riepe
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -14,10 +14,10 @@
  * 
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-/* @(#) $Id: libelf.h,v 1.26 2006/09/02 14:11:48 michael Exp $ */
+/* @(#) $Id: libelf.h,v 1.28 2009/05/22 17:08:09 michael Exp $ */
 
 #ifndef _LIBELF_H
 #define _LIBELF_H
@@ -63,6 +63,12 @@ typedef enum {
  */
 #define ELF_F_DIRTY	0x1
 #define ELF_F_LAYOUT	0x4
+/*
+ * Allow sections to overlap when ELF_F_LAYOUT is in effect.
+ * Note that this flag ist NOT portable, and that it may render
+ * the output file unusable.  Use with extreme caution!
+ */
+#define ELF_F_LAYOUT_OVERLAP	0x10000000
 
 /*
  * File types
