@@ -1,6 +1,6 @@
 /*
 verneed.h - copy versioning information.
-Copyright (C) 2001, 2002 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 2001 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #ifndef lint
-static const char verneed_h_rcsid[] = "@(#) $Id: verneed.h,v 1.4 2002/12/22 20:08:48 michael Exp $";
+static const char verneed_h_rcsid[] = "@(#) $Id: verneed.h,v 1.8 2003/05/12 13:35:37 michael Exp $";
 #endif /* lint */
 
 #if VER_NEED_CURRENT != 1
@@ -139,12 +139,18 @@ xlt_verneed(unsigned char *dst, const unsigned char *src, size_t n, unsigned enc
     size_t doff;
     size_t soff;
 
+    if (n < sizeof(verneed_stype)) {
+	return 0;
+    }
+    /* size translation shortcut */
+    if (dst == NULL
+     && sizeof(verneed_stype) == sizeof(verneed_dtype)
+     && sizeof(vernaux_stype) == sizeof(vernaux_dtype)) {
+	return n;
+    }
     if (src == NULL) {
 	seterr(ERROR_NULLBUF);
 	return (size_t)-1;
-    }
-    if (n < sizeof(verneed_stype)) {
-	return 0;
     }
     soff = doff = 0;
     for (;;) {

@@ -1,6 +1,6 @@
 /*
 verdef.h - copy versioning information.
-Copyright (C) 2001, 2002 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 2001 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #ifndef lint
-static const char verdef_h_rcsid[] = "@(#) $Id: verdef.h,v 1.4 2002/12/22 20:08:48 michael Exp $";
+static const char verdef_h_rcsid[] = "@(#) $Id: verdef.h,v 1.8 2003/05/12 13:35:37 michael Exp $";
 #endif /* lint */
 
 #if VER_DEF_CURRENT != 1
@@ -135,12 +135,18 @@ xlt_verdef(unsigned char *dst, const unsigned char *src, size_t n, unsigned enc)
     size_t doff;
     size_t soff;
 
+    if (n < sizeof(verdef_stype)) {
+	return 0;
+    }
+    /* size translation shortcut */
+    if (dst == NULL
+     && sizeof(verdef_stype) == sizeof(verdef_dtype)
+     && sizeof(verdaux_stype) == sizeof(verdaux_dtype)) {
+	return n;
+    }
     if (src == NULL) {
 	seterr(ERROR_NULLBUF);
 	return (size_t)-1;
-    }
-    if (n < sizeof(verdef_stype)) {
-	return 0;
     }
     soff = doff = 0;
     for (;;) {

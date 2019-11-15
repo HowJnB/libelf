@@ -1,6 +1,6 @@
 /*
 update.c - implementation of the elf_update(3) function.
-Copyright (C) 1995 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: update.c,v 1.22 2002/12/30 04:57:32 michael Exp $";
+static const char rcsid[] = "@(#) $Id: update.c,v 1.24 2003/05/12 13:36:19 michael Exp $";
 #endif /* lint */
 
 #if HAVE_MMAP
@@ -41,13 +41,24 @@ static const unsigned short __encoding = ELFDATA2LSB + (ELFDATA2MSB << 8);
 static off_t
 scn_data_layout(Elf_Scn *scn, unsigned v, unsigned type, size_t *algn, unsigned *flag) {
     Elf *elf = scn->s_elf;
+    Elf_Data *data;
     int layout = (elf->e_elf_flags & ELF_F_LAYOUT) == 0;
     size_t scn_align = 1;
     size_t len = 0;
     Scn_Data *sd;
     size_t fsize;
 
-    for (sd = scn->s_data_1; sd; sd = sd->sd_link) {
+    if (!(sd = scn->s_data_1)) {
+	/* no data in section */
+	*algn = scn_align;
+	return (off_t)len;
+    }
+    /* load data from file, if any */
+    if (!(data = elf_getdata(scn, NULL))) {
+	return (off_t)-1;
+    }
+    elf_assert(data == &sd->sd_data);
+    for (; sd; sd = sd->sd_link) {
 	elf_assert(sd->sd_magic == DATA_MAGIC);
 	elf_assert(sd->sd_scn == scn);
 
@@ -660,6 +671,7 @@ _elf32_write(Elf *elf, char *outbuf, size_t len) {
 	if (shdr->sh_type == SHT_NULL || shdr->sh_type == SHT_NOBITS) {
 	    continue;
 	}
+	/* XXX: this is probably no longer necessary */
 	if (scn->s_data_1 && !elf_getdata(scn, NULL)) {
 	    return -1;
 	}
@@ -786,6 +798,7 @@ _elf64_write(Elf *elf, char *outbuf, size_t len) {
 	if (shdr->sh_type == SHT_NULL || shdr->sh_type == SHT_NOBITS) {
 	    continue;
 	}
+	/* XXX: this is probably no longer necessary */
 	if (scn->s_data_1 && !elf_getdata(scn, NULL)) {
 	    return -1;
 	}
