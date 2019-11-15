@@ -20,7 +20,7 @@
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: begin.c,v 1.19 2005/08/15 23:48:17 michael Exp $";
+static const char rcsid[] = "@(#) $Id: begin.c,v 1.20 2006/08/17 23:59:58 michael Exp $";
 #endif /* lint */
 
 #if HAVE_AR_H
@@ -48,7 +48,7 @@ static const Elf _elf_init = INIT_ELF;
 static const char fmag[] = ARFMAG;
 
 static unsigned long
-getnum(const char *str, size_t len, int base, int *err) {
+getnum(const char *str, size_t len, int base, size_t *err) {
     unsigned long result = 0;
 
     while (len && *str == ' ') {
@@ -71,7 +71,7 @@ _elf_init_ar(Elf *elf) {
     struct ar_hdr *hdr;
     size_t offset;
     size_t size;
-    int err = 0;
+    size_t err = 0;
 
     elf->e_kind = ELF_K_AR;
     elf->e_idlen = SARMAG;
@@ -122,7 +122,7 @@ _elf_arhdr(Elf *arf) {
     size_t namelen;
     size_t tmp;
     char *name;
-    int err = 0;
+    size_t err = 0;
 
     if (arf->e_off == arf->e_size) {
 	/* no error! */

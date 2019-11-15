@@ -1,24 +1,24 @@
 /*
-verdef.h - copy versioning information.
-Copyright (C) 2001 - 2003 Michael Riepe
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ * verdef.h - copy versioning information.
+ * Copyright (C) 2001 - 2006 Michael Riepe
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #ifndef lint
-static const char verdef_h_rcsid[] = "@(#) $Id: verdef.h,v 1.11 2005/05/21 15:39:26 michael Exp $";
+static const char verdef_h_rcsid[] = "@(#) $Id: verdef.h,v 1.12 2006/07/27 22:56:11 michael Exp $";
 #endif /* lint */
 
 #if VER_DEF_CURRENT != 1
@@ -132,40 +132,42 @@ typedef align_ftype		verdef_atype;
 
 static size_t
 xlt_verdef(unsigned char *dst, const unsigned char *src, size_t n, unsigned enc) {
-    size_t doff;
-    size_t soff;
+    size_t off;
 
-    if (n < sizeof(verdef_stype)) {
-	return 0;
+    if (sizeof(verdef_stype) != sizeof(verdef_dtype)
+     || sizeof(verdaux_stype) != sizeof(verdaux_dtype)) {
+	/* never happens for ELF v1 and Verneed v1 */
+	seterr(ERROR_UNIMPLEMENTED);
+	return (size_t)-1;
     }
     /* size translation shortcut */
-    if (dst == NULL
-     && sizeof(verdef_stype) == sizeof(verdef_dtype)
-     && sizeof(verdaux_stype) == sizeof(verdaux_dtype)) {
+    if (dst == NULL) {
 	return n;
     }
     if (src == NULL) {
 	seterr(ERROR_NULLBUF);
 	return (size_t)-1;
     }
-    soff = doff = 0;
-    for (;;) {
+    off = 0;
+    while (off + sizeof(verdef_stype) <= n) {
 	const verdef_stype *svd;
 	verdef_dtype *dvd;
 	verdef_mtype vd;
 	size_t acount;
 	size_t aoff;
-	size_t save = doff;
 
 	/*
-	 * allocate space in dst buffer
+	 * check for proper alignment
 	 */
-	dvd = (verdef_dtype*)(dst + doff);
-	doff += sizeof(verdef_dtype);
+	if (off % sizeof(verdef_atype)) {
+	    seterr(ERROR_VERDEF_FORMAT);
+	    return (size_t)-1;
+	}
 	/*
-	 * load and check src
+	 * copy and check src
 	 */
-	svd = (verdef_stype*)(src + soff);
+	svd = (verdef_stype*)(src + off);
+	dvd = (verdef_dtype*)(dst + off);
 	copy_verdef_srctotmp(&vd, svd, enc);
 	if (vd.vd_version < 1
 	 || vd.vd_version > VER_DEF_CURRENT) {
@@ -173,99 +175,59 @@ xlt_verdef(unsigned char *dst, const unsigned char *src, size_t n, unsigned enc)
 	    return (size_t)-1;
 	}
 	if (vd.vd_cnt < 1
-	 || vd.vd_aux == 0
-	 || vd.vd_aux % sizeof(verdef_atype)
-	 || vd.vd_aux < sizeof(verdef_stype)) {
+	 || vd.vd_aux == 0) {
 	    seterr(ERROR_VERDEF_FORMAT);
 	    return (size_t)-1;
 	}
+	copy_verdef_tmptodst(dvd, &vd, enc);
 	/*
-	 * get Verdaux offset and advance to next Verdef
+	 * copy aux array
 	 */
-	aoff = soff + vd.vd_aux;
-	if (vd.vd_next != 0) {
-	    if (vd.vd_next % sizeof(verdef_atype)
-	     || vd.vd_next < sizeof(verdef_stype)) {
-		seterr(ERROR_VERDEF_FORMAT);
-		return (size_t)-1;
-	    }
-	    soff += vd.vd_next;
-	    if (soff + sizeof(verdef_stype) > n) {
-		seterr(ERROR_VERDEF_FORMAT);
-		return (size_t)-1;
-	    }
-	}
-	/*
-	 * read Verdaux array
-	 */
-	for (acount = 1; ; acount++) {
+	aoff = off + vd.vd_aux;
+	for (acount = 0; acount < vd.vd_cnt; acount++) {
 	    const verdaux_stype *svda;
 	    verdaux_dtype *dvda;
 	    verdaux_mtype vda;
 
 	    /*
-	     * check for src buffer overflow
+	     * are we still inside the buffer limits?
 	     */
 	    if (aoff + sizeof(verdaux_stype) > n) {
+		break;
+	    }
+	    /*
+	     * check for proper alignment
+	     */
+	    if (aoff % sizeof(verdef_atype)) {
 		seterr(ERROR_VERDEF_FORMAT);
 		return (size_t)-1;
 	    }
 	    /*
-	     * allocate space in dst buffer
-	     */
-	    dvda = (verdaux_dtype*)(dst + doff);
-	    doff += sizeof(verdaux_dtype);
-	    /*
-	     * load and check src
+	     * copy and check src
 	     */
 	    svda = (verdaux_stype*)(src + aoff);
+	    dvda = (verdaux_dtype*)(dst + aoff);
 	    copy_verdaux_srctotmp(&vda, svda, enc);
-	    if (vda.vda_next != 0) {
-		if (vda.vda_next % sizeof(verdef_atype)
-		 || vda.vda_next < sizeof(verdaux_stype)) {
-		    seterr(ERROR_VERDEF_FORMAT);
-		    return (size_t)-1;
-		}
-		aoff += vda.vda_next;
-		vda.vda_next = sizeof(verdaux_dtype);
-	    }
+	    copy_verdaux_tmptodst(dvda, &vda, enc);
 	    /*
-	     * copy Verdaux to dst buffer
-	     */
-	    if (dst) {
-		copy_verdaux_tmptodst(dvda, &vda, enc);
-	    }
-	    /*
-	     * end check
+	     * advance to next verdaux
 	     */
 	    if (vda.vda_next == 0) {
+		/* end of list */
 		break;
 	    }
+	    aoff += vda.vda_next;
 	}
 	/*
-	 * parameter check
-	 */
-	if (acount != vd.vd_cnt) {
-	    seterr(ERROR_VERDEF_FORMAT);
-	    return (size_t)-1;
-	}
-	/*
-	 * copy Verdef to dst buffer
-	 */
-	if (dst) {
-	    vd.vd_aux = sizeof(verdef_dtype);
-	    if (vd.vd_next != 0) {
-		vd.vd_next = doff - save;
-	    }
-	    copy_verdef_tmptodst(dvd, &vd, enc);
-	}
-	/*
-	 * end check
+	 * advance to next verdef
 	 */
 	if (vd.vd_next == 0) {
-	    return doff;
+	    /* end of list */
+	    break;
 	}
+	off += vd.vd_next;
     }
+    return n;
 }
 
 size_t

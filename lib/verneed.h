@@ -1,24 +1,24 @@
 /*
-verneed.h - copy versioning information.
-Copyright (C) 2001 - 2003 Michael Riepe
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ * verneed.h - copy versioning information.
+ * Copyright (C) 2001 - 2006 Michael Riepe
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #ifndef lint
-static const char verneed_h_rcsid[] = "@(#) $Id: verneed.h,v 1.11 2005/05/21 15:39:27 michael Exp $";
+static const char verneed_h_rcsid[] = "@(#) $Id: verneed.h,v 1.12 2006/07/27 22:40:03 michael Exp $";
 #endif /* lint */
 
 #if VER_NEED_CURRENT != 1
@@ -136,40 +136,42 @@ typedef align_ftype		verneed_atype;
 
 static size_t
 xlt_verneed(unsigned char *dst, const unsigned char *src, size_t n, unsigned enc) {
-    size_t doff;
-    size_t soff;
+    size_t off;
 
-    if (n < sizeof(verneed_stype)) {
-	return 0;
+    if (sizeof(verneed_stype) != sizeof(verneed_dtype)
+     || sizeof(vernaux_stype) != sizeof(vernaux_dtype)) {
+	/* never happens for ELF v1 and Verneed v1 */
+	seterr(ERROR_UNIMPLEMENTED);
+	return (size_t)-1;
     }
     /* size translation shortcut */
-    if (dst == NULL
-     && sizeof(verneed_stype) == sizeof(verneed_dtype)
-     && sizeof(vernaux_stype) == sizeof(vernaux_dtype)) {
+    if (dst == NULL) {
 	return n;
     }
     if (src == NULL) {
 	seterr(ERROR_NULLBUF);
 	return (size_t)-1;
     }
-    soff = doff = 0;
-    for (;;) {
+    off = 0;
+    while (off + sizeof(verneed_stype) <= n) {
 	const verneed_stype *svn;
 	verneed_dtype *dvn;
 	verneed_mtype vn;
 	size_t acount;
 	size_t aoff;
-	size_t save = doff;
 
 	/*
-	 * allocate space in dst buffer
+	 * check for proper alignment
 	 */
-	dvn = (verneed_dtype*)(dst + doff);
-	doff += sizeof(verneed_dtype);
+	if (off % sizeof(verneed_atype)) {
+	    seterr(ERROR_VERNEED_FORMAT);
+	    return (size_t)-1;
+	}
 	/*
-	 * load and check src
+	 * copy and check src
 	 */
-	svn = (verneed_stype*)(src + soff);
+	svn = (verneed_stype*)(src + off);
+	dvn = (verneed_dtype*)(dst + off);
 	copy_verneed_srctotmp(&vn, svn, enc);
 	if (vn.vn_version < 1
 	 || vn.vn_version > VER_NEED_CURRENT) {
@@ -177,99 +179,59 @@ xlt_verneed(unsigned char *dst, const unsigned char *src, size_t n, unsigned enc
 	    return (size_t)-1;
 	}
 	if (vn.vn_cnt < 1
-	 || vn.vn_aux == 0
-	 || vn.vn_aux % sizeof(verneed_atype)
-	 || vn.vn_aux < sizeof(verneed_stype)) {
+	 || vn.vn_aux == 0) {
 	    seterr(ERROR_VERNEED_FORMAT);
 	    return (size_t)-1;
 	}
+	copy_verneed_tmptodst(dvn, &vn, enc);
 	/*
-	 * get Vernaux offset and advance to next Verneed
+	 * copy aux array
 	 */
-	aoff = soff + vn.vn_aux;
-	if (vn.vn_next != 0) {
-	    if (vn.vn_next % sizeof(verneed_atype)
-	     || vn.vn_next < sizeof(verneed_stype)) {
-		seterr(ERROR_VERNEED_FORMAT);
-		return (size_t)-1;
-	    }
-	    soff += vn.vn_next;
-	    if (soff + sizeof(verneed_stype) > n) {
-		seterr(ERROR_VERNEED_FORMAT);
-		return (size_t)-1;
-	    }
-	}
-	/*
-	 * read Vernaux array
-	 */
-	for (acount = 1; ; acount++) {
+	aoff = off + vn.vn_aux;
+	for (acount = 0; acount < vn.vn_cnt; acount++) {
 	    const vernaux_stype *svna;
 	    vernaux_dtype *dvna;
 	    vernaux_mtype vna;
 
 	    /*
-	     * check for src buffer overflow
+	     * are we still inside the buffer limits?
 	     */
 	    if (aoff + sizeof(vernaux_stype) > n) {
+		break;
+	    }
+	    /*
+	     * check for proper alignment
+	     */
+	    if (aoff % sizeof(verneed_atype)) {
 		seterr(ERROR_VERNEED_FORMAT);
 		return (size_t)-1;
 	    }
 	    /*
-	     * allocate space in dst buffer
-	     */
-	    dvna = (vernaux_dtype*)(dst + doff);
-	    doff += sizeof(vernaux_dtype);
-	    /*
-	     * load and check src
+	     * copy and check src
 	     */
 	    svna = (vernaux_stype*)(src + aoff);
+	    dvna = (vernaux_dtype*)(dst + aoff);
 	    copy_vernaux_srctotmp(&vna, svna, enc);
-	    if (vna.vna_next != 0) {
-		if (vna.vna_next % sizeof(verneed_atype)
-		 || vna.vna_next < sizeof(vernaux_stype)) {
-		    seterr(ERROR_VERNEED_FORMAT);
-		    return (size_t)-1;
-		}
-		aoff += vna.vna_next;
-		vna.vna_next = sizeof(vernaux_dtype);
-	    }
+	    copy_vernaux_tmptodst(dvna, &vna, enc);
 	    /*
-	     * copy Vernaux to dst buffer
-	     */
-	    if (dst) {
-		copy_vernaux_tmptodst(dvna, &vna, enc);
-	    }
-	    /*
-	     * end check
+	     * advance to next vernaux
 	     */
 	    if (vna.vna_next == 0) {
+		/* end of list */
 		break;
 	    }
+	    aoff += vna.vna_next;
 	}
 	/*
-	 * parameter check
-	 */
-	if (acount != vn.vn_cnt) {
-	    seterr(ERROR_VERNEED_FORMAT);
-	    return (size_t)-1;
-	}
-	/*
-	 * copy Verneed to dst buffer
-	 */
-	if (dst) {
-	    vn.vn_aux = sizeof(verneed_dtype);
-	    if (vn.vn_next != 0) {
-		vn.vn_next = doff - save;
-	    }
-	    copy_verneed_tmptodst(dvn, &vn, enc);
-	}
-	/*
-	 * end check
+	 * advance to next verneed
 	 */
 	if (vn.vn_next == 0) {
-	    return doff;
+	    /* end of list */
+	    break;
 	}
+	off += vn.vn_next;
     }
+    return n;
 }
 
 size_t

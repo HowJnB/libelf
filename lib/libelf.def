@@ -76,3 +76,7 @@ EXPORTS
 	gelf_update_sym
 	gelf_xlatetof
 	gelf_xlatetom
+	elf_getphnum
+	elf_getshnum
+	elf_getshstrndx
+	elfx_update_shstrndx

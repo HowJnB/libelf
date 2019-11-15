@@ -1,6 +1,6 @@
 /*
  * 32.xlatetof.c - implementation of the elf32_xlateto[fm](3) functions.
- * Copyright (C) 1995 - 2004 Michael Riepe
+ * Copyright (C) 1995 - 2006 Michael Riepe
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 #include <byteswap.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.24 2005/05/21 15:39:20 michael Exp $";
+static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.26 2006/07/27 22:33:40 michael Exp $";
 #endif /* lint */
 
 /*
@@ -405,12 +405,18 @@ elf32_xlate(Elf_Data *dst, const Elf_Data *src, unsigned encode, int tof) {
 	return NULL;
     }
     dsize = (*op)(NULL, src->d_buf, src->d_size);
+    if (dsize == (size_t)-1) {
+	return NULL;
+    }
     if (dst->d_size < dsize) {
 	seterr(ERROR_DST2SMALL);
 	return NULL;
     }
     if (dsize) {
 	tmp = (*op)(dst->d_buf, src->d_buf, src->d_size);
+	if (tmp == (size_t)-1) {
+	    return NULL;
+	}
 	elf_assert(tmp == dsize);
     }
     dst->d_size = dsize;

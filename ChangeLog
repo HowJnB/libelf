@@ -1,3 +1,50 @@
+Mon Aug 21 20:26:47 CEST 2006, Michael Riepe <libelf@mr511.de>
+
+	* Makefile.in:
+		drop w32 from DISTSUBDIRS.
+	* lib/Makefile.in:
+		add new files to DISTFILES.
+	* lib/Makefile.w32:
+	* lib/build.bat:
+	* lib/config.h.w32:
+	* lib/libelf.def:
+	* lib/sys_elf.h.w32:
+		adopted from w32 subdirectory.
+
+Fri Aug 18 02:04:58 CEST 2006, Michael Riepe <libelf@mr511.de>
+
+	* lib/begin.c:
+		let getnum return a size_t.
+	* lib/libelf.h:
+		replace __value because it's a reserved word in VC++ 2005.
+	* lib/nlist.c:
+		don't declare open() on W32.
+	* lib/private.h:
+		use <io.h> on W32.
+	* w32/Makefile.w32:
+		fix W32 DLL build.
+	* w32/build.bat:
+		add more examples for vcvars32.bat location.
+
+Fri Jul 28 00:56:00 CEST 2006, Michael Riepe <libelf@mr511.de>
+
+	* lib/32.xlatetof.c:
+	* lib/64.xlatetof.c:
+		check for dsize == -1.
+	* lib/verdef.h:
+	* lib/verneed.h:
+		improve section translators.
+
+Tue Jul 11 18:53:00 CEST 2006, Michael Riepe <libelf@mr511.de>
+
+	* w32/libelf.def:
+		add missing functions.
+
+Sat Jul  8 00:50:00 CEST 2006, Michael Riepe <libelf@mr511.de>
+
+	* VERSION:
+		bump up to 0.8.9.
+
 Sat Jul  8 00:17:00 CEST 2006, Michael Riepe <libelf@mr511.de>
 
 	* lib/32.newehdr.c:

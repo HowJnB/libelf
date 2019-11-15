@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* @(#) $Id: private.h,v 1.35 2006/07/07 22:17:25 michael Exp $ */
+/* @(#) $Id: private.h,v 1.36 2006/08/18 00:01:24 michael Exp $ */
 
 #ifndef _PRIVATE_H
 #define _PRIVATE_H
@@ -47,6 +47,9 @@ extern int strcmp(), strncmp(), memcmp();
 extern void *memcpy(), *memmove(), *memset();
 #endif /* STDC_HEADERS */
 
+#if defined(_WIN32)
+#include <io.h>
+#else
 #if HAVE_UNISTD_H
 # include <unistd.h>
 #else /* HAVE_UNISTD_H */
@@ -56,6 +59,7 @@ extern off_t lseek();
 extern int ftruncate();
 #endif /* HAVE_FTRUNCATE */
 #endif /* HAVE_UNISTD_H */
+#endif /* defined(_WIN32) */
 
 #ifndef SEEK_SET
 #define SEEK_SET	0

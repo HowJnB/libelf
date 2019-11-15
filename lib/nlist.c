@@ -21,16 +21,16 @@
 #include <nlist.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: nlist.c,v 1.13 2005/05/21 15:39:25 michael Exp $";
+static const char rcsid[] = "@(#) $Id: nlist.c,v 1.14 2006/08/18 00:01:07 michael Exp $";
 #endif /* lint */
 
+#if !defined(_WIN32)
 #if HAVE_FCNTL_H
 #include <fcntl.h>
-#endif /* HAVE_FCNTL_H */
-
-#if !HAVE_FCNTL_H || defined(_WIN32)	/* W32 seems to lack `open()' in <fcntl.h> */
+#else
 extern int open();
-#endif /* !HAVE_FCNTL_H || defined(_WIN32) */
+#endif /* HAVE_FCNTL_H */
+#endif /* defined(_WIN32) */
 
 #ifndef O_RDONLY
 #define O_RDONLY	0

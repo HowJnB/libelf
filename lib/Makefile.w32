@@ -1,5 +1,5 @@
-# w32/Makefile - Makefile for W32 port.
-# Copyright (C) 1995 - 2005 Michael Riepe
+# lib/Makefile.w32 - Makefile for W32 port.
+# Copyright (C) 1995 - 2006 Michael Riepe
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# @(#) $Id: Makefile.w32,v 1.5 2005/07/19 09:56:26 michael Exp $
+# @(#) $Id: Makefile.w32,v 1.1 2006/08/21 18:03:48 michael Exp $
 
 instroot =
 
@@ -25,8 +25,8 @@ libdir =
 includedir = 
 installdirs = $(libdir) $(includedir) $(includedir)/libelf
 
-CC = cl -nologo
-LD = cl -nologo
+CC = cl /nologo
+LD = link /nologo
 AR = 
 MV = 
 RM = del
@@ -36,9 +36,9 @@ INSTALL =
 INSTALL_DATA = 
 INSTALL_PROGRAM = 
 
-CFLAGS = -O2 -W2
+CFLAGS = /O2 /W2 /TC /MD
 CPPFLAGS = 
-DEFS = -DHAVE_CONFIG_H
+DEFS = /DHAVE_CONFIG_H
 LDFLAGS = 
 LIBS = 
 DEPSHLIBS = 
@@ -48,7 +48,7 @@ PICFLAGS =
 SHLIB_SFX = .dll
 SHLINK_SFX = 
 SONAME_SFX = 
-LINK_SHLIB = $(CC) $(LDFLAGS) -LD
+LINK_SHLIB = $(LD) /DLL $(LDFLAGS)
 
 SHLIB = libelf$(SHLIB_SFX)
 SHLINK = libelf$(SHLINK_SFX)
@@ -57,14 +57,14 @@ SONAME = libelf$(SONAME_SFX)
 # install includes in includedir?
 DO_COMPAT = 
 
-INCLUDES = -I..\w32 -I.
+INCLUDES = /I.
 
-COMPILE = $(CC) -c $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(XCFLAGS)
+COMPILE = $(CC) /c $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(XCFLAGS)
 
 # no user serviceable parts below
 
 PACKAGE = libelf
-VERSION = 0.8.6
+VERSION = 0.8.9
 MAJOR = 0
 
 SHELL = /bin/sh
@@ -101,7 +101,7 @@ SRCS4 = nlist.c
 OBJS4 = $(SRCS4:.c=.obj)
 
 # opt
-SRCS5 = opt.delscn.c x.remscn.c x.movscn.c
+SRCS5 = opt.delscn.c x.remscn.c x.movscn.c x.elfext.c
 OBJS5 = $(SRCS5:.c=.obj)
 
 # 64-bit sources
@@ -124,7 +124,7 @@ LIBOBJS =
 HDRS = libelf.h nlist.h gelf.h
 
 # public header files (created by configure)
-AUXHDRS = ..\w32\sys_elf.h
+AUXHDRS = sys_elf.h
 
 # private header files
 PRIVHDRS = byteswap.h errors.h ext_types.h private.h elf_repl.h $(HDRS_V)
@@ -135,9 +135,9 @@ all: $(OBJS) $(SHLIB)
 
 check:
 
-$(SHLIB): ..\w32\libelf.def $(OBJS) $(LIBOBJS)
+$(SHLIB): libelf.def $(OBJS) $(LIBOBJS)
 	@$(RM) $(SHLIB)
-	$(LINK_SHLIB) -Fe$(SHLIB) ..\w32\libelf.def $(OBJS) $(LIBOBJS)
+	$(LINK_SHLIB) /OUT:"$(SHLIB)" /DEF:"libelf.def" $(OBJS) $(LIBOBJS) kernel32.lib
 
 install:
 
@@ -155,12 +155,12 @@ distclean: clean
 maintainer-clean: distclean
 
 # dependencies
-$(OBJS): private.h ..\w32\config.h libelf.h gelf.h errors.h $(AUXHDRS)
+$(OBJS): private.h config.h libelf.h gelf.h errors.h $(AUXHDRS)
 32.fsize.obj: ext_types.h
 32.xlatetof.obj: byteswap.h ext_types.h
 64.xlatetof.obj: byteswap.h ext_types.h
 getarsym.obj: byteswap.h
-memset.obj: ..\w32\config.h
+memset.obj: config.h
 nlist.obj: nlist.h
 swap64.obj: byteswap.h
 $(OBJS_V): byteswap.h ext_types.h $(HDRS_V)

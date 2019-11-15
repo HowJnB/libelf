@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* @(#) $Id: libelf.h,v 1.24 2006/07/07 22:16:27 michael Exp $ */
+/* @(#) $Id: libelf.h,v 1.25 2006/08/18 00:00:38 michael Exp $ */
 
 #ifndef _LIBELF_H
 #define _LIBELF_H
@@ -253,7 +253,7 @@ extern int elf_getshstrndx(Elf *__elf, size_t *__resultp);
  * There is no update function for e_shnum or e_phnum
  * because libelf handles them internally.
  */
-extern int elfx_update_shstrndx(Elf *__elf, size_t __value);
+extern int elfx_update_shstrndx(Elf *__elf, size_t __index);
 
 /*
  * Experimental extensions:
