@@ -1,6 +1,6 @@
 /*
  * private.h - private definitions for libelf.
- * Copyright (C) 1995 - 2006 Michael Riepe
+ * Copyright (C) 1995 - 2007 Michael Riepe
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* @(#) $Id: private.h,v 1.36 2006/08/18 00:01:24 michael Exp $ */
+/* @(#) $Id: private.h,v 1.38 2007/09/07 12:07:59 michael Exp $ */
 
 #ifndef _PRIVATE_H
 #define _PRIVATE_H
@@ -92,6 +92,8 @@ extern void *_elf_memset();
 
 #if __LIBELF_NEED_LINK_H
 # include <link.h>
+#elif __LIBELF_NEED_SYS_LINK_H
+# include <sys/link.h>
 #endif /* __LIBELF_NEED_LINK_H */
 
 #include <libelf.h>
@@ -291,6 +293,8 @@ struct Scn_Data {
 extern unsigned _elf_version;
 extern int _elf_errno;
 extern int _elf_fill;
+extern int _elf_sanity_checks;
+#define SANITY_CHECK_STRPTR	(1u << 0)
 
 /*
  * Private functions

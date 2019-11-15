@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* @(#) $Id: libelf.h,v 1.25 2006/08/18 00:00:38 michael Exp $ */
+/* @(#) $Id: libelf.h,v 1.26 2006/09/02 14:11:48 michael Exp $ */
 
 #ifndef _LIBELF_H
 #define _LIBELF_H
@@ -241,9 +241,9 @@ extern long elf64_checksum __P((Elf *__elf));
  *
  * These functions return 0 on failure, 1 on success.
  */
-extern int elf_getphnum(Elf *__elf, size_t *__resultp);
-extern int elf_getshnum(Elf *__elf, size_t *__resultp);
-extern int elf_getshstrndx(Elf *__elf, size_t *__resultp);
+extern int elf_getphnum __P((Elf *__elf, size_t *__resultp));
+extern int elf_getshnum __P((Elf *__elf, size_t *__resultp));
+extern int elf_getshstrndx __P((Elf *__elf, size_t *__resultp));
 
 /*
  * Convenience functions
@@ -253,7 +253,7 @@ extern int elf_getshstrndx(Elf *__elf, size_t *__resultp);
  * There is no update function for e_shnum or e_phnum
  * because libelf handles them internally.
  */
-extern int elfx_update_shstrndx(Elf *__elf, size_t __index);
+extern int elfx_update_shstrndx __P((Elf *__elf, size_t __index));
 
 /*
  * Experimental extensions:

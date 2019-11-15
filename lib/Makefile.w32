@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# @(#) $Id: Makefile.w32,v 1.1 2006/08/21 18:03:48 michael Exp $
+# @(#) $Id: Makefile.w32,v 1.2 2006/11/21 20:21:12 michael Exp $
 
 instroot =
 
@@ -136,21 +136,21 @@ all: $(OBJS) $(SHLIB)
 check:
 
 $(SHLIB): libelf.def $(OBJS) $(LIBOBJS)
-	@$(RM) $(SHLIB)
+	-@$(RM) $(SHLIB)
 	$(LINK_SHLIB) /OUT:"$(SHLIB)" /DEF:"libelf.def" $(OBJS) $(LIBOBJS) kernel32.lib
 
 install:
 
 mostlyclean:
-	$(RM) *.obj
-	$(RM) $(SHLIB)
-	$(RM) libelf.lib
-	$(RM) libelf.exp
+	-$(RM) *.obj
+	-$(RM) $(SHLIB)
+	-$(RM) libelf.lib
+	-$(RM) libelf.exp
 
 clean: mostlyclean
 
 distclean: clean
-	$(RM) $(AUXHDRS)
+	-$(RM) $(AUXHDRS)
 
 maintainer-clean: distclean
 

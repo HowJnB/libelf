@@ -1,3 +1,59 @@
+Fri Sep  7 14:04:20 CEST 2007, Michael Riepe <libelf@mr511.de>
+
+	* acconfig.h:
+		add ENABLE_SANITY_CHECKS.
+
+	* aclocal.m4:
+		fix --enable-gnu-names.
+
+	* configure.in:
+		add --enable-sanity-checks.
+		fix --enable-extended-format.
+
+	* lib/data.c:
+		add _elf_sanity_checks variable.
+
+	* lib/private.h:
+		declare _elf_sanity_checks and constants.
+
+	* lib/strptr.c:
+		enable/disable sanity check.
+
+	* lib/version.c:
+		set _elf_sanity_checks from $LIBELF_SANITY_CHECKS.
+
+Fri Jun 29 23:27:15 CEST 2007, Michael Riepe <libelf@mr511.de>
+
+	* lib/Makefile.in:
+		improved make -jX patch.
+
+Wed Jun 20 08:04:30 CEST 2007, Michael Riepe <libelf@mr511.de>
+
+	* lib/Makefile.in:
+		add "make -jX install" patch by Joel Martin.
+
+Tue Nov 21 21:21:12 CET 2006, Michael Riepe <libelf@mr511.de>
+
+	* lib/Makefile.w32:
+		fix Windows compilation bug.
+
+Thu Sep  7 17:55:42 CEST 2006, Michael Riepe <libelf@mr511.de>
+
+	* acconfig.h:
+	* aclocal.m4:
+	* configure.in:
+	* lib/config.h.w32:
+	* lib/gelf.h:
+	* lib/private.h:
+	* lib/sys_elf.h.in:
+	* lib/sys_elf.h.w32:
+		port to QNX Neutrino, thanks to darkelf.
+
+Fri Aug 25 14:46:34 CEST 2006, Michael Riepe <libelf@mr511.de>
+
+	* Makefile.in:
+		add trackinstall target.
+
 Mon Aug 21 20:26:47 CEST 2006, Michael Riepe <libelf@mr511.de>
 
 	* Makefile.in:

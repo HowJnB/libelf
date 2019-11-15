@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* @(#) $Id: gelf.h,v 1.14 2006/04/25 16:26:39 michael Exp $ */
+/* @(#) $Id: gelf.h,v 1.15 2006/09/07 15:55:42 michael Exp $ */
 
 #ifndef _GELF_H
 #define _GELF_H
@@ -30,6 +30,8 @@
 
 #if __LIBELF_NEED_LINK_H
 #include <link.h>
+#elif __LIBELF_NEED_SYS_LINK_H
+#include <sys/link.h>
 #endif /* __LIBELF_NEED_LINK_H */
 
 #ifdef __cplusplus

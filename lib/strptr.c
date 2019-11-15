@@ -1,26 +1,26 @@
 /*
-strptr.c - implementation of the elf_strptr(3) function.
-Copyright (C) 1995 - 2000, 2003 Michael Riepe
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ * strptr.c - implementation of the elf_strptr(3) function.
+ * Copyright (C) 1995 - 2007 Michael Riepe
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: strptr.c,v 1.10 2005/05/21 15:39:26 michael Exp $";
+static const char rcsid[] = "@(#) $Id: strptr.c,v 1.11 2007/09/07 12:07:59 michael Exp $";
 #endif /* lint */
 
 char*
@@ -127,6 +127,12 @@ elf_strptr(Elf *elf, size_t section, size_t offset) {
     }
     offset -= n;
     s = (char*)data->d_buf;
+    if (!(_elf_sanity_checks & SANITY_CHECK_STRPTR)) {
+	return s + offset;
+    }
+    /*
+     * Perform extra sanity check
+     */
     for (n = offset; n < data->d_size; n++) {
 	if (s[n] == '\0') {
 	    /*

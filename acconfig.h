@@ -17,13 +17,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* @(#) $Id: acconfig.h,v 1.13 2006/04/21 17:17:46 michael Exp $ */
+/* @(#) $Id: acconfig.h,v 1.15 2007/09/07 12:07:59 michael Exp $ */
 
 /* Define if you want to include extra debugging code */
 #undef ENABLE_DEBUG
 
 /* Define if you want to support extended ELF formats */
 #undef ENABLE_EXTENDED_FORMAT
+
+/* Define if you want ELF format sanity checks by default */
+#undef ENABLE_SANITY_CHECKS
 
 /* Define if memmove() does not copy overlapping arrays correctly */
 #undef HAVE_BROKEN_MEMMOVE
@@ -42,6 +45,9 @@
 
 /* Define if Elf32_Dyn is declared in <link.h> */
 #undef __LIBELF_NEED_LINK_H
+
+/* Define if Elf32_Dyn is declared in <sys/link.h> */
+#undef __LIBELF_NEED_SYS_LINK_H
 
 /* Define to `<elf.h>' or `<sys/elf.h>' if one of them is present */
 #undef __LIBELF_HEADER_ELF_H

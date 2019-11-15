@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# @(#) $Id: aclocal.m4,v 1.25 2006/04/21 17:17:30 michael Exp $
+# @(#) $Id: aclocal.m4,v 1.27 2007/09/07 12:07:59 michael Exp $
 
 AC_PREREQ(2.13)
 
@@ -226,7 +226,7 @@ AC_DEFUN(mr_ENABLE_SHARED, [
   AC_MSG_RESULT($mr_enable_shared)
   if test "$mr_enable_shared" = yes; then
     AC_MSG_CHECKING([whether GNU naming conventions are requested])
-    AC_ARG_ENABLE(gnu_names,
+    AC_ARG_ENABLE(gnu-names,
       [  --enable-gnu-names      use GNU library naming conventions (default: no)],
       [mr_enable_gnu_names="$enableval"],
       [mr_enable_gnu_names=no])
@@ -267,6 +267,24 @@ AC_DEFUN(mr_ENABLE_SHARED, [
 	  DEPSHLIBS='-lc'
 	else
 	  AC_MSG_WARN([GNU CC required for building shared libraries])
+	  mr_enable_shared=no
+	fi
+	;;
+      i386-pc-nto-qnx*)
+	mr_TARGET_ELF
+	if test "$mr_cv_target_elf" = yes; then
+	  PICFLAGS='-fPIC -DPIC'
+	  if test "$mr_enable_gnu_names" = yes
+	  then SHLIB_SFX='-$(VERSION).so'
+	  else SHLIB_SFX='.so.$(VERSION)'
+	  fi
+	  SHLINK_SFX='.so'
+	  SONAME_SFX='.so.$(MAJOR)'
+	  LINK_SHLIB='$(CC) -shared -Wl,-soname,$(SONAME)'
+	  INSTALL_SHLIB='$(INSTALL_PROGRAM)'
+	  DEPSHLIBS='-lc'
+	else
+	  AC_MSG_WARN([shared libraries not supported for $host])
 	  mr_enable_shared=no
 	fi
 	;;

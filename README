@@ -1,4 +1,4 @@
-This is the public release of libelf-0.8.9, a free ELF object
+This is the public release of libelf-0.8.10, a free ELF object
 file access library. If you have problems with applications
 that use libelf and work with the commercial (SVR4, Solaris)
 version but not with this one, please contact me.
@@ -9,7 +9,7 @@ have a file .../include/elf.h that contains the single line
 configure.
 
 Installation is straightforward - the package is autoconf'ed.  Just do
-``cd libelf-0.8.9; ./configure; make; make install''.  Header files
+``cd libelf-0.8.10; ./configure; make; make install''.  Header files
 will be installed in .../include/libelf/.  If your system does not
 provide its own versions of libelf.h, nlist.h or gelf.h, ``make
 install'' will add the missing headers.  If you prefer not to have
@@ -35,7 +35,7 @@ On some systems (in particular, Solaris and all variants of Linux),
 ``make'' will try to build a shared library. If you run into problems
 on your system, please pass ``--disable-shared'' to configure.
 If you build a shared library and want it to be installed as
-``libelf-0.8.9.so'' rather than ``libelf.so.0.8.9'', please use
+``libelf-0.8.10.so'' rather than ``libelf.so.0.8.10'', please use
 ``./configure --enable-gnu-names''. Other files, e.g. ``libelf.so'' and
 ``libelf.so.0'' are NOT affected.
 
@@ -181,6 +181,35 @@ Various notes regarding the W32 port:
 	  sections. You can read them using elf_getdata(), but you'll
 	  only get raw (untranslated) bytes.
 
+Changes since 0.8.9:
+
+	* Ported to QNX Neutrino.
+	* Fixed Windows build errors.
+	* Parallel (make -j) installation should work now.
+
+	* It's now possible to enable and disable select sanity checks
+	  libelf performs. Currently, this affects the "NUL terminated
+	  string table entry" check performed in elf_strptr(). By
+	  default, the function will return an error if the string
+	  requested is not properly terminated - because some
+	  applications might dump core otherwise. If you configure
+	  libelf with `--disable-sanity-checks', however, the check
+	  (and, in the future, probably others as well) is disabled
+	  by default. You can still turn it on and off at runtime by
+	  setting the LIBELF_SANITY_CHECKS environment variable to
+	  an integer value:
+
+	      # disable all sanity checks
+	      export LIBELF_SANITY_CHECKS=0
+
+	      # enable all sanity checks
+	      export LIBELF_SANITY_CHECKS=-1
+
+	  Each bit of the value corresponds to a particular check,
+	  so you could use LIBELF_SANITY_CHECKS=1 to enable only
+	  the elf_strptr() check. You may also use a value in hex
+	  (0x...) or octal (0...) format.
+ 
 Changes since 0.8.8:
 
 	* Improved translator for symbol versioning sections.
