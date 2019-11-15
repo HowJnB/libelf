@@ -1,6 +1,6 @@
 /*
 32.newphdr.c - implementation of the elf{32,64}_newphdr(3) functions.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2000 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: 32.newphdr.c,v 1.5 1998/06/12 19:42:15 michael Exp $";
+static const char rcsid[] = "@(#) $Id: 32.newphdr.c,v 1.9 2000/03/31 12:42:32 michael Exp $";
 #endif /* lint */
 
 static char*
@@ -90,6 +90,18 @@ elf32_newphdr(Elf *elf, size_t count) {
 Elf64_Phdr*
 elf64_newphdr(Elf *elf, size_t count) {
     return (Elf64_Phdr*)_elf_newphdr(elf, count, ELFCLASS64);
+}
+
+unsigned long
+gelf_newphdr(Elf *elf, size_t phnum) {
+    if (!valid_class(elf->e_class)) {
+	seterr(ERROR_UNKNOWN_CLASS);
+	return 0;
+    }
+    if (!_elf_newphdr(elf, phnum, elf->e_class)) {
+	return 0;
+    }
+    return 1;	/* really? */
 }
 
 #endif /* __LIBELF64 */

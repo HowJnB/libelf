@@ -1,6 +1,6 @@
 /*
 end.c - implementation of the elf_end(3) function.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2000 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: end.c,v 1.5 1998/06/12 19:42:20 michael Exp $";
+static const char rcsid[] = "@(#) $Id: end.c,v 1.7 2000/03/26 03:00:20 michael Exp $";
 #endif /* lint */
 
 #if HAVE_MMAP
@@ -43,6 +43,8 @@ _elf_free_scns(Elf *elf, Elf_Scn *scn) {
 	elf_assert(scn->s_magic == SCN_MAGIC);
 	elf_assert(scn->s_elf == elf);
 	for (sd = scn->s_data_1; sd; sd = tmp) {
+	    elf_assert(sd->sd_magic == DATA_MAGIC);
+	    elf_assert(sd->sd_scn == scn);
 	    tmp = sd->sd_link;
 	    if (sd->sd_free_data) {
 		_elf_free(sd->sd_memdata);
@@ -52,6 +54,8 @@ _elf_free_scns(Elf *elf, Elf_Scn *scn) {
 	    }
 	}
 	if ((sd = scn->s_rawdata)) {
+	    elf_assert(sd->sd_magic == DATA_MAGIC);
+	    elf_assert(sd->sd_scn == scn);
 	    if (sd->sd_free_data) {
 		_elf_free(sd->sd_memdata);
 	    }

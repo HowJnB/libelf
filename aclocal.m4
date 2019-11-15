@@ -1,7 +1,7 @@
 # Local additions to Autoconf macros.
-# Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+# Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
 
-# @(#) $Id: aclocal.m4,v 1.8 1998/08/25 15:22:22 michael Exp $
+# @(#) $Id: aclocal.m4,v 1.12 2001/10/09 20:47:29 michael Exp $
 
 AC_PREREQ(2.12)
 
@@ -23,7 +23,7 @@ AC_DEFUN(mr_ENABLE_NLS, [
 
   AC_MSG_CHECKING([whether NLS is requested])
   AC_ARG_ENABLE(nls,
-    [  --disable-nls           do not use Native Language Support],
+    [  --enable-nls            use Native Language Support (default: yes)],
     [mr_enable_nls="$enableval"],
     [mr_enable_nls=yes])
   AC_MSG_RESULT($mr_enable_nls)
@@ -182,14 +182,14 @@ AC_DEFUN(mr_ENABLE_SHARED, [
   DEPSHLIBS=
   AC_MSG_CHECKING([whether to build a shared library])
   AC_ARG_ENABLE(shared,
-    [  --enable-shared         build shared library],
+    [  --enable-shared         build shared library (default: no)],
     [mr_enable_shared="$enableval"],
     [mr_enable_shared=no])
   AC_MSG_RESULT($mr_enable_shared)
   if test "$mr_enable_shared" = yes; then
     AC_MSG_CHECKING([whether GNU naming conventions are requested])
     AC_ARG_ENABLE(gnu_names,
-      [  --enable-gnu-names      use GNU naming conventions for shared library],
+      [  --enable-gnu-names      use GNU library naming conventions (default: no)],
       [mr_enable_gnu_names="$enableval"],
       [mr_enable_gnu_names=no])
     AC_MSG_RESULT($mr_enable_gnu_names)
@@ -201,7 +201,7 @@ AC_DEFUN(mr_ENABLE_SHARED, [
 	if test "$GCC" = yes; then
 	  mr_TARGET_ELF
 	  if test "$mr_cv_target_elf" = yes; then
-	    PICFLAGS='-fPIC'
+	    PICFLAGS='-fPIC -DPIC'
 	    if test "$mr_enable_gnu_names" = yes
 	    then
 	      SHLIB='$(PACKAGE)-$(VERSION).so'
@@ -222,30 +222,11 @@ AC_DEFUN(mr_ENABLE_SHARED, [
 	  mr_enable_shared=no
 	fi
 	;;
-      i?86-*-linux)
-	if test "$GCC" = yes; then
-	  PICFLAGS='-fPIC'
-	  if test "$mr_enable_gnu_names" = yes
-	  then
-	    SHLIB='$(PACKAGE)-$(VERSION).so'
-	  else
-	    SHLIB='$(PACKAGE).so.$(VERSION)'
-	  fi
-	  SHLINK='$(PACKAGE).so'
-	  SONAME='$(PACKAGE).so.$(MAJOR)'
-	  LINK_SHLIB='$(CC) -shared -Wl,-soname,$(SONAME)'
-	  INSTALL_SHLIB='$(INSTALL_PROGRAM)'
-	  DEPSHLIBS='-lc'
-	else
-	  AC_MSG_WARN([GNU CC required for building shared libraries])
-	  mr_enable_shared=no
-	fi
-	;;
       sparc-sun-solaris2*)
 	if test "$GCC" = yes; then
-	  PICFLAGS='-fPIC'
+	  PICFLAGS='-fPIC -DPIC'
 	else
-	  PICFLAGS='-K PIC'
+	  PICFLAGS='-K PIC -DPIC'
 	fi
 	if test "$mr_enable_gnu_names" = yes
 	then
@@ -280,7 +261,7 @@ AC_DEFUN(mr_ENABLE_SHARED, [
 AC_DEFUN(mr_ENABLE_DEBUG, [
   AC_PROVIDE([$0])
   AC_ARG_ENABLE(debug,
-    [  --enable-debug          include extra debugging code],
+    [  --enable-debug          include extra debugging code (default: no)],
     [mr_enable_debug="$enableval"],
     [mr_enable_debug=no])
   if test "$mr_enable_debug" = yes; then

@@ -1,6 +1,6 @@
 /*
 errmsg.c - implementation of the elf_errmsg(3) function.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 1999 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: errmsg.c,v 1.4 1998/06/12 19:42:21 michael Exp $";
+static const char rcsid[] = "@(#) $Id: errmsg.c,v 1.6 2000/03/31 18:02:55 michael Exp $";
 #endif /* lint */
 
 #if HAVE_GETTEXT
@@ -39,7 +39,11 @@ static nl_catd _libelf_cat = (nl_catd)0;
 static const char domain[] = "libelf";
 #endif /* HAVE_GETTEXT || HAVE_CATGETS */
 
+#if PIC
+static const char *_messages[] = {
+#else /* PIC */
 static const char *const _messages[] = {
+#endif /* PIC */
 #define __err__(a,b)	b,
 #include <errors.h>		/* include string tables from errors.h */
 #undef __err__

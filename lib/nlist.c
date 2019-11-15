@@ -1,6 +1,6 @@
 /*
 nlist.c - implementation of the nlist(3) function.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -19,11 +19,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <private.h>
 #include <nlist.h>
-#include <fcntl.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: nlist.c,v 1.5 1998/06/12 19:42:34 michael Exp $";
+static const char rcsid[] = "@(#) $Id: nlist.c,v 1.6 2001/10/15 21:37:36 michael Exp $";
 #endif /* lint */
+
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif /* HAVE_FCNTL_H */
+
+#ifndef O_RDONLY
+#define O_RDONLY	0
+#endif /* O_RDONLY */
 
 #define PRIME	217
 

@@ -1,6 +1,6 @@
 /*
 cook.c - read and translate ELF files.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,26 +20,35 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: cook.c,v 1.8 1998/08/06 16:06:28 michael Exp $";
+static const char rcsid[] = "@(#) $Id: cook.c,v 1.17 2001/10/07 19:36:02 michael Exp $";
 #endif /* lint */
 
 const Elf_Scn _elf_scn_init = INIT_SCN;
 const Scn_Data _elf_data_init = INIT_DATA;
 
-const Elf_Type _elf_scn_types[SHT_NUM] = {
-    /* SHT_NULL */	ELF_T_BYTE,
-    /* SHT_PROGBITS */	ELF_T_BYTE,
-    /* SHT_SYMTAB */	ELF_T_SYM,
-    /* SHT_STRTAB */	ELF_T_BYTE,
-    /* SHT_RELA */	ELF_T_RELA,
-    /* SHT_HASH */	ELF_T_WORD,
-    /* SHT_DYNAMIC */	ELF_T_DYN,
-    /* SHT_NOTE */	ELF_T_BYTE,
-    /* SHT_NOBITS */	ELF_T_BYTE,
-    /* SHT_REL */	ELF_T_REL,
-    /* SHT_SHLIB */	ELF_T_BYTE,
-    /* SHT_DYNSYM */	ELF_T_SYM
-};
+Elf_Type
+_elf_scn_type(unsigned t) {
+    switch (t) {
+	case SHT_DYNAMIC:      return ELF_T_DYN;
+	case SHT_DYNSYM:       return ELF_T_SYM;
+	case SHT_HASH:         return ELF_T_WORD;
+	case SHT_REL:          return ELF_T_REL;
+	case SHT_RELA:         return ELF_T_RELA;
+	case SHT_SYMTAB:       return ELF_T_SYM;
+#if __LIBELF_SYMBOL_VERSIONS
+#if __LIBELF_SUN_SYMBOL_VERSIONS
+	case SHT_SUNW_verdef:  return ELF_T_VDEF;
+	case SHT_SUNW_verneed: return ELF_T_VNEED;
+	case SHT_SUNW_versym:  return ELF_T_HALF;
+#else /* __LIBELF_SUN_SYMBOL_VERSIONS */
+	case SHT_GNU_verdef:   return ELF_T_VDEF;
+	case SHT_GNU_verneed:  return ELF_T_VNEED;
+	case SHT_GNU_versym:   return ELF_T_HALF;
+#endif /* __LIBELF_SUN_SYMBOL_VERSIONS */
+#endif /* __LIBELF_SYMBOL_VERSIONS */
+    }
+    return ELF_T_BYTE;
+}
 
 /*
  * Check for overflow on 32-bit systems
@@ -131,7 +140,7 @@ _elf_item(Elf *elf, Elf_Type type, size_t n, size_t off, int *flag) {
 
 static int
 _elf_cook_file(Elf *elf) {
-    size_t num, off, align;
+    size_t num, off, align_addr;
     int flag;
 
     elf->e_ehdr = _elf_item(elf, ELF_T_EHDR, 1, 0, &flag);
@@ -141,16 +150,16 @@ _elf_cook_file(Elf *elf) {
     if (flag) {
 	elf->e_free_ehdr = 1;
     }
+    align_addr = _fsize(elf->e_class, elf->e_version, ELF_T_ADDR);
+    elf_assert(align_addr);
     if (elf->e_class == ELFCLASS32) {
 	num = ((Elf32_Ehdr*)elf->e_ehdr)->e_phnum;
 	off = ((Elf32_Ehdr*)elf->e_ehdr)->e_phoff;
-	align = _ELF32_ALIGN_PHDR;
     }
 #if __LIBELF64
     else if (elf->e_class == ELFCLASS64) {
 	num = ((Elf64_Ehdr*)elf->e_ehdr)->e_phnum;
 	off = ((Elf64_Ehdr*)elf->e_ehdr)->e_phoff;
-	align = _ELF64_ALIGN_PHDR;
 	/*
 	 * Check for overflow on 32-bit systems
 	 */
@@ -165,7 +174,7 @@ _elf_cook_file(Elf *elf) {
 	return 0;
     }
     if (num && off) {
-	if (off % align) {
+	if (off % align_addr) {
 	    seterr(ERROR_ALIGN_PHDR);
 	    return 0;
 	}
@@ -181,13 +190,11 @@ _elf_cook_file(Elf *elf) {
     if (elf->e_class == ELFCLASS32) {
 	num = ((Elf32_Ehdr*)elf->e_ehdr)->e_shnum;
 	off = ((Elf32_Ehdr*)elf->e_ehdr)->e_shoff;
-	align = _ELF32_ALIGN_SHDR;
     }
 #if __LIBELF64
     else if (elf->e_class == ELFCLASS64) {
 	num = ((Elf64_Ehdr*)elf->e_ehdr)->e_shnum;
 	off = ((Elf64_Ehdr*)elf->e_ehdr)->e_shoff;
-	align = _ELF64_ALIGN_SHDR;
 	/*
 	 * Check for overflow on 32-bit systems
 	 */
@@ -213,7 +220,7 @@ _elf_cook_file(Elf *elf) {
 	Scn_Data *sd;
 	unsigned i;
 
-	if (off % align) {
+	if (off % align_addr) {
 	    seterr(ERROR_ALIGN_SHDR);
 	    return 0;
 	}
@@ -269,6 +276,8 @@ _elf_cook_file(Elf *elf) {
 	    scn->s_data_1 = sd;
 	    scn->s_data_n = sd;
 
+	    sd->sd_scn = scn;
+
 	    if (elf->e_class == ELFCLASS32) {
 		Elf32_Shdr *shdr = &scn->s_shdr32;
 
@@ -303,12 +312,7 @@ _elf_cook_file(Elf *elf) {
 	    }
 	    */
 
-	    if (valid_scntype(scn->s_type)) {
-		sd->sd_data.d_type = _elf_scn_types[scn->s_type];
-	    }
-	    else {
-		sd->sd_data.d_type = ELF_T_BYTE;
-	    }
+	    sd->sd_data.d_type = _elf_scn_type(scn->s_type);
 	    sd->sd_data.d_size = scn->s_size;
 	    sd->sd_data.d_version = _elf_version;
 	}

@@ -1,6 +1,6 @@
 /*
 32.newehdr.c - implementation of the elf{32,64}_newehdr(3) functions.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2000 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: 32.newehdr.c,v 1.5 1998/06/12 19:42:14 michael Exp $";
+static const char rcsid[] = "@(#) $Id: 32.newehdr.c,v 1.9 2000/03/31 12:42:32 michael Exp $";
 #endif /* lint */
 
 static char*
@@ -67,6 +67,18 @@ elf32_newehdr(Elf *elf) {
 Elf64_Ehdr*
 elf64_newehdr(Elf *elf) {
     return (Elf64_Ehdr*)_elf_newehdr(elf, ELFCLASS64);
+}
+
+unsigned long
+gelf_newehdr(Elf *elf, int cls) {
+    if (!valid_class(cls) || !_msize(cls, _elf_version, ELF_T_EHDR)) {
+	seterr(ERROR_UNKNOWN_CLASS);
+	return 0;
+    }
+    if (!_elf_newehdr(elf, cls)) {
+	return 0;
+    }
+    return 1;	/* really? */
 }
 
 #endif /* __LIBELF64 */

@@ -17,7 +17,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* @(#) $Id: ext_types.h,v 1.3 1998/06/01 19:47:15 michael Exp $ */
+/* @(#) $Id: ext_types.h,v 1.5 2001/10/05 16:00:50 michael Exp $ */
 
 #ifndef _EXT_TYPES_H
 #define _EXT_TYPES_H
@@ -29,20 +29,26 @@ extern "C" {
 /*
  * Scalar data types
  */
-typedef unsigned char __ext_Elf32_Addr	[ELF32_FSZ_ADDR];
-typedef unsigned char __ext_Elf32_Half	[ELF32_FSZ_HALF];
-typedef unsigned char __ext_Elf32_Off	[ELF32_FSZ_OFF];
-typedef unsigned char __ext_Elf32_Sword	[ELF32_FSZ_SWORD];
-typedef unsigned char __ext_Elf32_Word	[ELF32_FSZ_WORD];
+typedef unsigned char __ext_Elf32_Addr  [ELF32_FSZ_ADDR];
+typedef unsigned char __ext_Elf32_Half  [ELF32_FSZ_HALF];
+typedef unsigned char __ext_Elf32_Off   [ELF32_FSZ_OFF];
+typedef unsigned char __ext_Elf32_Sword [ELF32_FSZ_SWORD];
+typedef unsigned char __ext_Elf32_Word  [ELF32_FSZ_WORD];
 
 #if __LIBELF64
-typedef unsigned char __ext_Elf64_Addr	[ELF64_FSZ_ADDR];
-typedef unsigned char __ext_Elf64_Half	[ELF64_FSZ_HALF];
-typedef unsigned char __ext_Elf64_Off	[ELF64_FSZ_OFF];
+
+typedef unsigned char __ext_Elf32_Lword [8];
+
+typedef unsigned char __ext_Elf64_Addr  [ELF64_FSZ_ADDR];
+typedef unsigned char __ext_Elf64_Half  [ELF64_FSZ_HALF];
+typedef unsigned char __ext_Elf64_Off   [ELF64_FSZ_OFF];
 typedef unsigned char __ext_Elf64_Sword [ELF64_FSZ_SWORD];
+typedef unsigned char __ext_Elf64_Word  [ELF64_FSZ_WORD];
 typedef unsigned char __ext_Elf64_Sxword[ELF64_FSZ_SXWORD];
-typedef unsigned char __ext_Elf64_Word	[ELF64_FSZ_WORD];
 typedef unsigned char __ext_Elf64_Xword [ELF64_FSZ_XWORD];
+
+typedef unsigned char __ext_Elf64_Lword [8];
+
 #endif /* __LIBELF64 */
 
 /*
@@ -229,7 +235,99 @@ typedef struct {
 } __ext_Elf64_Dyn;
 #endif /* __LIBELF64 */
 
-#ifdef	__cplusplus
+/*
+ * Version definitions
+ */
+typedef struct {
+    __ext_Elf32_Half	vd_version;
+    __ext_Elf32_Half	vd_flags;
+    __ext_Elf32_Half	vd_ndx;
+    __ext_Elf32_Half	vd_cnt;
+    __ext_Elf32_Word	vd_hash;
+    __ext_Elf32_Word	vd_aux;
+    __ext_Elf32_Word	vd_next;
+} __ext_Elf32_Verdef;
+
+typedef struct {
+    __ext_Elf32_Word	vda_name;
+    __ext_Elf32_Word	vda_next;
+} __ext_Elf32_Verdaux;
+
+typedef struct {
+    __ext_Elf32_Half	vn_version;
+    __ext_Elf32_Half	vn_cnt;
+    __ext_Elf32_Word	vn_file;
+    __ext_Elf32_Word	vn_aux;
+    __ext_Elf32_Word	vn_next;
+} __ext_Elf32_Verneed;
+
+typedef struct {
+    __ext_Elf32_Word	vna_hash;
+    __ext_Elf32_Half	vna_flags;
+    __ext_Elf32_Half	vna_other;
+    __ext_Elf32_Word	vna_name;
+    __ext_Elf32_Word	vna_next;
+} __ext_Elf32_Vernaux;
+
+#if __LIBELF64
+
+typedef struct {
+    __ext_Elf64_Half	vd_version;
+    __ext_Elf64_Half	vd_flags;
+    __ext_Elf64_Half	vd_ndx;
+    __ext_Elf64_Half	vd_cnt;
+    __ext_Elf64_Word	vd_hash;
+    __ext_Elf64_Word	vd_aux;
+    __ext_Elf64_Word	vd_next;
+} __ext_Elf64_Verdef;
+
+typedef struct {
+    __ext_Elf64_Word	vda_name;
+    __ext_Elf64_Word	vda_next;
+} __ext_Elf64_Verdaux;
+
+typedef struct {
+    __ext_Elf64_Half	vn_version;
+    __ext_Elf64_Half	vn_cnt;
+    __ext_Elf64_Word	vn_file;
+    __ext_Elf64_Word	vn_aux;
+    __ext_Elf64_Word	vn_next;
+} __ext_Elf64_Verneed;
+
+typedef struct {
+    __ext_Elf64_Word	vna_hash;
+    __ext_Elf64_Half	vna_flags;
+    __ext_Elf64_Half	vna_other;
+    __ext_Elf64_Word	vna_name;
+    __ext_Elf64_Word	vna_next;
+} __ext_Elf64_Vernaux;
+
+#endif /* __LIBELF64 */
+
+/*
+ * Move section
+ */
+#if __LIBELF64
+
+typedef struct {
+    __ext_Elf32_Lword	m_value;
+    __ext_Elf32_Word	m_info;
+    __ext_Elf32_Word	m_poffset;
+    __ext_Elf32_Half	m_repeat;
+    __ext_Elf32_Half	m_stride;
+} __ext_Elf32_Move;
+
+typedef struct {
+    __ext_Elf64_Lword	m_value;
+    __ext_Elf64_Xword	m_info;
+    __ext_Elf64_Xword	m_poffset;
+    __ext_Elf64_Half	m_repeat;
+    __ext_Elf64_Half	m_stride;
+} __ext_Elf64_Move;
+
+#endif /* __LIBELF64 */
+
+#ifdef __cplusplus
 }
 #endif /* __cplusplus */
 

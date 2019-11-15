@@ -1,6 +1,6 @@
 /*
 libelf.h - public header file for libelf.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* @(#) $Id: libelf.h,v 1.5 1998/06/01 19:47:18 michael Exp $ */
+/* @(#) $Id: libelf.h,v 1.10 2001/10/05 19:05:25 michael Exp $ */
 
 #ifndef _LIBELF_H
 #define _LIBELF_H
@@ -60,8 +60,8 @@ typedef enum {
 /*
  * Flags
  */
-#define	ELF_F_DIRTY	0x1
-#define	ELF_F_LAYOUT	0x4
+#define ELF_F_DIRTY	0x1
+#define ELF_F_LAYOUT	0x4
 
 /*
  * File types
@@ -100,6 +100,12 @@ typedef enum {
      */
     ELF_T_SXWORD,
     ELF_T_XWORD,
+    /*
+     * Symbol versioning.  Sun broke binary compatibility (again!),
+     * but I won't.
+     */
+    ELF_T_VDEF,
+    ELF_T_VNEED,
     ELF_T_NUM		/* must be last */
 } Elf_Type;
 
@@ -180,7 +186,7 @@ extern char *elf_getident __P((Elf *__elf, size_t *__ptr));
 extern Elf32_Phdr *elf32_getphdr __P((Elf *__elf));
 extern Elf_Scn *elf_getscn __P((Elf *__elf, size_t __index));
 extern Elf32_Shdr *elf32_getshdr __P((Elf_Scn *__scn));
-extern unsigned long elf_hash __P((const char *__name));
+extern unsigned long elf_hash __P((const unsigned char *__name));
 extern Elf_Kind elf_kind __P((Elf *__elf));
 extern size_t elf_ndxscn __P((Elf_Scn *__scn));
 extern Elf_Data *elf_newdata __P((Elf_Scn *__scn));
@@ -200,6 +206,11 @@ extern Elf_Data *elf32_xlatetof __P((Elf_Data *__dst, const Elf_Data *__src,
 extern Elf_Data *elf32_xlatetom __P((Elf_Data *__dst, const Elf_Data *__src,
 	unsigned __encode));
 
+/*
+ * Additional functions found on Solaris
+ */
+extern long elf32_checksum __P((Elf *__elf));
+
 #if __LIBELF64
 /*
  * 64-bit ELF functions
@@ -216,12 +227,17 @@ extern Elf_Data *elf64_xlatetof __P((Elf_Data *__dst, const Elf_Data *__src,
 	unsigned __encode));
 extern Elf_Data *elf64_xlatetom __P((Elf_Data *__dst, const Elf_Data *__src,
 	unsigned __encode));
+
+/*
+ * Additional functions found on Solaris
+ */
+extern long elf64_checksum __P((Elf *__elf));
+
 #endif /* __LIBELF64 */
 
 /*
- * More function declarations
- * These functions are NOT available
- * in the SYSV version of libelf!
+ * More function declarations.  These functions are NOT available in
+ * the SYSV/Solaris versions of libelf!
  */
 extern size_t elf_delscn __P((Elf *__elf, Elf_Scn *__scn));
 

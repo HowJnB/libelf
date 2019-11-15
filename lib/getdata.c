@@ -1,6 +1,6 @@
 /*
 getdata.c - implementation of the elf_getdata(3) function.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,26 +20,51 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: getdata.c,v 1.5 1998/08/06 16:06:29 michael Exp $";
+static const char rcsid[] = "@(#) $Id: getdata.c,v 1.9 2001/10/07 04:39:50 michael Exp $";
 #endif /* lint */
 
 static Elf_Data*
 _elf_cook_scn(Elf *elf, Elf_Scn *scn, Scn_Data *sd) {
-    Elf_Data src, dst;
-    size_t fsize, msize;
+    Elf_Data dst;
+    Elf_Data src;
     int flag = 0;
-
-    src = dst = sd->sd_data;
-    src.d_version = elf->e_version;
-    fsize = _fsize(elf->e_class, src.d_version, src.d_type);
-    msize = _msize(elf->e_class, dst.d_version, src.d_type);
-    elf_assert(fsize);
-    elf_assert(msize);
-    if (fsize != msize) {
-	dst.d_size = (dst.d_size / fsize) * msize;
-    }
+    size_t dlen;
 
     elf_assert(elf->e_data);
+
+    /*
+     * Prepare source
+     */
+    src = sd->sd_data;
+    src.d_version = elf->e_version;
+    if (elf->e_rawdata) {
+	src.d_buf = elf->e_rawdata + scn->s_offset;
+    }
+    else {
+	src.d_buf = elf->e_data + scn->s_offset;
+    }
+
+    /*
+     * Prepare destination (needs prepared source!)
+     */
+    dst = sd->sd_data;
+    if (elf->e_class == ELFCLASS32) {
+	dlen = _elf32_xltsize(&src, dst.d_version, elf->e_encoding, 0);
+    }
+#if __LIBELF64
+    else if (elf->e_class == ELFCLASS64) {
+	dlen = _elf64_xltsize(&src, dst.d_version, elf->e_encoding, 0);
+    }
+#endif /* __LIBELF64 */
+    else {
+	elf_assert(valid_class(elf->e_class));
+	seterr(ERROR_UNIMPLEMENTED);
+	return NULL;
+    }
+    if (dlen == (size_t)-1) {
+	return NULL;
+    }
+    dst.d_size = dlen;
     if (elf->e_rawdata != elf->e_data && dst.d_size <= src.d_size) {
 	dst.d_buf = elf->e_data + scn->s_offset;
     }
@@ -51,13 +76,9 @@ _elf_cook_scn(Elf *elf, Elf_Scn *scn, Scn_Data *sd) {
 	flag = 1;
     }
 
-    if (elf->e_rawdata) {
-	src.d_buf = elf->e_rawdata + scn->s_offset;
-    }
-    else {
-	src.d_buf = elf->e_data + scn->s_offset;
-    }
-
+    /*
+     * Translate data
+     */
     if (_elf_xlatetom(elf, &dst, &src)) {
 	sd->sd_memdata = (char*)dst.d_buf;
 	sd->sd_data = dst;
@@ -87,6 +108,8 @@ elf_getdata(Elf_Scn *scn, Elf_Data *data) {
     }
     else if (data) {
 	for (sd = scn->s_data_1; sd; sd = sd->sd_link) {
+	    elf_assert(sd->sd_magic == DATA_MAGIC);
+	    elf_assert(sd->sd_scn == scn);
 	    if (data == &sd->sd_data) {
 		/*
 		 * sd_link allocated by elf_newdata().
@@ -97,6 +120,8 @@ elf_getdata(Elf_Scn *scn, Elf_Data *data) {
 	seterr(ERROR_SCNDATAMISMATCH);
     }
     else if ((sd = scn->s_data_1)) {
+	elf_assert(sd->sd_magic == DATA_MAGIC);
+	elf_assert(sd->sd_scn == scn);
 	elf = scn->s_elf;
 	elf_assert(elf);
 	elf_assert(elf->e_magic == ELF_MAGIC);

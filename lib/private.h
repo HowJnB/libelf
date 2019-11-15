@@ -1,6 +1,6 @@
 /*
 private.h - private definitions for libelf.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* @(#) $Id: private.h,v 1.10 1998/11/27 21:25:19 michael Exp $ */
+/* @(#) $Id: private.h,v 1.23 2001/10/15 21:39:02 michael Exp $ */
 
 #ifndef _PRIVATE_H
 #define _PRIVATE_H
@@ -34,8 +34,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # include <stdlib.h>
 # include <string.h>
 #else /* STDC_HEADERS */
-extern char *malloc(), *realloc();
-extern void free(), bcopy();
+extern void *malloc(), *realloc();
+extern void free(), bcopy(), abort();
 extern int strcmp(), strncmp(), memcmp();
 extern void *memcpy(), *memmove(), *memset();
 #endif /* STDC_HEADERS */
@@ -43,9 +43,22 @@ extern void *memcpy(), *memmove(), *memset();
 #if HAVE_UNISTD_H
 # include <unistd.h>
 #else /* HAVE_UNISTD_H */
-extern int read(), write();
+extern int read(), write(), close();
 extern off_t lseek();
+#if HAVE_FTRUNCATE
+extern int ftruncate();
+#endif /* HAVE_FTRUNCATE */
 #endif /* HAVE_UNISTD_H */
+
+#ifndef SEEK_SET
+#define SEEK_SET	0
+#endif /* SEEK_SET */
+#ifndef SEEK_CUR
+#define SEEK_CUR	1
+#endif /* SEEK_CUR */
+#ifndef SEEK_END
+#define SEEK_END	2
+#endif /* SEEK_END */
 
 #if !HAVE_MEMCMP
 # define memcmp	strncmp
@@ -66,15 +79,19 @@ extern void *_elf_memset();
 # define nlist __override_nlist_declaration
 #endif /* HAVE_STRUCT_NLIST_DECLARATION */
 
-#if NEED_LINK_H
+#if __LIBELF_NEED_LINK_H
 # include <link.h>
-#endif /* NEED_LINK_H */
+#endif /* __LIBELF_NEED_LINK_H */
 
 #include <libelf.h>
 
 #if HAVE_STRUCT_NLIST_DECLARATION
 # undef nlist
 #endif /* HAVE_STRUCT_NLIST_DECLARATION */
+
+#if __LIBELF64
+#include <gelf.h>
+#endif /* __LIBELF64 */
 
 typedef struct Scn_Data Scn_Data;
 
@@ -231,6 +248,7 @@ struct Elf_Scn {
 struct Scn_Data {
     Elf_Data	sd_data;		/* must be first! */
     Scn_Data*	sd_link;		/* pointer to next Scn_Data */
+    Elf_Scn*	sd_scn;			/* pointer to section */
     char*	sd_memdata;		/* memory image of section */
     unsigned	sd_data_flags;		/* data flags (ELF_F_*) */
     /* misc flags */
@@ -252,6 +270,7 @@ struct Scn_Data {
     /* d_version */	EV_NONE\
     },\
     /* sd_link */	NULL,\
+    /* sd_scn */	NULL,\
     /* sd_memdata */	NULL,\
     /* sd_data_flags */	0,\
     /* sd_freeme */	0,\
@@ -273,14 +292,37 @@ extern void *_elf_read __P((Elf*, void*, size_t, size_t));
 extern void *_elf_mmap __P((Elf*));
 extern int _elf_cook __P((Elf*));
 extern char *_elf_getehdr __P((Elf*, unsigned));
-extern Elf_Data *_elf_xlatetom(const Elf*, Elf_Data*, const Elf_Data*);
+extern char *_elf_getphdr __P((Elf*, unsigned));
+extern Elf_Data *_elf_xlatetom __P((const Elf*, Elf_Data*, const Elf_Data*));
+extern Elf_Type _elf_scn_type __P((unsigned));
+extern size_t _elf32_xltsize __P((const Elf_Data *src, unsigned dv, unsigned encode, int tof));
+extern size_t _elf64_xltsize __P((const Elf_Data *src, unsigned dv, unsigned encode, int tof));
+
+/*
+ * Special translators
+ */
+extern size_t _elf_verdef_32L11_tof __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verdef_32L11_tom __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verdef_32M11_tof __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verdef_32M11_tom __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verdef_64L11_tof __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verdef_64L11_tom __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verdef_64M11_tof __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verdef_64M11_tom __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verneed_32L11_tof __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verneed_32L11_tom __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verneed_32M11_tof __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verneed_32M11_tom __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verneed_64L11_tof __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verneed_64L11_tom __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verneed_64M11_tof __P((unsigned char *dst, const unsigned char *src, size_t n));
+extern size_t _elf_verneed_64M11_tom __P((unsigned char *dst, const unsigned char *src, size_t n));
 
 /*
  * Private data
  */
 extern const Elf_Scn _elf_scn_init;
 extern const Scn_Data _elf_data_init;
-extern const Elf_Type _elf_scn_types[SHT_NUM];
 extern const size_t _elf_fmsize[2][EV_CURRENT - EV_NONE][ELF_T_NUM][2];
 
 /*
@@ -298,7 +340,6 @@ extern const size_t _elf_fmsize[2][EV_CURRENT - EV_NONE][ELF_T_NUM][2];
 #define valid_encoding(e)	((e) >= ELFDATA2LSB && (e) <= ELFDATA2MSB)
 #define valid_version(v)	((v) > EV_NONE && (v) <= EV_CURRENT)
 #define valid_type(t)		((t) >= ELF_T_BYTE && (t) < ELF_T_NUM)
-#define valid_scntype(s)	((s) >= SHT_NULL && (s) < SHT_NUM)
 
 /*
  * Error codes
@@ -334,27 +375,17 @@ ERROR_NUM
 #endif /* ELF64_FSZ_ADDR */
 
 /*
- * Alignment
- */
-#define _ELF32_ALIGN_PHDR	4
-#define _ELF32_ALIGN_SHDR	4
-#define _ELF64_ALIGN_PHDR	8
-#define _ELF64_ALIGN_SHDR	8
-
-/*
  * Debugging
  */
 #if ENABLE_DEBUG
-# include <stdio.h>
+extern void __elf_assert __P((const char*, unsigned, const char*));
 # if __STDC__
-#  define elf_assert(x)	((void)((x)||__elf_assert(__FILE__,__LINE__,#x)))
+#  define elf_assert(x)	do{if(!(x))__elf_assert(__FILE__,__LINE__,#x);}while(0)
 # else /* __STDC__ */
-#  define elf_assert(x)	((void)((x)||__elf_assert(__FILE__,__LINE__,"x")))
+#  define elf_assert(x)	do{if(!(x))__elf_assert(__FILE__,__LINE__,"x");}while(0)
 # endif /* __STDC__ */
-# define __elf_assert(f,l,x)	(fprintf(stderr,\
-	"%s:%u: libelf assertion failure: %s\n",(f),(l),(x)),abort(),0)
 #else /* ENABLE_DEBUG */
-# define elf_assert(x)	((void)0)
+# define elf_assert(x)	do{}while(0)
 #endif /* ENABLE_DEBUG */
 
 #endif /* _PRIVATE_H */

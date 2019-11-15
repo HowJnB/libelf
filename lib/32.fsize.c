@@ -1,6 +1,6 @@
 /*
 32.fsize.c - implementation of the elf{32,64}_fsize(3) functions.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <ext_types.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: 32.fsize.c,v 1.5 1998/06/12 19:42:11 michael Exp $";
+static const char rcsid[] = "@(#) $Id: 32.fsize.c,v 1.9 2001/10/05 19:05:25 michael Exp $";
 #endif /* lint */
 
 const size_t
@@ -43,6 +43,11 @@ _elf_fmsize[2][EV_CURRENT - EV_NONE][ELF_T_NUM][2] = {
 	    { sizeof(Elf32_Sword),    sizeof(__ext_Elf32_Sword)  },
 	    { sizeof(Elf32_Sym),      sizeof(__ext_Elf32_Sym)    },
 	    { sizeof(Elf32_Word),     sizeof(__ext_Elf32_Word)   },
+	    { 0, 0 },	/* there is no Elf32_Sxword */
+	    { 0, 0 },	/* there is no Elf32_Xword */
+	    /* XXX: check Solaris values */
+	    { 0, 0 },	/* Elf32_Verdef/Verdaux size varies */
+	    { 0, 0 },	/* Elf32_Verneed/Vernaux size varies */
 	},
     },
 #if __LIBELF64
@@ -65,6 +70,9 @@ _elf_fmsize[2][EV_CURRENT - EV_NONE][ELF_T_NUM][2] = {
 	    { sizeof(Elf64_Word),     sizeof(__ext_Elf64_Word)   },
 	    { sizeof(Elf64_Sxword),   sizeof(__ext_Elf64_Sxword) },
 	    { sizeof(Elf64_Xword),    sizeof(__ext_Elf64_Xword)  },
+	    /* XXX: check Solaris values */
+	    { 0, 0 },	/* Elf64_Verdef/Verdaux size varies */
+	    { 0, 0 },	/* Elf64_Verneed/Vernaux size varies */
 	},
     },
 #endif /* __LIBELF64 */
@@ -96,6 +104,52 @@ elf32_fsize(Elf_Type type, size_t count, unsigned ver) {
 size_t
 elf64_fsize(Elf_Type type, size_t count, unsigned ver) {
     return count * _elf_fsize(ELFCLASS64, type, ver);
+}
+
+size_t
+gelf_fsize(Elf *elf, Elf_Type type, size_t count, unsigned ver) {
+    if (elf) {
+	if (elf->e_kind != ELF_K_ELF) {
+	    seterr(ERROR_NOTELF);
+	}
+	else if (valid_class(elf->e_class)) {
+	    return count * _elf_fsize(elf->e_class, type, ver);
+	}
+	else {
+	    seterr(ERROR_UNKNOWN_CLASS);
+	}
+    }
+    return 0;
+}
+
+/*
+ * Extension: report memory size
+ */
+size_t
+gelf_msize(Elf *elf, Elf_Type type, size_t count, unsigned ver) {
+    size_t n;
+
+    if (elf) {
+	if (elf->e_kind != ELF_K_ELF) {
+	    seterr(ERROR_NOTELF);
+	}
+	else if (!valid_class(elf->e_class)) {
+	    seterr(ERROR_UNKNOWN_CLASS);
+	}
+	else if (!valid_version(ver)) {
+	    seterr(ERROR_UNKNOWN_VERSION);
+	}
+	else if (!valid_type(type)) {
+	    seterr(ERROR_UNKNOWN_TYPE);
+	}
+	else if (!(n = _msize(elf->e_class, ver, type))) {
+	    seterr(ERROR_UNKNOWN_TYPE);
+	}
+	else {
+	    return count * n;
+	}
+    }
+    return 0;
 }
 
 #endif /* __LIBELF64 */

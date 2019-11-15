@@ -1,6 +1,6 @@
 /*
 rawdata.c - implementation of the elf_rawdata(3) function.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2000 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: rawdata.c,v 1.4 1998/08/06 16:06:31 michael Exp $";
+static const char rcsid[] = "@(#) $Id: rawdata.c,v 1.6 2000/03/26 03:00:20 michael Exp $";
 #endif /* lint */
 
 Elf_Data*
@@ -45,6 +45,8 @@ elf_rawdata(Elf_Scn *scn, Elf_Data *data) {
 	return NULL;
     }
     else if ((sd = scn->s_rawdata)) {
+	elf_assert(sd->sd_magic == DATA_MAGIC);
+	elf_assert(sd->sd_scn == scn);
 	return &sd->sd_data;
     }
     else if (scn->s_offset < 0 || scn->s_offset > elf->e_size) {
@@ -59,6 +61,7 @@ elf_rawdata(Elf_Scn *scn, Elf_Data *data) {
     }
     else {
 	*sd = _elf_data_init;
+	sd->sd_scn = scn;
 	sd->sd_freeme = 1;
 	sd->sd_data.d_size = scn->s_size;
 	sd->sd_data.d_version = _elf_version;

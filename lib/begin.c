@@ -1,6 +1,6 @@
 /*
 begin.c - implementation of the elf_begin(3) and elf_memory(3) functions.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -18,11 +18,31 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include <private.h>
-#include <ar.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: begin.c,v 1.8 1998/08/22 13:57:46 michael Exp $";
+static const char rcsid[] = "@(#) $Id: begin.c,v 1.12 2001/10/15 21:38:29 michael Exp $";
 #endif /* lint */
+
+#if HAVE_AR_H
+#include <ar.h>
+#else /* HAVE_AR_H */
+
+#define ARMAG	"!<arch>\n"
+#define SARMAG	8
+
+struct ar_hdr {
+    char    ar_name[16];
+    char    ar_date[12];
+    char    ar_uid[6];
+    char    ar_gid[6];
+    char    ar_mode[8];
+    char    ar_size[10];
+    char    ar_fmag[2];
+};
+
+#define ARFMAG	"`\n"
+
+#endif /* HAVE_AR_H */
 
 static const Elf _elf_init = INIT_ELF;
 static const char fmag[] = ARFMAG;
@@ -262,7 +282,7 @@ elf_begin(int fd, Elf_Cmd cmd, Elf *ref) {
 	}
 	size = arhdr->ar_size;
     }
-    else if ((off_t)(size = lseek(fd, (off_t)0, 2)) == (off_t)-1) {
+    else if ((off_t)(size = lseek(fd, (off_t)0, SEEK_END)) == (off_t)-1) {
 	seterr(ERROR_IO_GETSIZE);
 	return NULL;
     }
@@ -396,3 +416,15 @@ elf_memory(char *image, size_t size) {
     _elf_check_type(elf, size);
     return elf;
 }
+
+#if __LIBELF64
+
+int
+gelf_getclass(Elf *elf) {
+    if (elf && elf->e_kind == ELF_K_ELF && valid_class(elf->e_class)) {
+	return elf->e_class;
+    }
+    return ELFCLASSNONE;
+}
+
+#endif /* __LIBELF64 */

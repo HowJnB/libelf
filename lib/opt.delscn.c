@@ -1,6 +1,6 @@
 /*
 opt.delscn.c - implementation of the elf_delscn(3) function.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: opt.delscn.c,v 1.5 1998/06/12 19:42:35 michael Exp $";
+static const char rcsid[] = "@(#) $Id: opt.delscn.c,v 1.8 2001/10/08 15:57:10 michael Exp $";
 #endif /* lint */
 
 static size_t
@@ -45,6 +45,17 @@ _elf32_update_shdr(Elf *elf, size_t index) {
 	    case SHT_DYNAMIC:
 	    case SHT_HASH:
 	    case SHT_SYMTAB:
+#if __LIBELF_SYMBOL_VERSIONS
+#if __LIBELF_SUN_SYMBOL_VERSIONS
+	    case SHT_SUNW_verdef:
+	    case SHT_SUNW_verneed:
+	    case SHT_SUNW_versym:
+#else /* __LIBELF_SUN_SYMBOL_VERSIONS */
+	    case SHT_GNU_verdef:
+	    case SHT_GNU_verneed:
+	    case SHT_GNU_versym:
+#endif /* __LIBELF_SUN_SYMBOL_VERSIONS */
+#endif /* __LIBELF_SYMBOL_VERSIONS */
 		shdr->sh_link = _newindex(shdr->sh_link, index);
 		/* fall through */
 	    default:
@@ -72,6 +83,17 @@ _elf64_update_shdr(Elf *elf, size_t index) {
 	    case SHT_DYNAMIC:
 	    case SHT_HASH:
 	    case SHT_SYMTAB:
+#if __LIBELF_SYMBOL_VERSIONS
+#if __LIBELF_SUN_SYMBOL_VERSIONS
+	    case SHT_SUNW_verdef:
+	    case SHT_SUNW_verneed:
+	    case SHT_SUNW_versym:
+#else /* __LIBELF_SUN_SYMBOL_VERSIONS */
+	    case SHT_GNU_verdef:
+	    case SHT_GNU_verneed:
+	    case SHT_GNU_versym:
+#endif /* __LIBELF_SUN_SYMBOL_VERSIONS */
+#endif /* __LIBELF_SYMBOL_VERSIONS */
 		shdr->sh_link = _newindex(shdr->sh_link, index);
 		/* fall through */
 	    default:
@@ -129,6 +151,8 @@ elf_delscn(Elf *elf, Elf_Scn *scn) {
      * Free section descriptor and data.
      */
     for (sd = scn->s_data_1; sd; sd = tmp) {
+	elf_assert(sd->sd_magic == DATA_MAGIC);
+	elf_assert(sd->sd_scn == scn);
 	tmp = sd->sd_link;
 	if (sd->sd_free_data && sd->sd_memdata) {
 	    free(sd->sd_memdata);
@@ -138,6 +162,8 @@ elf_delscn(Elf *elf, Elf_Scn *scn) {
 	}
     }
     if ((sd = scn->s_rawdata)) {
+	elf_assert(sd->sd_magic == DATA_MAGIC);
+	elf_assert(sd->sd_scn == scn);
 	if (sd->sd_free_data && sd->sd_memdata) {
 	    free(sd->sd_memdata);
 	}

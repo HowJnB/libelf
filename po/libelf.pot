@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Date: 1998-06-08 16:51:10+0200\n"
-"From: Michael Riepe <michael@tribble>\n"
+"Date: 2001-10-07 21:54:14+0200\n"
+"From: Michael Riepe <michael@thrai>\n"
 "Content-Type: text/plain; charset=\n"
 "Xgettext-Options: -c -dlibelf -k_\n"
 "Files: ../lib/errors.h\n"
@@ -195,49 +195,97 @@ msgid "Format error: data region truncated"
 msgstr ""
 
 #: ../lib/errors.h:72
-msgid "Format error: section size too small for data"
-msgstr ""
-
-#: ../lib/errors.h:73
 msgid "Format error: program header table alignment"
 msgstr ""
 
-#: ../lib/errors.h:74
+#: ../lib/errors.h:73
 msgid "Format error: section header table alignment"
 msgstr ""
 
+#: ../lib/errors.h:74
+msgid "Format error: bad parameter in Verdef record"
+msgstr ""
+
 #: ../lib/errors.h:75
-msgid "Memory error: elf descriptor"
+msgid "Format error: unknown Verdef version"
 msgstr ""
 
 #: ../lib/errors.h:76
-msgid "Memory error: archive symbol table"
+msgid "Format error: bad parameter in Verneed record"
 msgstr ""
 
 #: ../lib/errors.h:77
-msgid "Memory error: archive member header"
+msgid "Format error: unknown Verneed version"
 msgstr ""
 
 #: ../lib/errors.h:78
-msgid "Memory error: ELF header"
+msgid "Layout error: section size too small for data"
 msgstr ""
 
 #: ../lib/errors.h:79
-msgid "Memory error: program header table"
+msgid "Layout error: overlapping sections"
 msgstr ""
 
 #: ../lib/errors.h:80
-msgid "Memory error: section header table"
+msgid "Memory error: elf descriptor"
 msgstr ""
 
 #: ../lib/errors.h:81
-msgid "Memory error: section descriptor"
+msgid "Memory error: archive symbol table"
 msgstr ""
 
 #: ../lib/errors.h:82
-msgid "Memory error: section data"
+msgid "Memory error: archive member header"
 msgstr ""
 
 #: ../lib/errors.h:83
+msgid "Memory error: ELF header"
+msgstr ""
+
+#: ../lib/errors.h:84
+msgid "Memory error: program header table"
+msgstr ""
+
+#: ../lib/errors.h:85
+msgid "Memory error: section header table"
+msgstr ""
+
+#: ../lib/errors.h:86
+msgid "Memory error: section descriptor"
+msgstr ""
+
+#: ../lib/errors.h:87
+msgid "Memory error: section data"
+msgstr ""
+
+#: ../lib/errors.h:88
 msgid "Memory error: output file space"
+msgstr ""
+
+#: ../lib/errors.h:89
+msgid "GElf error: value out of range"
+msgstr ""
+
+#: ../lib/errors.h:90
+msgid "GElf error: index out of range"
+msgstr ""
+
+#: ../lib/errors.h:91
+msgid "GElf error: type mismatch"
+msgstr ""
+
+#: ../lib/errors.h:92
+msgid "GElf error: not enough memory for GElf_Sym"
+msgstr ""
+
+#: ../lib/errors.h:93
+msgid "GElf error: not enough memory for GElf_Dyn"
+msgstr ""
+
+#: ../lib/errors.h:94
+msgid "GElf error: not enough memory for GElf_Rela"
+msgstr ""
+
+#: ../lib/errors.h:95
+msgid "GElf error: not enough memory for GElf_Rel"
 msgstr ""

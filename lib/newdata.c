@@ -1,6 +1,6 @@
 /*
 newdata.c - implementation of the elf_newdata(3) function.
-Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2000 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: newdata.c,v 1.4 1998/08/06 16:06:30 michael Exp $";
+static const char rcsid[] = "@(#) $Id: newdata.c,v 1.6 2000/03/26 03:00:20 michael Exp $";
 #endif /* lint */
 
 Elf_Data*
@@ -39,6 +39,7 @@ elf_newdata(Elf_Scn *scn) {
     }
     else {
 	*sd = _elf_data_init;
+	sd->sd_scn = scn;
 	sd->sd_data_flags = ELF_F_DIRTY;
 	sd->sd_freeme = 1;
 	sd->sd_data.d_version = _elf_version;
