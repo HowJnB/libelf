@@ -1,6 +1,6 @@
 /*
 private.h - private definitions for libelf.
-Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* @(#) $Id: private.h,v 1.24 2002/12/30 04:57:32 michael Exp $ */
+/* @(#) $Id: private.h,v 1.26 2003/05/24 16:55:58 michael Exp $ */
 
 #ifndef _PRIVATE_H
 #define _PRIVATE_H
@@ -295,8 +295,9 @@ extern char *_elf_getehdr __P((Elf*, unsigned));
 extern char *_elf_getphdr __P((Elf*, unsigned));
 extern Elf_Data *_elf_xlatetom __P((const Elf*, Elf_Data*, const Elf_Data*));
 extern Elf_Type _elf_scn_type __P((unsigned));
-extern size_t _elf32_xltsize __P((const Elf_Data *src, unsigned dv, unsigned encode, int tof));
-extern size_t _elf64_xltsize __P((const Elf_Data *src, unsigned dv, unsigned encode, int tof));
+extern size_t _elf32_xltsize __P((const Elf_Data *__src, unsigned __dv, unsigned __encode, int __tof));
+extern size_t _elf64_xltsize __P((const Elf_Data *__src, unsigned __dv, unsigned __encode, int __tof));
+extern int _elf_update_shnum(Elf *__elf, size_t __shnum);
 
 /*
  * Special translators

@@ -1,4 +1,4 @@
-This is the public release of libelf-0.8.4, a free ELF object
+This is the public release of libelf-0.8.5, a free ELF object
 file access library. If you have problems with applications
 that use libelf and work with the commercial (SVR4, Solaris)
 version but not with this one, please contact me.
@@ -9,13 +9,19 @@ have a file .../include/elf.h that contains the single line
 configure.
 
 Installation is straightforward - the package is autoconf'ed.  Just do
-``cd libelf-0.8.4; ./configure; make; make install''.  Header files
+``cd libelf-0.8.5; ./configure; make; make install''.  Header files
 will be installed in .../include/libelf/.  If your system does not
 provide its own versions of libelf.h, nlist.h or gelf.h, ``make
 install'' will add the missing headers.  If you prefer not to have
 these files installed in /usr/include, use ``--disable-compat'' and
 add ``-I /usr/include/libelf'' to your CFLAGS when compiling
 libelf-based programs.
+
+Note to distribution makers:  You can install libelf in a separate root
+hierarchy by using the command ``make instroot=/my/root install''.
+You should also use the ``--enable-compat'' configure option in that
+case, or run ``make instroot=/my/root install-compat'' manually, to
+install all the required header files.
 
 If you are running Linux with libc 5.* as the default C library,
 and you plan to use the 64-bit functions, you must either use
@@ -29,7 +35,7 @@ On some systems (in particular, Solaris and all variants of Linux),
 ``make'' will try to build a shared library. If you run into problems
 on your system, please pass ``--disable-shared'' to configure.
 If you build a shared library and want it to be installed as
-``libelf-0.8.4.so'' rather than ``libelf.so.0.8.4'', please use
+``libelf-0.8.5.so'' rather than ``libelf.so.0.8.5'', please use
 ``./configure --enable-gnu-names''. Other files, e.g. ``libelf.so'' and
 ``libelf.so.0'' are NOT affected.
 
@@ -69,6 +75,32 @@ IMHO a good idea in general in this case):
 
 After that, return to the libelf build directory, remove
 config.cache, and start over.
+
+*** Large File Support (LFS) applications ***
+
+Some 32-bit systems support files that are larger than the address space
+of the architecture.  On these, the `off_t' data type may have 32 or
+64 bits, depending on the API you choose.  Since off_t is also part of
+the libelf API, in particular the Elf_Data and Elf_Arhdr structures,
+an application compiled with large file support will need a version of
+libelf that has also been compiled with LFS; otherwise, it won't work
+correctly.  Similarly, a program compiled without LFS needs a library
+compiled without LFS.
+
+Note that libelf is currently unable to process large files on 32-bit
+architectures, whether you compile it for LFS or not, for the simple
+reason that the files won't fit into the processes' address space.
+Therefore, libelf is compiled without LFS by default.  It can of course
+read and write ELF files for 64-bit architectures, but they will be
+limited in length on a 32-bit system.
+
+You may compile libelf with large file support by setting CPPFLAGS at
+configuration time:
+
+	CPPFLAGS=`getconf LFS_CFLAGS` ./configure
+
+But I really, really recommend you don't, because it breaks binary
+compatibility with existing libelf based applications.
 
 *** 64-bit support ***
 
@@ -132,6 +164,11 @@ to turn off versioning translation support.
 	* Libelf does not translate Solaris' `Move' and `Syminfo'
 	  sections. You can read them using elf_getdata(), but you'll
 	  only get raw (untranslated) bytes.
+
+Changes since 0.8.4:
+
+	* elf_strptr() should now work more safely with fragmented
+	  or badly formatted string tables.
 
 Changes since 0.8.3:
 

@@ -1,5 +1,5 @@
 # lib/Makefile for libelf.
-# Copyright (C) 1995 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
+# Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -15,7 +15,9 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-# @(#) $Id: Makefile.in,v 1.19 2002/12/22 19:38:40 michael Exp $
+# @(#) $Id: Makefile.in,v 1.25 2003/12/05 15:36:00 michael Exp $
+
+instroot =
 
 prefix = @prefix@
 exec_prefix = @exec_prefix@
@@ -43,11 +45,15 @@ DEPSHLIBS = @DEPSHLIBS@
 
 DO_SHLIB = @DO_SHLIB@
 PICFLAGS = @PICFLAGS@
-SHLIB = @SHLIB@
-SHLINK = @SHLINK@
-SONAME = @SONAME@
+SHLIB_SFX = @SHLIB_SFX@
+SHLINK_SFX = @SHLINK_SFX@
+SONAME_SFX = @SONAME_SFX@
 LINK_SHLIB = @LINK_SHLIB@
 INSTALL_SHLIB = @INSTALL_SHLIB@
+
+SHLIB = libelf$(SHLIB_SFX)
+SHLINK = libelf$(SHLINK_SFX)
+SONAME = libelf$(SONAME_SFX)
 
 # install includes in includedir?
 DO_COMPAT = @DO_COMPAT@
@@ -70,15 +76,12 @@ VPATH = @srcdir@
 topdir = ..
 subdir = lib
 
-picdir = ../pic
-back = ../lib
-
 .SUFFIXES:
 .SUFFIXES: .c .o
 .c.o:
-	@$(RM) $@ $(picdir)/$@
+	@$(RM) $@ pic/$@
 	if test -n "$(PICFLAGS)"; then \
-	  $(COMPILE) $(PICFLAGS) $< && $(MV) $@ $(picdir)/$@; \
+	  $(COMPILE) $(PICFLAGS) $< && $(MV) $@ pic/$@; \
 	else true; fi
 	$(COMPILE) $<
 
@@ -109,8 +112,8 @@ SRCS4 = nlist.c
 OBJS4 = nlist.o
 
 # opt
-SRCS5 = opt.delscn.c
-OBJS5 = opt.delscn.o
+SRCS5 = opt.delscn.c x.remscn.c x.movscn.c
+OBJS5 = opt.delscn.o x.remscn.o x.movscn.o
 
 # 64-bit sources
 SRCS64 = 64.xlatetof.c gelfehdr.c gelfphdr.c gelfshdr.c gelftrans.c swap64.c
@@ -139,7 +142,14 @@ PRIVHDRS = byteswap.h errors.h ext_types.h private.h elf_repl.h $(HDRS_V)
 
 DISTFILES = $(SRCS) $(LIBSRCS) $(HDRS) $(PRIVHDRS) Makefile.in sys_elf.h.in
 
-all: $(picdir) libelf.a shared-$(DO_SHLIB)
+all: objdirs libelf.a shared-$(DO_SHLIB)
+
+check:
+
+objdirs:
+	@for d in pic; do \
+	    test -d $$d || mkdir $$d || exit 1; \
+	done
 
 shared-yes: $(SHLIB)
 shared-no:
@@ -151,8 +161,8 @@ libelf.a: $(OBJS) $(LIBOBJS)
 
 $(SHLIB): $(OBJS) $(LIBOBJS)
 	@$(RM) $(SHLIB)
-	cd $(picdir) && \
-	  $(LINK_SHLIB) -o $(back)/$(SHLIB) $(OBJS) $(LIBOBJS) $(DEPSHLIBS)
+	cd pic && \
+	  $(LINK_SHLIB) -o ../$(SHLIB) $(OBJS) $(LIBOBJS) $(DEPSHLIBS)
 	if test "$(SONAME)" = "$(SHLIB)"; then true; else \
 	  $(RM) $(SONAME) && $(LN_S) $(SHLIB) $(SONAME); \
 	fi
@@ -160,24 +170,22 @@ $(SHLIB): $(OBJS) $(LIBOBJS)
 	  $(RM) $(SHLINK) && $(LN_S) $(SHLIB) $(SHLINK); \
 	fi
 
-$(picdir):
-	@$(RM) -r $(picdir)
-	mkdir $(picdir)
-
 install: all installdirs install-data \
 	install-shared-$(DO_SHLIB) install-compat-$(DO_COMPAT)
 
 installdirs: $(top_srcdir)/mkinstalldirs
-	$(SHELL) $(top_srcdir)/mkinstalldirs $(installdirs)
+	dirs="$(installdirs)"; for dir in $$dirs; do \
+	    $(SHELL) $(top_srcdir)/mkinstalldirs $(instroot)$$dir; \
+	done
 
 install-data:
-	$(INSTALL_DATA) libelf.a $(libdir)
-	-cd $(libdir) && $(RANLIB) libelf.a
+	$(INSTALL_DATA) libelf.a $(instroot)$(libdir)
+	-cd $(instroot)$(libdir) && $(RANLIB) libelf.a
 	files="$(HDRS) $(AUXHDRS) elf_repl.h"; for file in $$files; do \
 	  if test -r $$file; then \
-	    $(INSTALL_DATA) $$file $(includedir)/libelf; \
+	    $(INSTALL_DATA) $$file $(instroot)$(includedir)/libelf; \
 	  else \
-	    $(INSTALL_DATA) $(srcdir)/$$file $(includedir)/libelf; \
+	    $(INSTALL_DATA) $(srcdir)/$$file $(instroot)$(includedir)/libelf; \
 	  fi; \
 	done
 
@@ -185,31 +193,31 @@ uninstall: uninstall-data \
 	uninstall-shared-$(DO_SHLIB) uninstall-compat-$(DO_COMPAT)
 
 uninstall-data:
-	$(RM) $(libdir)/libelf.a
-	$(RM) -r $(includedir)/libelf
+	$(RM) $(instroot)$(libdir)/libelf.a
+	$(RM) -r $(instroot)$(includedir)/libelf
 
 install-shared-yes: install-shared
 install-shared-no:
 install-shared: $(SHLIB)
-	$(INSTALL_SHLIB) $(SHLIB) $(libdir)
+	$(INSTALL_SHLIB) $(SHLIB) $(instroot)$(libdir)
 	if test "$(SONAME)" = "$(SHLIB)"; then true; else \
-	  cd $(libdir) && $(RM) $(SONAME) && $(LN_S) $(SHLIB) $(SONAME); \
+	  cd $(instroot)$(libdir) && $(RM) $(SONAME) && $(LN_S) $(SHLIB) $(SONAME); \
 	fi
 	if test "$(SHLINK)" = "$(SHLIB)"; then true; else \
-	  cd $(libdir) && $(RM) $(SHLINK) && $(LN_S) $(SHLIB) $(SHLINK); \
+	  cd $(instroot)$(libdir) && $(RM) $(SHLINK) && $(LN_S) $(SHLIB) $(SHLINK); \
 	fi
 
 uninstall-shared-yes: uninstall-shared
 uninstall-shared-no:
 uninstall-shared:
-	cd $(libdir) && $(RM) $(SHLIB) $(SONAME) $(SHLINK)
+	cd $(instroot)$(libdir) && $(RM) $(SHLIB) $(SONAME) $(SHLINK)
 
 install-compat-yes: install-compat
 install-compat-no:
 install-compat:
 	files="$(HDRS)"; for file in $$files; do \
-	  if test -f $(includedir)/$$file; then true; else \
-	    echo "#include <libelf/$$file>" > $(includedir)/$$file; \
+	  if test -f $(instroot)$(includedir)/$$file; then true; else \
+	    echo "#include <libelf/$$file>" > $(instroot)$(includedir)/$$file; \
 	  fi; \
 	done
 
@@ -217,20 +225,20 @@ uninstall-compat-yes: uninstall-compat
 uninstall-compat-no:
 uninstall-compat:
 	files="$(HDRS)"; for file in $$files; do \
-	  if grep "^#include <libelf/$$file>$" $(includedir)/$$file >/dev/null 2>&1; then \
-	    $(RM) $(includedir)/$$file; \
+	  if grep "^#include <libelf/$$file>\$$" $(instroot)$(includedir)/$$file >/dev/null 2>&1; then \
+	    $(RM) $(instroot)$(includedir)/$$file; \
 	  else true; fi; \
 	done
 
 mostlyclean:
-	$(RM) *.o *.a $(picdir)/*.o $(SHLIB) $(SONAME) $(SHLINK)
+	$(RM) *.o *.a pic/*.o $(SHLIB) $(SONAME) $(SHLINK)
 	$(RM) *~ core a.out errlist
 
 clean: mostlyclean
 
 distclean: clean
 	$(RM) stamp-h $(AUXHDRS)
-	$(RM) -r $(picdir)
+	$(RM) -r pic
 	$(RM) Makefile
 
 maintainer-clean: distclean

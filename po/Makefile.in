@@ -15,7 +15,9 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-# @(#) $Id: Makefile.in,v 1.9 2003/01/02 14:59:11 michael Exp $
+# @(#) $Id: Makefile.in,v 1.11 2003/12/05 15:36:00 michael Exp $
+
+instroot =
 
 prefix = @prefix@
 exec_prefix = @exec_prefix@
@@ -85,24 +87,26 @@ INSTOBJEXT = @INSTOBJEXT@
 
 all: $(CATALOGS)
 
+check:
+
 install: all install-data
 
 install-data: $(top_srcdir)/mkinstalldirs
 	catalogs="$(CATALOGS)"; for cat in $$catalogs; do \
 	  lang=`echo $$cat | sed 's,$(CATOBJEXT)$$,,'`; \
 	  dir=$(localedir)/$$lang/LC_MESSAGES; \
-	  $(SHELL) $(top_srcdir)/mkinstalldirs $$dir; \
+	  $(SHELL) $(top_srcdir)/mkinstalldirs $(instroot)$$dir; \
 	  if test -r $$cat; then \
-	    $(INSTALL_DATA) $$cat $$dir/$(PACKAGE)$(INSTOBJEXT); \
+	    $(INSTALL_DATA) $$cat $(instroot)$$dir/$(PACKAGE)$(INSTOBJEXT); \
 	  else \
-	    $(INSTALL_DATA) $(srcdir)/$$cat $$dir/$(PACKAGE)$(INSTOBJEXT); \
+	    $(INSTALL_DATA) $(srcdir)/$$cat $(instroot)$$dir/$(PACKAGE)$(INSTOBJEXT); \
 	  fi; \
 	done
 
 uninstall:
 	catalogs="$(CATALOGS)"; for cat in $$catalogs; do \
 	  lang=`echo $$cat | sed 's,$(CATOBJEXT)$$,,'`; \
-	  $(RM) $(localedir)/$$lang/LC_MESSAGES/$(PACKAGE)$(INSTOBJEXT); \
+	  $(RM) $(instroot)$(localedir)/$$lang/LC_MESSAGES/$(PACKAGE)$(INSTOBJEXT); \
 	done
 
 mostlyclean:

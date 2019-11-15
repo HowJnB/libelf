@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: checksum.c,v 1.2 2001/10/01 22:30:10 michael Exp $";
+static const char rcsid[] = "@(#) $Id: checksum.c,v 1.3 2003/05/22 23:16:24 michael Exp $";
 #endif /* lint */
 
 /*
@@ -106,7 +106,11 @@ _elf_csum(Elf *elf) {
 	}
 	data = NULL;
 	while ((data = elf_getdata(scn, data))) {
-	    if (data->d_buf && data->d_size) {
+	    if (data->d_size) {
+		if (data->d_buf == NULL) {
+		    seterr(ERROR_NULLBUF);
+		    return 0L;
+		}
 		csum += add_bytes(data->d_buf, data->d_size);
 	    }
 	}

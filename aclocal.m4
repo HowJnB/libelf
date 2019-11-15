@@ -1,9 +1,31 @@
 # Local additions to Autoconf macros.
 # Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
 
-# @(#) $Id: aclocal.m4,v 1.13 2003/01/02 14:57:16 michael Exp $
+# @(#) $Id: aclocal.m4,v 1.17 2003/12/05 15:36:00 michael Exp $
 
-AC_PREREQ(2.12)
+AC_PREREQ(2.13)
+
+dnl mr_PACKAGE(package-name)
+AC_DEFUN(mr_PACKAGE, [changequote(<<, >>)dnl
+  define(<<mr_MAINT>>, <<I_AM_THE_>>translit($1, [a-z-], [A-Z_])<<_MAINTAINER>>)dnl
+  changequote([, ])dnl
+  PACKAGE=$1
+  VERSION=`cat $srcdir/VERSION`
+  AC_SUBST(PACKAGE)
+  AC_SUBST(VERSION)
+  AC_ARG_ENABLE(maintainer-mode,
+    [  --enable-maintainer-mode
+                          enable maintainer-specific make rules (default: no)],
+    [mr_enable_maintainer_mode="$enableval"],
+    [mr_enable_maintainer_mode="${mr_MAINT-no}"])
+  if test x"$mr_enable_maintainer_mode" = x"yes"; then
+    MAINT=
+  else
+    MAINT='maintainer-only-'
+  fi
+  AC_SUBST(MAINT)
+  undefine(<<mr_MAINT>>)dnl
+])
 
 AC_DEFUN(mr_ENABLE_NLS, [
   AC_PROVIDE([$0])
@@ -174,9 +196,9 @@ main(int argc, char **argv) {
 AC_DEFUN(mr_ENABLE_SHARED, [
   AC_PROVIDE([$0])
   PICFLAGS=
-  SHLIB=_shlib_dummy_
-  SHLINK=
-  SONAME=
+  SHLIB_SFX=
+  SHLINK_SFX=
+  SONAME_SFX=
   LINK_SHLIB=
   INSTALL_SHLIB=
   DEPSHLIBS=
@@ -204,12 +226,12 @@ AC_DEFUN(mr_ENABLE_SHARED, [
 	    PICFLAGS='-fPIC -DPIC'
 	    if test "$mr_enable_gnu_names" = yes
 	    then
-	      SHLIB='$(PACKAGE)-$(VERSION).so'
+	      SHLIB_SFX='-$(VERSION).so'
 	    else
-	      SHLIB='$(PACKAGE).so.$(VERSION)'
+	      SHLIB_SFX='.so.$(VERSION)'
 	    fi
-	    SHLINK='$(PACKAGE).so'
-	    SONAME='$(PACKAGE).so.$(MAJOR)'
+	    SHLINK_SFX='.so'
+	    SONAME_SFX='.so.$(MAJOR)'
 	    LINK_SHLIB='$(CC) -shared -Wl,-soname,$(SONAME)'
 	    INSTALL_SHLIB='$(INSTALL_PROGRAM)'
 	    DEPSHLIBS='-lc'
@@ -222,7 +244,7 @@ AC_DEFUN(mr_ENABLE_SHARED, [
 	  mr_enable_shared=no
 	fi
 	;;
-      sparc-sun-solaris[2-9]*)
+      sparc-sun-solaris2*)
 	if test "$GCC" = yes; then
 	  PICFLAGS='-fPIC -DPIC'
 	else
@@ -230,12 +252,12 @@ AC_DEFUN(mr_ENABLE_SHARED, [
 	fi
 	if test "$mr_enable_gnu_names" = yes
 	then
-	  SHLIB='$(PACKAGE)-$(MAJOR).so'
+	  SHLIB_SFX='-$(MAJOR).so'
 	else
-	  SHLIB='$(PACKAGE).so.$(MAJOR)'
+	  SHLIB_SFX='.so.$(MAJOR)'
 	fi
-	SONAME='$(PACKAGE).so.$(MAJOR)'
-	SHLINK='$(PACKAGE).so'
+	SONAME_SFX='.so.$(MAJOR)'
+	SHLINK_SFX='.so'
 	LINK_SHLIB='$(LD) -G -z text -h $(SONAME)'
 	INSTALL_SHLIB='$(INSTALL_PROGRAM)'
 	;;
@@ -248,9 +270,9 @@ AC_DEFUN(mr_ENABLE_SHARED, [
     mr_enable_shared=no
   fi
   AC_SUBST(PICFLAGS)
-  AC_SUBST(SHLIB)
-  AC_SUBST(SHLINK)
-  AC_SUBST(SONAME)
+  AC_SUBST(SHLIB_SFX)
+  AC_SUBST(SHLINK_SFX)
+  AC_SUBST(SONAME_SFX)
   AC_SUBST(LINK_SHLIB)
   AC_SUBST(INSTALL_SHLIB)
   AC_SUBST(DEPSHLIBS)

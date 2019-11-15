@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-# @(#) $Id: Makefile.in,v 1.15 2003/02/27 13:35:12 michael Exp $
+# @(#) $Id: Makefile.in,v 1.18 2003/11/06 17:35:00 michael Exp $
 
 MV = mv -f
 RM = rm -f
@@ -47,6 +47,7 @@ DISTFILES = \
 	Makefile.in mkinstalldirs README stamp-h.in VERSION
 
 all: all-recursive all-local
+check: check-recursive check-local
 install: install-recursive install-local
 uninstall: uninstall-recursive uninstall-local
 mostlyclean: mostlyclean-recursive mostlyclean-local
@@ -57,9 +58,9 @@ maintainer-clean: maintainer-clean-recursive maintainer-clean-local
 install-compat uninstall-compat:
 	cd lib && $(MAKE) $@
 
-all-recursive install-recursive uninstall-recursive \
-clean-recursive distclean-recursive \
-mostlyclean-recursive maintainer-clean-recursive:
+all-recursive check-recursive install-recursive uninstall-recursive \
+clean-recursive distclean-recursive mostlyclean-recursive \
+maintainer-clean-recursive:
 	@subdirs="$(SUBDIRS)"; for subdir in $$subdirs; do \
 	  target=`echo $@|sed 's,-recursive,,'`; \
 	  echo making $$target in $$subdir; \
@@ -67,6 +68,8 @@ mostlyclean-recursive maintainer-clean-recursive:
 	done
 
 all-local:
+
+check-local:
 
 install-local:
 
@@ -104,19 +107,23 @@ $(MAINT)./stamp-dist: $(DISTFILES)
 	subdirs="$(DISTSUBDIRS)"; for subdir in $$subdirs; do \
 	  (cd $$subdir && $(MAKE) dist) || exit 1; \
 	done
+	cd $(distdir) && \
+	    find . -type f ! -name MANIFEST -exec wc -c {} \; | \
+	    sort +1 >MANIFEST
 	-$(RM) $(distdir).tar.gz.bak $(PACKAGE).tar.gz
 	-$(MV) $(distdir).tar.gz $(distdir).tar.gz.bak
 	tar cvhfz $(distdir).tar.gz $(DISTPERMS) $(distdir)
 	$(LN_S) $(distdir).tar.gz $(PACKAGE).tar.gz
 	$(RM) stamp-dist && echo timestamp > stamp-dist
 
-$(MAINT)test-dist:
-	$(RM) -r testdist
-	mkdir testdist
-	echo 'unset CC CFLAGS CPPFLAGS LDFLAGS LIBS' >testdist/config.site
-	@echo 'unset I_AM_THE_LIBELF_MAINTAINER' >>testdist/config.site
-	cd testdist && CONFIG_SITE=config.site ../$(distdir)/configure
-	$(MAKE) -C testdist
+$(MAINT)check-dist:
+	$(RM) -r disttest
+	mkdir disttest
+	@echo 'unset CC CFLAGS CPPFLAGS LDFLAGS LIBS' >disttest/config.site
+	@echo 'unset I_AM_THE_$(PACKAGE)_MAINTAINER' >>disttest/config.site
+	cd disttest && CONFIG_SITE=config.site ../$(distdir)/configure
+	$(MAKE) -C disttest
+	$(MAKE) -C disttest check
 
 tags:
 	rm -f tags

@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# @(#) $Id: de.po,v 1.10 2003/02/27 13:57:08 michael Exp $
+# @(#) $Id: de.po,v 1.11 2003/05/18 15:01:36 michael Exp $
 #
 msgid ""
 msgstr ""
@@ -39,7 +39,7 @@ msgstr "Interner Fehler: Ursache unbekannt"
 
 #: ../lib/errors.h:28
 msgid "Internal error: not implemented"
-msgstr "Interner Fehler: diese Funktion ist nicht implementiert"
+msgstr "Interner Fehler: Diese Funktion ist nicht implementiert"
 
 #: ../lib/errors.h:29
 msgid "Request error: cntl(ELF_C_FDREAD) on write-only file"
@@ -47,19 +47,19 @@ msgstr "Aufruffehler: cntl(ELF_C_FDREAD) ohne Leseberechtigung"
 
 #: ../lib/errors.h:30
 msgid "Request error: invalid ELF_C_* argument"
-msgstr "Aufruffehler: das ELF_C_*-Argument ist ungültig"
+msgstr "Aufruffehler: Das ELF_C_*-Argument ist ungültig"
 
 #: ../lib/errors.h:31
 msgid "Request error: file descriptor disabled"
-msgstr "Aufruffehler: der Zugriff auf diese Datei ist nicht mehr möglich"
+msgstr "Aufruffehler: Der Zugriff auf diese Datei ist nicht mehr möglich"
 
 #: ../lib/errors.h:32
 msgid "Request error: not an archive"
-msgstr "Aufruffehler: die bearbeitete Datei ist kein Archiv (.a)"
+msgstr "Aufruffehler: Die bearbeitete Datei ist kein Archiv (.a)"
 
 #: ../lib/errors.h:33
 msgid "Request error: offset out of range"
-msgstr "Aufruffehler: die gewünschte Byteposition liegt außerhalb der Datei"
+msgstr "Aufruffehler: Die gewünschte Byteposition liegt außerhalb der Datei"
 
 #: ../lib/errors.h:34
 msgid "Request error: unknown ELF version"
@@ -67,27 +67,27 @@ msgstr "Aufruffehler: unbekannte ELF-Version"
 
 #: ../lib/errors.h:35
 msgid "Request error: ELF_C_* argument does not match"
-msgstr "Aufruffehler: das ELF_C_*-Argument paßt nicht zu den Zugriffsrechten"
+msgstr "Aufruffehler: Das ELF_C_*-Argument paßt nicht zu den Zugriffsrechten"
 
 #: ../lib/errors.h:36
 msgid "Request error: archive member begin() for writing"
-msgstr "Aufruffehler: der Archivinhalt ist nicht schreibbar"
+msgstr "Aufruffehler: Der Archivinhalt ist nicht schreibbar"
 
 #: ../lib/errors.h:37
 msgid "Request error: archive/member file descriptor mismatch"
-msgstr "Aufruffehler: die Datei- und Archiv-Deskriptoren passen nicht zusammen"
+msgstr "Aufruffehler: Die Datei- und Archiv-Deskriptoren passen nicht zusammen"
 
 #: ../lib/errors.h:38
 msgid "Request error: not an ELF file"
-msgstr "Aufruffehler: dies ist keine ELF-Datei"
+msgstr "Aufruffehler: Dies ist keine ELF-Datei"
 
 #: ../lib/errors.h:39
 msgid "Request error: class file/memory mismatch"
-msgstr "Aufruffehler: die Datei gehört zur falschen ELF-Klasse (32/64 Bit)"
+msgstr "Aufruffehler: Die Datei gehört zur falschen ELF-Klasse (32/64 Bit)"
 
 #: ../lib/errors.h:40
 msgid "Request error: invalid ELF_T_* argument"
-msgstr "Aufruffehler: das ELF_T_*-Argument ist ungültig"
+msgstr "Aufruffehler: Das ELF_T_*-Argument ist ungültig"
 
 #: ../lib/errors.h:41
 msgid "Request error: unknown data encoding"
@@ -95,7 +95,7 @@ msgstr "Aufruffehler: unbekannte Datenrepräsentation (big/little endian)"
 
 #: ../lib/errors.h:42
 msgid "Request error: destination buffer too small"
-msgstr "Aufruffehler: der Zielpuffer ist zu klein"
+msgstr "Aufruffehler: Der Zielpuffer ist zu klein"
 
 #: ../lib/errors.h:43
 msgid "Request error: d_buf is NULL"
@@ -107,11 +107,11 @@ msgstr "Aufruffehler: unbekannte ELF-Klasse (32/64 Bit)"
 
 #: ../lib/errors.h:45
 msgid "Request error: section does not belong to file"
-msgstr "Aufruffehler: der Dateiabschnitt gehört nicht zu dieser Datei"
+msgstr "Aufruffehler: Der Dateiabschnitt gehört nicht zu dieser Datei"
 
 #: ../lib/errors.h:46
 msgid "Request error: no section at index"
-msgstr "Aufruffehler: ein Abschnitt mit dieser Nummer existiert nicht"
+msgstr "Aufruffehler: Ein Abschnitt mit dieser Nummer existiert nicht"
 
 #: ../lib/errors.h:47
 msgid "Request error: can't manipulate null section"
@@ -119,15 +119,15 @@ msgstr "Aufruffehler: Sie versuchen, den \"Null\"-Abschnitt zu bearbeiten"
 
 #: ../lib/errors.h:48
 msgid "Request error: data does not belong to section"
-msgstr "Aufruffehler: dieser Datenblock gehört nicht zum angegebenen Dateiabschnitt"
+msgstr "Aufruffehler: Dieser Datenblock gehört nicht zum angegebenen Dateiabschnitt"
 
 #: ../lib/errors.h:49
 msgid "Request error: no string table"
-msgstr "Aufruffehler: die Namenliste fehlt"
+msgstr "Aufruffehler: Die Namenliste fehlt"
 
 #: ../lib/errors.h:50
 msgid "Request error: string table offset out of range"
-msgstr "Aufruffehler: die gewünschte Position liegt außerhalb der Namenliste"
+msgstr "Aufruffehler: Die gewünschte Position liegt außerhalb der Namenliste"
 
 #: ../lib/errors.h:51
 msgid "Request error: update(ELF_C_WRITE) on read-only file"
@@ -135,11 +135,11 @@ msgstr "Aufruffehler: update(ELF_C_WRITE) ohne Schreibberechtigung"
 
 #: ../lib/errors.h:52
 msgid "I/O error: seek"
-msgstr "Ein-/Ausgabefehler: das Positionieren innerhalb der Datei schlug fehl"
+msgstr "Ein-/Ausgabefehler: Das Positionieren innerhalb der Datei schlug fehl"
 
 #: ../lib/errors.h:53
 msgid "I/O error: file too big for memory"
-msgstr "Ein-/Ausgabefehler: die Datei ist zu groß"
+msgstr "Ein-/Ausgabefehler: Die Datei ist zu groß"
 
 #: ../lib/errors.h:54
 msgid "I/O error: raw read"
@@ -147,7 +147,7 @@ msgstr "Ein-/Ausgabefehler: Lesefehler"
 
 #: ../lib/errors.h:55
 msgid "I/O error: get file size"
-msgstr "Ein-/Ausgabefehler: die Dateigröße ist nicht zu ermitteln"
+msgstr "Ein-/Ausgabefehler: Die Dateigröße ist nicht zu ermitteln"
 
 #: ../lib/errors.h:56
 msgid "I/O error: output write"
@@ -155,7 +155,7 @@ msgstr "Ein-/Ausgabefehler: Schreibfehler"
 
 #: ../lib/errors.h:57
 msgid "I/O error: can't truncate output file"
-msgstr "Ein-/Ausgabefehler: das Verkürzen der Datei schlug fehl"
+msgstr "Ein-/Ausgabefehler: Das Verkürzen der Datei schlug fehl"
 
 #: ../lib/errors.h:58
 msgid "Sequence error: must set ELF version first"
@@ -167,59 +167,59 @@ msgstr "Falsche Reihenfolge: Sie müssen zuerst elf{32,64}_newehdr() aufrufen"
 
 #: ../lib/errors.h:60
 msgid "Format error: reference outside file"
-msgstr "Fehler in der Datei: eine Positionsangabe zeigt auf einen Punkt außerhalb der Datei"
+msgstr "Fehler in der Datei: Eine Positionsangabe zeigt auf einen Punkt außerhalb der Datei"
 
 #: ../lib/errors.h:61
 msgid "Format error: archive header truncated"
-msgstr "Fehler in der Datei: der Archiv-Header ist unvollständig"
+msgstr "Fehler in der Datei: Der Archiv-Header ist unvollständig"
 
 #: ../lib/errors.h:62
 msgid "Format error: archive fmag"
-msgstr "Fehler in der Datei: die Archiv-Kennung ist falsch"
+msgstr "Fehler in der Datei: Die Archiv-Kennung ist falsch"
 
 #: ../lib/errors.h:63
 msgid "Format error: archive header"
-msgstr "Fehler in der Datei: der Archiv-Header ist fehlerhaft"
+msgstr "Fehler in der Datei: Der Archiv-Header ist fehlerhaft"
 
 #: ../lib/errors.h:64
 msgid "Format error: archive member truncated"
-msgstr "Fehler in der Datei: der Archivinhalt ist unvollständig"
+msgstr "Fehler in der Datei: Der Archivinhalt ist unvollständig"
 
 #: ../lib/errors.h:65
 msgid "Format error: archive symbol table size"
-msgstr "Fehler in der Datei: die Größe der Archiv-Symboltabelle ist falsch"
+msgstr "Fehler in der Datei: Die Größe der Archiv-Symboltabelle ist falsch"
 
 #: ../lib/errors.h:66
 msgid "Format error: archive string table"
-msgstr "Fehler in der Datei: die Archiv-Namenliste ist defekt"
+msgstr "Fehler in der Datei: Die Archiv-Namenliste ist defekt"
 
 #: ../lib/errors.h:67
 msgid "Format error: archive special name unknown"
-msgstr "Fehler in der Datei: es existiert ein internes Archiv-Objekt mit unbekanntem Namen"
+msgstr "Fehler in der Datei: Es existiert ein internes Archiv-Objekt mit unbekanntem Namen"
 
 #: ../lib/errors.h:68
 msgid "Format error: ELF header truncated"
-msgstr "Fehler in der Datei: der ELF-Header ist unvollständig"
+msgstr "Fehler in der Datei: Der ELF-Header ist unvollständig"
 
 #: ../lib/errors.h:69
 msgid "Format error: program header table truncated"
-msgstr "Fehler in der Datei: die ELF Program Header Table ist unvollständig"
+msgstr "Fehler in der Datei: Die ELF Program Header Table ist unvollständig"
 
 #: ../lib/errors.h:70
 msgid "Format error: section header table truncated"
-msgstr "Fehler in der Datei: die ELF Section Header Table ist unvollständig"
+msgstr "Fehler in der Datei: Die ELF Section Header Table ist unvollständig"
 
 #: ../lib/errors.h:71
 msgid "Format error: data region truncated"
-msgstr "Fehler in der Datei: ein Datenblock ist unvollständig"
+msgstr "Fehler in der Datei: Ein Datenblock ist unvollständig"
 
 #: ../lib/errors.h:72
 msgid "Format error: program header table alignment"
-msgstr "Fehler in der Datei: die ELF Program Header Table liegt nicht auf einer Wortgrenze"
+msgstr "Fehler in der Datei: Die ELF Program Header Table liegt nicht auf einer Wortgrenze"
 
 #: ../lib/errors.h:73
 msgid "Format error: section header table alignment"
-msgstr "Fehler in der Datei: die ELF Section Header Table liegt nicht auf einer Wortgrenze"
+msgstr "Fehler in der Datei: Die ELF Section Header Table liegt nicht auf einer Wortgrenze"
 
 #: ../lib/errors.h:74
 msgid "Format error: bad parameter in Verdef record"
@@ -242,77 +242,81 @@ msgid "Format error: bad e_shnum value"
 msgstr "Fehler in der Datei: e_shnum enthält einen ungültigen Wert"
 
 #: ../lib/errors.h:79
-msgid "Layout error: section size too small for data"
-msgstr "Layout-Fehler: ein Dateiabschnitt ist zu kurz für die darin enthaltenen Daten"
+msgid "Format error: unterminated string in string table"
+msgstr "Fehler in der Datei: Der Eintrag in der String-Tabelle ist nicht terminiert"
 
 #: ../lib/errors.h:80
-msgid "Layout error: overlapping sections"
-msgstr "Layout-Fehler: zwei (oder mehr) Dateiabschnitte überlappen sich"
+msgid "Layout error: section size too small for data"
+msgstr "Layout-Fehler: Ein Dateiabschnitt ist zu kurz für die darin enthaltenen Daten"
 
 #: ../lib/errors.h:81
+msgid "Layout error: overlapping sections"
+msgstr "Layout-Fehler: Zwei (oder mehr) Dateiabschnitte überlappen sich"
+
+#: ../lib/errors.h:82
 msgid "Memory error: elf descriptor"
 msgstr "Zu wenig Speicher: für den Elf-Deskriptor"
 
-#: ../lib/errors.h:82
+#: ../lib/errors.h:83
 msgid "Memory error: archive symbol table"
 msgstr "Zu wenig Speicher: für die Archiv-Symboltabelle"
 
-#: ../lib/errors.h:83
+#: ../lib/errors.h:84
 msgid "Memory error: archive member header"
 msgstr "Zu wenig Speicher: für die Archiv-Verwaltungsinformationen"
 
-#: ../lib/errors.h:84
+#: ../lib/errors.h:85
 msgid "Memory error: ELF header"
 msgstr "Zu wenig Speicher: für den ELF-Header"
 
-#: ../lib/errors.h:85
+#: ../lib/errors.h:86
 msgid "Memory error: program header table"
 msgstr "Zu wenig Speicher: für die Program Header Table"
 
-#: ../lib/errors.h:86
+#: ../lib/errors.h:87
 msgid "Memory error: section header table"
 msgstr "Zu wenig Speicher: für die Section Header Table"
 
-#: ../lib/errors.h:87
+#: ../lib/errors.h:88
 msgid "Memory error: section descriptor"
 msgstr "Zu wenig Speicher: für den Elf_Scn-Deskriptor"
 
-#: ../lib/errors.h:88
+#: ../lib/errors.h:89
 msgid "Memory error: section data"
 msgstr "Zu wenig Speicher: für die Daten dieses Abschnitts"
 
-#: ../lib/errors.h:89
+#: ../lib/errors.h:90
 msgid "Memory error: output file space"
 msgstr "Zu wenig Speicher: für die Ausgabe"
 
-#: ../lib/errors.h:90
+#: ../lib/errors.h:91
 msgid "Memory error: temporary buffer"
 msgstr "Zu wenig Speicher: für einen temporären Puffer"
 
-#: ../lib/errors.h:91
+#: ../lib/errors.h:92
 msgid "GElf error: value out of range"
 msgstr "GElf-Fehler: eine Zahl ist außerhalb des darstellbaren Bereichs"
 
-#: ../lib/errors.h:92
+#: ../lib/errors.h:93
 msgid "GElf error: index out of range"
 msgstr "GElf-Fehler: Index außerhalb des erlaubten Bereichs"
 
-#: ../lib/errors.h:93
+#: ../lib/errors.h:94
 msgid "GElf error: type mismatch"
 msgstr "GElf-Fehler: Typfehler"
 
-#: ../lib/errors.h:94
+#: ../lib/errors.h:95
 msgid "GElf error: not enough memory for GElf_Sym"
 msgstr "GElf-Fehler: zu wenig Speicher für eine Variable vom Typ GElf_Sym"
 
-#: ../lib/errors.h:95
+#: ../lib/errors.h:96
 msgid "GElf error: not enough memory for GElf_Dyn"
 msgstr "GElf-Fehler: zu wenig Speicher für eine Variable vom Typ GElf_Dyn"
 
-#: ../lib/errors.h:96
+#: ../lib/errors.h:97
 msgid "GElf error: not enough memory for GElf_Rela"
 msgstr "GElf-Fehler: zu wenig Speicher für eine Variable vom Typ GElf_Rela"
 
-#: ../lib/errors.h:97
+#: ../lib/errors.h:98
 msgid "GElf error: not enough memory for GElf_Rel"
 msgstr "GElf-Fehler: zu wenig Speicher für eine Variable vom Typ GElf_Rel"

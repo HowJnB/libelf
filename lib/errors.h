@@ -17,7 +17,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* @(#) $Id: errors.h,v 1.11 2003/02/27 12:54:30 michael Exp $ */
+/* @(#) $Id: errors.h,v 1.13 2003/05/22 18:55:29 michael Exp $ */
 
 /* dummy for xgettext */
 #define _(str) str
@@ -76,6 +76,7 @@ __err__(ERROR_VERDEF_VERSION,	_("Format error: unknown Verdef version"))
 __err__(ERROR_VERNEED_FORMAT,	_("Format error: bad parameter in Verneed record"))
 __err__(ERROR_VERNEED_VERSION,	_("Format error: unknown Verneed version"))
 __err__(ERROR_EHDR_SHNUM,	_("Format error: bad e_shnum value"))
+__err__(ERROR_UNTERM,		_("Format error: unterminated string in string table"))
 __err__(ERROR_SCN2SMALL,	_("Layout error: section size too small for data"))
 __err__(ERROR_SCN_OVERLAP,	_("Layout error: overlapping sections"))
 __err__(ERROR_MEM_ELF,		_("Memory error: elf descriptor"))

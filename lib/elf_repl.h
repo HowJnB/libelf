@@ -17,7 +17,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* @(#) $Id: elf_repl.h,v 1.12 2003/01/02 04:34:47 michael Exp $ */
+/* @(#) $Id: elf_repl.h,v 1.13 2003/10/25 15:22:59 michael Exp $ */
 
 /*
  * NEVER INCLUDE THIS FILE DIRECTLY - USE <libelf.h> INSTEAD!
@@ -199,6 +199,7 @@ typedef struct {
 #define EM_MIPS		8	/* MIPS I Architecture */
 #define EM_S370		9	/* IBM System/370 Processor */
 #define EM_MIPS_RS3_LE	10	/* MIPS RS3000 Little-endian */
+#define EM_SPARC64	11	/* SPARC 64-bit */
 #define EM_PARISC	15	/* Hewlett-Packard PA-RISC */
 #define EM_VPP500	17	/* Fujitsu VPP500 */
 #define EM_SPARC32PLUS	18	/* Enhanced instruction set SPARC */

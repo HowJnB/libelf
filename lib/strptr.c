@@ -1,6 +1,6 @@
 /*
 strptr.c - implementation of the elf_strptr(3) function.
-Copyright (C) 1995 - 2000 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2000, 2003 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,13 +20,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: strptr.c,v 1.6 2000/04/06 17:15:46 michael Exp $";
+static const char rcsid[] = "@(#) $Id: strptr.c,v 1.7 2003/05/18 15:01:36 michael Exp $";
 #endif /* lint */
 
 char*
 elf_strptr(Elf *elf, size_t section, size_t offset) {
     Elf_Data *data;
     Elf_Scn *scn;
+    size_t n;
+    char *s;
 
     if (!elf) {
 	return NULL;
@@ -64,16 +66,79 @@ elf_strptr(Elf *elf, size_t section, size_t offset) {
 	seterr(ERROR_UNKNOWN_CLASS);
 	return NULL;
     }
-    if (offset >= 0 && offset < scn->s_size) {
-	data = NULL;
+    /*
+     * Find matching buffer
+     */
+    n = 0;
+    data = NULL;
+    if (elf->e_elf_flags & ELF_F_LAYOUT) {
+	/*
+	 * Programmer is responsible for d_off
+	 * Note: buffers may be in any order!
+	 */
 	while ((data = elf_getdata(scn, data))) {
-	    if (data->d_buf
-	     && offset >= (size_t)data->d_off
-	     && offset < (size_t)data->d_off + data->d_size) {
-		return (char*)data->d_buf + (offset - data->d_off);
+	    n = data->d_off;
+	    if (offset >= n && offset - n < data->d_size) {
+		/*
+		 * Found it
+		 */
+		break;
 	    }
 	}
     }
-    seterr(ERROR_BADSTROFF);
+    else {
+	/*
+	 * Calculate offsets myself
+	 */
+	while ((data = elf_getdata(scn, data))) {
+	    if (data->d_align > 1) {
+		n += data->d_align - 1;
+		n -= n % data->d_align;
+	    }
+	    if (offset < n) {
+		/*
+		 * Invalid offset: points into a hole
+		 */
+		seterr(ERROR_BADSTROFF);
+		return NULL;
+	    }
+	    if (offset - n < data->d_size) {
+		/*
+		 * Found it
+		 */
+		break;
+	    }
+	    n += data->d_size;
+	}
+    }
+    if (data == NULL) {
+	/*
+	 * Not found
+	 */
+	seterr(ERROR_BADSTROFF);
+	return NULL;
+    }
+    if (data->d_buf == NULL) {
+	/*
+	 * Buffer is NULL (usually the programmers' fault)
+	 */
+	seterr(ERROR_NULLBUF);
+	return NULL;
+    }
+    offset -= n;
+    s = (char*)data->d_buf;
+    for (n = offset; n < data->d_size; n++) {
+	if (s[n] == '\0') {
+	    /*
+	     * Return properly NUL terminated string
+	     */
+	    return s + offset;
+	}
+    }
+    /*
+     * String is not NUL terminated
+     * Return error to avoid SEGV in application
+     */
+    seterr(ERROR_UNTERM);
     return NULL;
 }

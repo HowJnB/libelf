@@ -1,6 +1,6 @@
 /*
 libelf.h - public header file for libelf.
-Copyright (C) 1995 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* @(#) $Id: libelf.h,v 1.12 2002/12/30 02:10:14 michael Exp $ */
+/* @(#) $Id: libelf.h,v 1.14 2003/05/24 16:55:58 michael Exp $ */
 
 #ifndef _LIBELF_H
 #define _LIBELF_H
@@ -236,8 +236,24 @@ extern long elf64_checksum __P((Elf *__elf));
 #endif /* __LIBELF64 */
 
 /*
- * More function declarations.  These functions are NOT available in
- * the SYSV/Solaris versions of libelf!
+ * Experimental extensions:
+ *
+ * elfx_movscn() moves section `__scn' directly after section `__after'.
+ * elfx_remscn() removes section `__scn'.  Both functions update
+ * the section indices; elfx_remscn() also adjusts the ELF header's
+ * e_shnum member.  The application is responsible for updating other
+ * data (in particular, e_shstrndx and the section headers' sh_link and
+ * sh_info members).
+ *
+ * elfx_movscn() returns the new index of the moved section.
+ * elfx_remscn() returns the original index of the removed section.
+ * A return value of zero indicates an error.
+ */
+extern size_t elfx_movscn __P((Elf *__elf, Elf_Scn *__scn, Elf_Scn *__after));
+extern size_t elfx_remscn __P((Elf *__elf, Elf_Scn *__scn));
+
+/*
+ * elf_delscn() is obsolete.  Please use elfx_remscn() instead.
  */
 extern size_t elf_delscn __P((Elf *__elf, Elf_Scn *__scn));
 

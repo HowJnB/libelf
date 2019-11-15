@@ -1,3 +1,88 @@
+Fri Dec  5 16:25:16 CET 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* aclocal.m4:
+		add explanation for --enable-maintainer-mode
+	* lib/Makefile.in:
+	* po/Makefile.in:
+		add instroot make variable
+	* README:
+		add hint how to use it
+
+Thu Nov  6 17:35:00 CET 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* Makefile.in:
+	* lib/Makefile.in:
+	* po/Makefile.in:
+		add check targets
+		add MANIFEST to distribution
+	* aclocal.m4:
+		add mr_PACKAGE macro
+	* configure.in:
+		use mr_PACKAGE macro
+
+Sat Oct 25 15:22:59 CEST 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* lib/elf_repl.h:
+		add EM_SPARC64
+
+Thu Oct  9 23:08:56 CEST 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* lib/x.movscn.c:
+	* lib/x.remscn.c:
+		verify that file is really an ELF file
+
+Wed Oct  8 17:10:09 CEST 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* config.guess:
+	* config.sub:
+		latest versions from FSF
+
+Sat May 24 18:55:14 CEST 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* config.guess:
+		latest version from FSF
+	* lib/Makefile.in:
+	* lib/libelf.h:
+	* lib/x.movscn.c:
+	* lib/x.remscn.c:
+		add elfx_movscn() and elfx_remscn()
+	* lib/newscn.c:
+		update e_shnum properly
+	* lib/private.h:
+		declare _elf_update_shnum()
+
+Fri May 23 18:25:48 CEST 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* aclocal.m4:
+		provide name suffixes only
+	* lib/Makefile.in:
+		use name suffixes
+
+Fri May 23 01:24:26 CEST 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* README:
+		update for 0.8.5
+		add section about LFS
+	* config.guess:
+		latest version from FSF
+	* configure.in:
+	* lib/Makefile.in:
+		use local pic object directory
+	* lib/checksum.c:
+		detect d_buf == NULL
+
+Sun May 18 16:49:10 CEST 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* VERSION:
+		bump up to 0.8.5
+	* lib/strptr.c:
+		make elf_strptr() work safely with fragmented string tables
+	* lib/errors.h:
+		new error code and message for elf_strptr()
+	* po/de.po:
+	* po/libelf.po:
+		regenerated
+
 Mon May 12 15:29:12 CEST 2003, Michael Riepe <michael@stud.uni-hannover.de>
 
 	* lib/update.c:
