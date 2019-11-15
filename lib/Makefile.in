@@ -1,5 +1,5 @@
 # lib/Makefile for libelf.
-# Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+# Copyright (C) 1995 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-# @(#) $Id: Makefile.in,v 1.18 2001/10/13 21:35:22 michael Exp $
+# @(#) $Id: Makefile.in,v 1.19 2002/12/22 19:38:40 michael Exp $
 
 prefix = @prefix@
 exec_prefix = @exec_prefix@
@@ -271,5 +271,9 @@ $(OBJS): private.h $(topdir)/config.h libelf.h gelf.h errors.h $(AUXHDRS)
 getarsym.o: byteswap.h
 memset.o: $(topdir)/config.h
 nlist.o: nlist.h
-swap64.c: byteswap.h
+swap64.o: byteswap.h
 $(OBJS_V): byteswap.h ext_types.h $(HDRS_V)
+verdef_32_tof.o: verdef.h verneed.h
+verdef_32_tom.o: verdef.h verneed.h
+verdef_64_tof.o: verdef.h verneed.h
+verdef_64_tom.o: verdef.h verneed.h

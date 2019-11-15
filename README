@@ -1,4 +1,4 @@
-This is the public release of libelf-0.8.2, a free ELF object
+This is the public release of libelf-0.8.3, a free ELF object
 file access library. If you have problems with applications
 that use libelf and work with the commercial (SVR4, Solaris)
 version but not with this one, please contact me.
@@ -9,7 +9,7 @@ have a file .../include/elf.h that contains the single line
 configure.
 
 Installation is straightforward - the package is autoconf'ed.  Just do
-``cd libelf-0.8.2; ./configure; make; make install''.  Header files
+``cd libelf-0.8.3; ./configure; make; make install''.  Header files
 will be installed in .../include/libelf/.  If your system does not
 provide its own versions of libelf.h, nlist.h or gelf.h, ``make
 install'' will add the missing headers.  If you prefer not to have
@@ -25,16 +25,16 @@ doesn't have its own <libelf.h>, <nlist.h> or <gelf.h>.
 
 You need an ANSI/ISO C compiler to build libelf. Gcc is optimal.
 
-On some systems you can build and install a shared libelf
-library. To do this, pass ``--enable-shared'' to configure.
-Another configure option, ``--enable-debug'', adds debugging
-code to libelf; if you don't run into problems, you will
-probably not need it.
-
+On some systems (in particular, Solaris and all variants of Linux),
+``make'' will try to build a shared library. If you run into problems
+on your system, please pass ``--disable-shared'' to configure.
 If you build a shared library and want it to be installed as
-``libelf-0.8.2.so'' rather than ``libelf.so.0.8.2'', please use
-``./configure --enable-shared --enable-gnu-names''. Other files,
-e.g. ``libelf.so'' and ``libelf.so.0'' are NOT affected.
+``libelf-0.8.3.so'' rather than ``libelf.so.0.8.3'', please use
+``./configure --enable-gnu-names''. Other files, e.g. ``libelf.so'' and
+``libelf.so.0'' are NOT affected.
+
+Another configure option, ``--enable-debug'', adds debugging code to
+libelf; if you don't run into problems, you will probably not need it.
 
 When creating an ELF shared library, it is possible to add references
 to other shared libraries in the DYNAMIC section of the resulting
@@ -115,18 +115,42 @@ to turn off versioning translation support.
 	  The ELF file format is described in several places;
 	  among them Suns "Linker and Libraries Guide" and the
 	  "System V Application Binary Interface" documents;
-	  http://www.sco.com/developer/devspecs/gabi41.pdf and
-	  http://www.sco.com/developer/gabi/contents.html are
-	  probably good starting points.
+	  http://www.caldera.com/developer/devspecs/gabi41.pdf and
+	  http://www.caldera.com/developer/gabi/ are probably good
+	  starting points. Processor-specific documentation is spread
+	  across a number of `Processor Supplement' documents, one
+	  for each architecture; you'll have to use a search engine to
+	  find them.
 
-	* The COFF file format is not understood.
+	* The COFF file format is not understood. This is so obsolete
+	  that it will probably never be implemented.
 
 	* nlist(3) is incomplete; the n_type and n_sclass
 	  members of struct nl are set to zero even if type
 	  (that is, debug) information is available.
 
-	* Libelf does not support Solaris' `Move' and `Syminfo'
-	  sections.
+	* Libelf does not translate Solaris' `Move' and `Syminfo'
+	  sections. You can read them using elf_getdata(), but you'll
+	  only get raw (untranslated) bytes.
+
+Changes since 0.8.2:
+
+	* Should compile on MacOSX now.
+
+	* Can read and write files with more than 65280 sections
+
+	* Tries to handle 64-bit ELF files that use 8-byte hash table
+	  entries. In particular, libelf tries to guess the data type in
+	  elf_getdata(), and doesn't override sh_entsize in elf_update()
+	  any longer. If you want the library to pick the entry size,
+	  you must set its value to 0 before you call elf_update().
+
+	* No longer dumps core in elf_update() when a versioning section
+	  has no data. Instead, it returns an error message. Note that
+	  you're supposed to provide a valid d_buf for any section, unless
+	  it's empty or has SHT_NOBITS type.
+
+	* Building a shared library is now the default (if supported).
 
 Changes since 0.8.0:
 
@@ -171,7 +195,7 @@ Changes since 0.5.2:
 
 Where to get libelf:
 
-	ftp://sunsite.unc.edu/pub/Linux/libs/
+	ftp://ftp.ibiblio.org/pub/Linux/libs/
 	http://www.stud.uni-hannover.de/~michael/software/
 
 Michael "Tired" Riepe

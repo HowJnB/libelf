@@ -1,3 +1,100 @@
+Sun Mar 23 16:06:43 CET 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* configure.in:
+		fix --enable-compat
+
+Thu Feb 27 14:35:12 CET 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* Makefile.in:
+		add `test-dist' target
+	* lib/errors.h:
+		new error code
+	* po/de.po:
+	* po/libelf.pot:
+		regenerated
+
+Wed Feb 26 17:48:58 CET 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* config.guess:
+	* config.sub:
+		latest versions from FSF
+
+Wed Jan 15 22:50:53 CET 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* lib/begin.c:
+		fix overflow check
+
+Sun Jan 12 04:27:31 CET 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* configure.in:
+		prefer int for __libelf_i32_t (if int has 32 bits)
+
+Thu Jan  2 17:40:22 CET 2003, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* README:
+		update for 0.8.3
+	* config.guess:
+	* config.sub:
+		update from ftp.gnu.org
+	* lib/cook.c:
+		require space for one SHDR only
+	* lib/elf_repl.h:
+		fix DT_ENCODING value
+
+Tue Dec 31 16:27:19 CET 2002, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* lib/cook.c:
+		honor ELF extensions for >= 0xff00 sections
+	* lib/elf_repl.h:
+		add definitions from lates ELF spec
+	* lib/errors.h:
+	* po/libelf.pot:
+	* po/de.po:
+		new error message
+	* lib/private.h:
+		define missing pieces
+	* lib/update.c:
+		handle >= 0xff00 sections
+
+Mon Dec 23 00:23:20 CET 2002, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* lib/Makefile.in:
+		fix dependencies.
+	* lib/cook.c:
+		add quirks mode for broken 64-bit architectures.
+	* lib/update.c:
+		do not override sh_entsize unless it's set to 0.
+	* lib/verdef.h:
+	* lib/verneed.h:
+		work around possible SEGV in translation routines.
+
+Sat Dec 14 23:33:10 CET 2002, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* ChangeLog:
+		add missing entries for 0.8.2 release.
+	* VERSION:
+		bump up to 0.8.3.
+	* lib/32.xlatetof.c:
+	* lib/64.xlatetof.c:
+	* lib/verdef.h:
+	* lib/verneed.h:
+		fix ISO C violations (required for MacOS X).
+	* po/gmo2msg.c:
+		create SUSv3 compliant .msg files.
+
+Thu Jun 11 19:00:19 CEST 2002, Michael Riepe <michael@stud.uni-hannover.de>
+
+	* README:
+		update for 0.8.2.
+	* VERSION:
+		bump up to 0.8.2.
+	* lib/32.xlatetof.c:
+	* lib/64.xlatetof.c:
+		fix typos in for loop.
+	* lib/nlist.c:
+		add O_BINARY to file mode
+		(defaults to 0 on systems that lack it).
+
 Tue Dec 25 14:42:51 CET 2001, Michael Riepe <michael@stud.uni-hannover.de>
 
 	* VERSION:

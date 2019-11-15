@@ -1,6 +1,6 @@
 /*
 libelf.h - public header file for libelf.
-Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* @(#) $Id: libelf.h,v 1.10 2001/10/05 19:05:25 michael Exp $ */
+/* @(#) $Id: libelf.h,v 1.12 2002/12/30 02:10:14 michael Exp $ */
 
 #ifndef _LIBELF_H
 #define _LIBELF_H

@@ -1,6 +1,6 @@
 /*
 cook.c - read and translate ELF files.
-Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: cook.c,v 1.17 2001/10/07 19:36:02 michael Exp $";
+static const char rcsid[] = "@(#) $Id: cook.c,v 1.21 2003/01/02 16:40:22 michael Exp $";
 #endif /* lint */
 
 const Elf_Scn _elf_scn_init = INIT_SCN;
@@ -29,21 +29,22 @@ const Scn_Data _elf_data_init = INIT_DATA;
 Elf_Type
 _elf_scn_type(unsigned t) {
     switch (t) {
-	case SHT_DYNAMIC:      return ELF_T_DYN;
-	case SHT_DYNSYM:       return ELF_T_SYM;
-	case SHT_HASH:         return ELF_T_WORD;
-	case SHT_REL:          return ELF_T_REL;
-	case SHT_RELA:         return ELF_T_RELA;
-	case SHT_SYMTAB:       return ELF_T_SYM;
+	case SHT_DYNAMIC:       return ELF_T_DYN;
+	case SHT_DYNSYM:        return ELF_T_SYM;
+	case SHT_HASH:          return ELF_T_WORD;
+	case SHT_REL:           return ELF_T_REL;
+	case SHT_RELA:          return ELF_T_RELA;
+	case SHT_SYMTAB:        return ELF_T_SYM;
+	case SHT_SYMTAB_SHNDX:	return ELF_T_WORD;	/* XXX: really? */
 #if __LIBELF_SYMBOL_VERSIONS
 #if __LIBELF_SUN_SYMBOL_VERSIONS
-	case SHT_SUNW_verdef:  return ELF_T_VDEF;
-	case SHT_SUNW_verneed: return ELF_T_VNEED;
-	case SHT_SUNW_versym:  return ELF_T_HALF;
+	case SHT_SUNW_verdef:   return ELF_T_VDEF;
+	case SHT_SUNW_verneed:  return ELF_T_VNEED;
+	case SHT_SUNW_versym:   return ELF_T_HALF;
 #else /* __LIBELF_SUN_SYMBOL_VERSIONS */
-	case SHT_GNU_verdef:   return ELF_T_VDEF;
-	case SHT_GNU_verneed:  return ELF_T_VNEED;
-	case SHT_GNU_versym:   return ELF_T_HALF;
+	case SHT_GNU_verdef:    return ELF_T_VDEF;
+	case SHT_GNU_verneed:   return ELF_T_VNEED;
+	case SHT_GNU_versym:    return ELF_T_HALF;
 #endif /* __LIBELF_SUN_SYMBOL_VERSIONS */
 #endif /* __LIBELF_SYMBOL_VERSIONS */
     }
@@ -92,8 +93,7 @@ _elf_item(Elf *elf, Elf_Type type, size_t n, size_t off, int *flag) {
     src.d_version = elf->e_version;
     src.d_size = n * _fsize(elf->e_class, src.d_version, type);
     elf_assert(src.d_size);
-    if (off + src.d_size < off /* modulo overflow */
-     || off + src.d_size > elf->e_size) {
+    if ((elf->e_size - off) < src.d_size) {
 	seterr(truncerr(type));
 	return NULL;
     }
@@ -210,7 +210,7 @@ _elf_cook_file(Elf *elf) {
 	return 0;
     }
     */
-    if (num && off) {
+    if (off) {
 	struct tmp {
 	    Elf_Scn	scn;
 	    Scn_Data	data;
@@ -235,8 +235,56 @@ _elf_cook_file(Elf *elf) {
 	elf_assert(src.d_size);
 	dst.d_version = EV_CURRENT;
 
-	if (off + num * src.d_size < off /* modulo overflow */
-	 || off + num * src.d_size > elf->e_size) {
+	if (num == 0) {
+	    union {
+		Elf32_Shdr sh32;
+		Elf64_Shdr sh64;
+	    } u;
+
+	    /*
+	     * Overflow in ehdr->e_shnum.
+	     * Get real value from first SHDR.
+	     */
+	    if (elf->e_size - off < src.d_size) {
+		seterr(ERROR_TRUNC_SHDR);
+		return 0;
+	    }
+	    if (elf->e_rawdata) {
+		src.d_buf = elf->e_rawdata + off;
+	    }
+	    else {
+		src.d_buf = elf->e_data + off;
+	    }
+	    dst.d_buf = &u;
+	    dst.d_size = sizeof(u);
+	    if (!(_elf_xlatetom(elf, &dst, &src))) {
+		return 0;
+	    }
+	    elf_assert(dst.d_size == _msize(elf->e_class, EV_CURRENT, ELF_T_SHDR));
+	    elf_assert(dst.d_type == ELF_T_SHDR);
+	    if (elf->e_class == ELFCLASS32) {
+		num = u.sh32.sh_size;
+	    }
+#if __LIBELF64
+	    else if (elf->e_class == ELFCLASS64) {
+		num = u.sh64.sh_size;
+		/*
+		 * Check for overflow on 32-bit systems
+		 */
+		if (overflow(num, u.sh64.sh_size, Elf64_Xword)) {
+		    seterr(ERROR_OUTSIDE);
+		    return 0;
+		}
+	    }
+#endif /* __LIBELF64 */
+	    if (num < SHN_LORESERVE) {
+		/* XXX: shall we tolerate this? */
+		seterr(ERROR_EHDR_SHNUM);
+		return 0;
+	    }
+	}
+
+	if ((elf->e_size - off) / src.d_size < num) {
 	    seterr(ERROR_TRUNC_SHDR);
 	    return 0;
 	}
@@ -285,6 +333,7 @@ _elf_cook_file(Elf *elf) {
 		scn->s_size = shdr->sh_size;
 		scn->s_offset = shdr->sh_offset;
 		sd->sd_data.d_align = shdr->sh_addralign;
+		sd->sd_data.d_type = _elf_scn_type(scn->s_type);
 	    }
 #if __LIBELF64
 	    else if (elf->e_class == ELFCLASS64) {
@@ -303,6 +352,68 @@ _elf_cook_file(Elf *elf) {
 		    seterr(ERROR_OUTSIDE);
 		    return 0;
 		}
+		sd->sd_data.d_type = _elf_scn_type(scn->s_type);
+		/*
+		 * QUIRKS MODE:
+		 *
+		 * Some 64-bit architectures use 64-bit entries in the
+		 * .hash section. This violates the ELF standard, and
+		 * should be fixed. It's mostly harmless as long as the
+		 * binary and the machine running your program have the
+		 * same byte order, but you're in trouble if they don't,
+		 * and if the entry size is wrong.
+		 *
+		 * As a workaround, I let libelf guess the right size
+		 * for the binary. This relies pretty much on the fact
+		 * that the binary provides correct data in the section
+		 * headers. If it doesn't, it's probably broken anyway.
+		 * Therefore, libelf uses a standard conforming value
+		 * when it's not absolutely sure.
+		 */
+		if (scn->s_type == SHT_HASH) {
+		    int override = 0;
+
+		    /*
+		     * sh_entsize must reflect the entry size
+		     */
+		    if (shdr->sh_entsize == ELF64_FSZ_ADDR) {
+			override++;
+		    }
+		    /*
+		     * sh_size must be a multiple of sh_entsize
+		     */
+		    if (shdr->sh_size % ELF64_FSZ_ADDR == 0) {
+			override++;
+		    }
+		    /*
+		     * There must be room for at least 2 entries
+		     */
+		    if (shdr->sh_size >= 2 * ELF64_FSZ_ADDR) {
+			override++;
+		    }
+		    /*
+		     * sh_addralign must be correctly set
+		     */
+		    if (shdr->sh_addralign == ELF64_FSZ_ADDR) {
+			override++;
+		    }
+		    /*
+		     * The section must be properly aligned
+		     */
+		    if (shdr->sh_offset % ELF64_FSZ_ADDR == 0) {
+			override++;
+		    }
+		    /* XXX: also look at the data? */
+		    /*
+		     * Make a conservative decision...
+		     */
+		    if (override >= 5) {
+			sd->sd_data.d_type = ELF_T_ADDR;
+		    }
+		}
+		/*
+		 * END QUIRKS MODE.
+		 */
 	    }
 #endif /* __LIBELF64 */
 	    /* we already had this
@@ -312,7 +423,6 @@ _elf_cook_file(Elf *elf) {
 	    }
 	    */
 
-	    sd->sd_data.d_type = _elf_scn_type(scn->s_type);
 	    sd->sd_data.d_size = scn->s_size;
 	    sd->sd_data.d_version = _elf_version;
 	}

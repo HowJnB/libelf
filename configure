@@ -20,13 +20,13 @@ ac_help="$ac_help
 ac_help="$ac_help
   --enable-nls            use Native Language Support (default: yes)"
 ac_help="$ac_help
-  --enable-shared         build shared library (default: no)"
+  --enable-shared         build shared library (default: yes)"
 ac_help="$ac_help
   --enable-gnu-names      use GNU library naming conventions (default: no)"
 ac_help="$ac_help
   --enable-debug          include extra debugging code (default: no)"
 ac_help="$ac_help
-  --enable-maintainer-mode  (default: no)"
+  --enable-maintainer-mode  (default: $maintainer_mode)"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -1220,9 +1220,8 @@ echo "configure:1220: checking whether to install <libelf.h>, <nlist.h> and <gel
 # Check whether --enable-compat or --disable-compat was given.
 if test "${enable_compat+set}" = set; then
   enableval="$enable_compat"
-  libelf_enable_compat="$enableval"
+  DO_COMPAT="$enableval"
 else
-  
   if test "$ac_cv_header_libelf_h$ac_cv_header_nlist_h$ac_cv_header_gelf_h" = yesyesyes
   then DO_COMPAT=no
   else DO_COMPAT=yes
@@ -1230,6 +1229,7 @@ else
 fi
 
 echo "$ac_t""$DO_COMPAT" 1>&6
+
 
 echo $ac_n "checking for working const""... $ac_c" 1>&6
 echo "configure:1236: checking for working const" >&5
@@ -1914,10 +1914,10 @@ if eval "test \"`echo '$''{'libelf_cv_int32'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   
-  if test "$ac_cv_sizeof_long" = 4; then
-    libelf_cv_int32='long'
-  elif test "$ac_cv_sizeof_int" = 4; then
+  if test "$ac_cv_sizeof_int" = 4; then
     libelf_cv_int32='int'
+  elif test "$ac_cv_sizeof_long" = 4; then
+    libelf_cv_int32='long'
   else
     libelf_cv_int32=no
   fi
@@ -2984,7 +2984,7 @@ if test "${enable_shared+set}" = set; then
   enableval="$enable_shared"
   mr_enable_shared="$enableval"
 else
-  mr_enable_shared=no
+  mr_enable_shared=yes
 fi
 
   echo "$ac_t""$mr_enable_shared" 1>&6
@@ -3039,7 +3039,7 @@ else
 fi
 
     case "$host" in
-      *-linux*)
+      *-linux*|*-gnu*)
 	if test "$GCC" = yes; then
 	  
   
@@ -3112,7 +3112,7 @@ echo "$ac_t""$mr_cv_target_elf" 1>&6
 	  mr_enable_shared=no
 	fi
 	;;
-      sparc-sun-solaris2*)
+      sparc-sun-solaris2-9*)
 	if test "$GCC" = yes; then
 	  PICFLAGS='-fPIC -DPIC'
 	else
@@ -3166,12 +3166,13 @@ EOF
   fi
 
 
+maintainer_mode=${I_AM_THE_LIBELF_MAINTAINER-no}
 # Check whether --enable-maintainer-mode or --disable-maintainer-mode was given.
 if test "${enable_maintainer_mode+set}" = set; then
   enableval="$enable_maintainer_mode"
   libelf_enable_maintainer_mode="$enableval"
 else
-  libelf_enable_maintainer_mode=no
+  libelf_enable_maintainer_mode="$maintainer_mode"
 fi
 
 if test x"$libelf_enable_maintainer_mode" = x"yes"; then

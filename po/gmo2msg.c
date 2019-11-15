@@ -1,6 +1,6 @@
 /*
 gmo2msg.c - create X/Open message source file for libelf.
-Copyright (C) 1996, 1999 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1996 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: gmo2msg.c,v 1.5 1999/11/04 20:17:34 michael Exp $";
+static const char rcsid[] = "@(#) $Id: gmo2msg.c,v 1.6 2002/12/14 17:43:13 michael Exp $";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -64,7 +64,7 @@ main(int argc, char **argv) {
     unlink(DOMAIN ".mo"); symlink(buf, DOMAIN ".mo");
     unlink("LC_MESSAGES"); symlink(".", "LC_MESSAGES");
     unlink(lang); symlink(".", lang);
-    printf("$set 1 # Automatically created from %s by %s\n", buf, progname);
+    printf("$set 1 Automatically created from %s by %s\n", buf, progname);
 
     /*
      * Get translated messages.
@@ -75,14 +75,14 @@ main(int argc, char **argv) {
     if ((s = gettext("")) && (s = strdup(s))) {
 	s = strtok(s, "\n");
 	while (s) {
-	    printf("# %s\n", s);
+	    printf("$ %s\n", s);
 	    s = strtok(NULL, "\n");
 	}
     }
     for (i = 0; i < sizeof(msgs)/sizeof(*msgs); i++) {
 	s = gettext(msgs[i]);
 	if (s != msgs[i] && strcmp(s, msgs[i])) {
-	    printf("#\n$ Original message: %s\n", msgs[i]);
+	    printf("$ \n$ Original message: %s\n", msgs[i]);
 	    printf("%u %s\n", i + 1, s);
 	}
     }

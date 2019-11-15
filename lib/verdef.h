@@ -1,6 +1,6 @@
 /*
 verdef.h - copy versioning information.
-Copyright (C) 2001 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 2001, 2002 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #ifndef lint
-static const char verdef_h_rcsid[] = "@(#) $Id: verdef.h,v 1.1 2001/10/07 20:03:02 michael Exp $";
+static const char verdef_h_rcsid[] = "@(#) $Id: verdef.h,v 1.4 2002/12/22 20:08:48 michael Exp $";
 #endif /* lint */
 
 #if VER_DEF_CURRENT != 1
@@ -72,7 +72,7 @@ typedef align_mtype		verdef_atype;
 #define copy_verdef_srctotmp(d, s, e)	(*(d) = *(s))
 #define copy_verdef_tmptodst(d, s, e)	__store_verdef((d), (s), (e))
 
-#define translator_suffix	11_tof
+#define translator_suffix	_tof
 
 #else /* TOFILE */
 
@@ -121,7 +121,7 @@ typedef align_ftype		verdef_atype;
 #define copy_verdef_srctotmp(d, s, e)	__load_verdef((d), (s), (e))
 #define copy_verdef_tmptodst(d, s, e)	(*(d) = *(s))
 
-#define translator_suffix	11_tom
+#define translator_suffix	_tom
 
 #endif /* TOFILE */
 
@@ -135,6 +135,10 @@ xlt_verdef(unsigned char *dst, const unsigned char *src, size_t n, unsigned enc)
     size_t doff;
     size_t soff;
 
+    if (src == NULL) {
+	seterr(ERROR_NULLBUF);
+	return (size_t)-1;
+    }
     if (n < sizeof(verdef_stype)) {
 	return 0;
     }
@@ -259,11 +263,11 @@ xlt_verdef(unsigned char *dst, const unsigned char *src, size_t n, unsigned enc)
 }
 
 size_t
-translator(verdef,L)(unsigned char *dst, const unsigned char *src, size_t n) {
+translator(verdef,L11)(unsigned char *dst, const unsigned char *src, size_t n) {
     return xlt_verdef(dst, src, n, ELFDATA2LSB);
 }
 
 size_t
-translator(verdef,M)(unsigned char *dst, const unsigned char *src, size_t n) {
+translator(verdef,M11)(unsigned char *dst, const unsigned char *src, size_t n) {
     return xlt_verdef(dst, src, n, ELFDATA2MSB);
 }

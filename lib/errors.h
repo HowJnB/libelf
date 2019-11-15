@@ -1,6 +1,6 @@
 /*
 errors.h - exhaustive list of all error codes and messages for libelf.
-Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* @(#) $Id: errors.h,v 1.9 2001/10/07 19:34:07 michael Exp $ */
+/* @(#) $Id: errors.h,v 1.11 2003/02/27 12:54:30 michael Exp $ */
 
 /* dummy for xgettext */
 #define _(str) str
@@ -75,6 +75,7 @@ __err__(ERROR_VERDEF_FORMAT,	_("Format error: bad parameter in Verdef record"))
 __err__(ERROR_VERDEF_VERSION,	_("Format error: unknown Verdef version"))
 __err__(ERROR_VERNEED_FORMAT,	_("Format error: bad parameter in Verneed record"))
 __err__(ERROR_VERNEED_VERSION,	_("Format error: unknown Verneed version"))
+__err__(ERROR_EHDR_SHNUM,	_("Format error: bad e_shnum value"))
 __err__(ERROR_SCN2SMALL,	_("Layout error: section size too small for data"))
 __err__(ERROR_SCN_OVERLAP,	_("Layout error: overlapping sections"))
 __err__(ERROR_MEM_ELF,		_("Memory error: elf descriptor"))
@@ -86,6 +87,7 @@ __err__(ERROR_MEM_SHDR,		_("Memory error: section header table"))
 __err__(ERROR_MEM_SCN,		_("Memory error: section descriptor"))
 __err__(ERROR_MEM_SCNDATA,	_("Memory error: section data"))
 __err__(ERROR_MEM_OUTBUF,	_("Memory error: output file space"))
+__err__(ERROR_MEM_TEMPORARY,    _("Memory error: temporary buffer"))
 __err__(ERROR_BADVALUE,		_("GElf error: value out of range"))
 __err__(ERROR_BADINDEX,		_("GElf error: index out of range"))
 __err__(ERROR_BADTYPE,		_("GElf error: type mismatch"))

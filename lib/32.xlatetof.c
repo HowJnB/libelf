@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <byteswap.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.14 2002/06/11 18:53:22 michael Exp $";
+static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.17 2002/12/22 20:08:48 michael Exp $";
 #endif /* lint */
 
 /*
@@ -132,7 +132,7 @@ static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.14 2002/06/11 18:53:22 
 #define copy_dyn_11(e,io,seq)		\
     seq(copy_sword(e,io,d_tag),		\
     seq(copy_addr(e,io,d_un.d_ptr),	\
-    /**/))
+    nullcopy))
 #define copy_ehdr_11(e,io,seq)		\
     seq(copy_arr(e,io,e_ident),		\
     seq(copy_half(e,io,e_type),		\
@@ -148,7 +148,7 @@ static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.14 2002/06/11 18:53:22 
     seq(copy_half(e,io,e_shentsize),	\
     seq(copy_half(e,io,e_shnum),	\
     seq(copy_half(e,io,e_shstrndx),	\
-    /**/))))))))))))))
+    nullcopy))))))))))))))
 #define copy_phdr_11(e,io,seq)		\
     seq(copy_word(e,io,p_type),		\
     seq(copy_off(e,io,p_offset),	\
@@ -158,16 +158,16 @@ static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.14 2002/06/11 18:53:22 
     seq(copy_word(e,io,p_memsz),	\
     seq(copy_word(e,io,p_flags),	\
     seq(copy_word(e,io,p_align),	\
-    /**/))))))))
+    nullcopy))))))))
 #define copy_rela_11(e,io,seq)		\
     seq(copy_addr(e,io,r_offset),	\
     seq(copy_word(e,io,r_info),		\
     seq(copy_sword(e,io,r_addend),	\
-    /**/)))
+    nullcopy)))
 #define copy_rel_11(e,io,seq)		\
     seq(copy_addr(e,io,r_offset),	\
     seq(copy_word(e,io,r_info),		\
-    /**/))
+    nullcopy))
 #define copy_shdr_11(e,io,seq)		\
     seq(copy_word(e,io,sh_name),	\
     seq(copy_word(e,io,sh_type),	\
@@ -179,7 +179,7 @@ static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.14 2002/06/11 18:53:22 
     seq(copy_word(e,io,sh_info),	\
     seq(copy_word(e,io,sh_addralign),	\
     seq(copy_word(e,io,sh_entsize),	\
-    /**/))))))))))
+    nullcopy))))))))))
 #define copy_sym_11(e,io,seq)		\
     seq(copy_word(e,io,st_name),	\
     seq(copy_addr(e,io,st_value),	\
@@ -187,7 +187,9 @@ static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.14 2002/06/11 18:53:22 
     seq(copy_byte(e,io,st_info),	\
     seq(copy_byte(e,io,st_other),	\
     seq(copy_half(e,io,st_shndx),	\
-    /**/))))))
+    nullcopy))))))
+
+#define nullcopy /**/
 
 static size_t
 byte_copy(unsigned char *dst, const unsigned char *src, size_t n) {

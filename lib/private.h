@@ -17,7 +17,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* @(#) $Id: private.h,v 1.23 2001/10/15 21:39:02 michael Exp $ */
+/* @(#) $Id: private.h,v 1.24 2002/12/30 04:57:32 michael Exp $ */
 
 #ifndef _PRIVATE_H
 #define _PRIVATE_H
@@ -373,6 +373,13 @@ ERROR_NUM
 # define ELF64_FSZ_WORD		4
 # define ELF64_FSZ_XWORD	8
 #endif /* ELF64_FSZ_ADDR */
+
+/*
+ * More missing pieces, in no particular order
+ */
+#ifndef SHT_SYMTAB_SHNDX
+#define SHT_SYMTAB_SHNDX	18
+#endif
 
 /*
  * Debugging

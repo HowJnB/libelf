@@ -1,7 +1,7 @@
 # Local additions to Autoconf macros.
-# Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+# Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
 
-# @(#) $Id: aclocal.m4,v 1.12 2001/10/09 20:47:29 michael Exp $
+# @(#) $Id: aclocal.m4,v 1.13 2003/01/02 14:57:16 michael Exp $
 
 AC_PREREQ(2.12)
 
@@ -182,9 +182,9 @@ AC_DEFUN(mr_ENABLE_SHARED, [
   DEPSHLIBS=
   AC_MSG_CHECKING([whether to build a shared library])
   AC_ARG_ENABLE(shared,
-    [  --enable-shared         build shared library (default: no)],
+    [  --enable-shared         build shared library (default: yes)],
     [mr_enable_shared="$enableval"],
-    [mr_enable_shared=no])
+    [mr_enable_shared=yes])
   AC_MSG_RESULT($mr_enable_shared)
   if test "$mr_enable_shared" = yes; then
     AC_MSG_CHECKING([whether GNU naming conventions are requested])
@@ -197,7 +197,7 @@ AC_DEFUN(mr_ENABLE_SHARED, [
     AC_REQUIRE([AC_PROG_CC])
     AC_PATH_PROG(LD, ld, ld)
     case "$host" in
-      *-linux*)
+      *-linux*|*-gnu*)
 	if test "$GCC" = yes; then
 	  mr_TARGET_ELF
 	  if test "$mr_cv_target_elf" = yes; then
@@ -222,7 +222,7 @@ AC_DEFUN(mr_ENABLE_SHARED, [
 	  mr_enable_shared=no
 	fi
 	;;
-      sparc-sun-solaris2*)
+      sparc-sun-solaris[2-9]*)
 	if test "$GCC" = yes; then
 	  PICFLAGS='-fPIC -DPIC'
 	else

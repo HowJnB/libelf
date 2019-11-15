@@ -1,5 +1,5 @@
 # Makefile for libelf.
-# Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+# Copyright (C) 1995 - 2001, 2003 Michael Riepe <michael@stud.uni-hannover.de>
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-# @(#) $Id: Makefile.in,v 1.13 2001/10/30 16:05:55 michael Exp $
+# @(#) $Id: Makefile.in,v 1.15 2003/02/27 13:35:12 michael Exp $
 
 MV = mv -f
 RM = rm -f
@@ -109,6 +109,14 @@ $(MAINT)./stamp-dist: $(DISTFILES)
 	tar cvhfz $(distdir).tar.gz $(DISTPERMS) $(distdir)
 	$(LN_S) $(distdir).tar.gz $(PACKAGE).tar.gz
 	$(RM) stamp-dist && echo timestamp > stamp-dist
+
+$(MAINT)test-dist:
+	$(RM) -r testdist
+	mkdir testdist
+	echo 'unset CC CFLAGS CPPFLAGS LDFLAGS LIBS' >testdist/config.site
+	@echo 'unset I_AM_THE_LIBELF_MAINTAINER' >>testdist/config.site
+	cd testdist && CONFIG_SITE=config.site ../$(distdir)/configure
+	$(MAKE) -C testdist
 
 tags:
 	rm -f tags

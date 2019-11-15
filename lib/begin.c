@@ -1,6 +1,6 @@
 /*
 begin.c - implementation of the elf_begin(3) and elf_memory(3) functions.
-Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: begin.c,v 1.12 2001/10/15 21:38:29 michael Exp $";
+static const char rcsid[] = "@(#) $Id: begin.c,v 1.13 2003/01/15 21:50:53 michael Exp $";
 #endif /* lint */
 
 #if HAVE_AR_H
@@ -239,6 +239,7 @@ Elf*
 elf_begin(int fd, Elf_Cmd cmd, Elf *ref) {
     Elf_Arhdr *arhdr = NULL;
     size_t size = 0;
+    off_t off;
     Elf *elf;
 
     elf_assert(_elf_init.e_magic == ELF_MAGIC);
@@ -282,7 +283,7 @@ elf_begin(int fd, Elf_Cmd cmd, Elf *ref) {
 	}
 	size = arhdr->ar_size;
     }
-    else if ((off_t)(size = lseek(fd, (off_t)0, SEEK_END)) == (off_t)-1) {
+    else if ((off = lseek(fd, (off_t)0, SEEK_END)) == (off_t)-1 || (size = off) != off) {
 	seterr(ERROR_IO_GETSIZE);
 	return NULL;
     }

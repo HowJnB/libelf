@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-# @(#) $Id: Makefile.in,v 1.7 2001/10/07 04:54:20 michael Exp $
+# @(#) $Id: Makefile.in,v 1.9 2003/01/02 14:59:11 michael Exp $
 
 prefix = @prefix@
 exec_prefix = @exec_prefix@

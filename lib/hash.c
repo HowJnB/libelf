@@ -1,6 +1,6 @@
 /*
 hash.c - implementation of the elf_hash(3) function.
-Copyright (C) 1995 - 1999 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: hash.c,v 1.4 1999/03/17 15:21:02 michael Exp $";
+static const char rcsid[] = "@(#) $Id: hash.c,v 1.6 2002/12/30 02:10:14 michael Exp $";
 #endif /* lint */
 
 unsigned long
@@ -29,7 +29,7 @@ elf_hash(const unsigned char *name) {
     unsigned long tmp;
 
     while (*name) {
-	hash = (hash << 4) + *name++;
+	hash = (hash << 4) + (unsigned char)*name++;
 	if ((tmp = hash & 0xf0000000)) {
 	    hash ^= tmp | (tmp >> 24);
 	}

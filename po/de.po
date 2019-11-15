@@ -1,5 +1,5 @@
 # po/de.po - German messages for libelf.
-# Copyright (C) 1999 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+# Copyright (C) 1999 - 2003 Michael Riepe <michael@stud.uni-hannover.de>
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# @(#) $Id: de.po,v 1.6 2001/10/07 19:33:03 michael Exp $
+# @(#) $Id: de.po,v 1.10 2003/02/27 13:57:08 michael Exp $
 #
 msgid ""
 msgstr ""
@@ -79,7 +79,7 @@ msgstr "Aufruffehler: die Datei- und Archiv-Deskriptoren passen nicht zusammen"
 
 #: ../lib/errors.h:38
 msgid "Request error: not an ELF file"
-msgstr "Aufruffehler: dies ist kein ELF-Datei"
+msgstr "Aufruffehler: dies ist keine ELF-Datei"
 
 #: ../lib/errors.h:39
 msgid "Request error: class file/memory mismatch"
@@ -99,7 +99,7 @@ msgstr "Aufruffehler: der Zielpuffer ist zu klein"
 
 #: ../lib/errors.h:43
 msgid "Request error: d_buf is NULL"
-msgstr "Aufruffehler: d_buf ist ein NULL-Zeiger"
+msgstr "Aufruffehler: d_buf ist NULL"
 
 #: ../lib/errors.h:44
 msgid "Request error: unknown ELF class"
@@ -238,73 +238,81 @@ msgid "Format error: unknown Verneed version"
 msgstr "Fehler in der Datei: libelf unterstützt die Verneed-Version nicht"
 
 #: ../lib/errors.h:78
+msgid "Format error: bad e_shnum value"
+msgstr "Fehler in der Datei: e_shnum enthält einen ungültigen Wert"
+
+#: ../lib/errors.h:79
 msgid "Layout error: section size too small for data"
 msgstr "Layout-Fehler: ein Dateiabschnitt ist zu kurz für die darin enthaltenen Daten"
 
-#: ../lib/errors.h:79
+#: ../lib/errors.h:80
 msgid "Layout error: overlapping sections"
 msgstr "Layout-Fehler: zwei (oder mehr) Dateiabschnitte überlappen sich"
 
-#: ../lib/errors.h:80
+#: ../lib/errors.h:81
 msgid "Memory error: elf descriptor"
 msgstr "Zu wenig Speicher: für den Elf-Deskriptor"
 
-#: ../lib/errors.h:81
+#: ../lib/errors.h:82
 msgid "Memory error: archive symbol table"
 msgstr "Zu wenig Speicher: für die Archiv-Symboltabelle"
 
-#: ../lib/errors.h:82
+#: ../lib/errors.h:83
 msgid "Memory error: archive member header"
 msgstr "Zu wenig Speicher: für die Archiv-Verwaltungsinformationen"
 
-#: ../lib/errors.h:83
+#: ../lib/errors.h:84
 msgid "Memory error: ELF header"
 msgstr "Zu wenig Speicher: für den ELF-Header"
 
-#: ../lib/errors.h:84
+#: ../lib/errors.h:85
 msgid "Memory error: program header table"
 msgstr "Zu wenig Speicher: für die Program Header Table"
 
-#: ../lib/errors.h:85
+#: ../lib/errors.h:86
 msgid "Memory error: section header table"
 msgstr "Zu wenig Speicher: für die Section Header Table"
 
-#: ../lib/errors.h:86
+#: ../lib/errors.h:87
 msgid "Memory error: section descriptor"
 msgstr "Zu wenig Speicher: für den Elf_Scn-Deskriptor"
 
-#: ../lib/errors.h:87
+#: ../lib/errors.h:88
 msgid "Memory error: section data"
 msgstr "Zu wenig Speicher: für die Daten dieses Abschnitts"
 
-#: ../lib/errors.h:88
+#: ../lib/errors.h:89
 msgid "Memory error: output file space"
 msgstr "Zu wenig Speicher: für die Ausgabe"
 
-#: ../lib/errors.h:89
+#: ../lib/errors.h:90
+msgid "Memory error: temporary buffer"
+msgstr "Zu wenig Speicher: für einen temporären Puffer"
+
+#: ../lib/errors.h:91
 msgid "GElf error: value out of range"
 msgstr "GElf-Fehler: eine Zahl ist außerhalb des darstellbaren Bereichs"
 
-#: ../lib/errors.h:90
+#: ../lib/errors.h:92
 msgid "GElf error: index out of range"
 msgstr "GElf-Fehler: Index außerhalb des erlaubten Bereichs"
 
-#: ../lib/errors.h:91
+#: ../lib/errors.h:93
 msgid "GElf error: type mismatch"
 msgstr "GElf-Fehler: Typfehler"
 
-#: ../lib/errors.h:92
+#: ../lib/errors.h:94
 msgid "GElf error: not enough memory for GElf_Sym"
 msgstr "GElf-Fehler: zu wenig Speicher für eine Variable vom Typ GElf_Sym"
 
-#: ../lib/errors.h:93
+#: ../lib/errors.h:95
 msgid "GElf error: not enough memory for GElf_Dyn"
 msgstr "GElf-Fehler: zu wenig Speicher für eine Variable vom Typ GElf_Dyn"
 
-#: ../lib/errors.h:94
+#: ../lib/errors.h:96
 msgid "GElf error: not enough memory for GElf_Rela"
 msgstr "GElf-Fehler: zu wenig Speicher für eine Variable vom Typ GElf_Rela"
 
-#: ../lib/errors.h:95
+#: ../lib/errors.h:97
 msgid "GElf error: not enough memory for GElf_Rel"
 msgstr "GElf-Fehler: zu wenig Speicher für eine Variable vom Typ GElf_Rel"

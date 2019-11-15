@@ -1,6 +1,6 @@
 /*
 update.c - implementation of the elf_update(3) function.
-Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <private.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: update.c,v 1.18 2001/11/17 21:02:51 michael Exp $";
+static const char rcsid[] = "@(#) $Id: update.c,v 1.22 2002/12/30 04:57:32 michael Exp $";
 #endif /* lint */
 
 #if HAVE_MMAP
@@ -56,7 +56,7 @@ scn_data_layout(Elf_Scn *scn, unsigned v, unsigned type, size_t *algn, unsigned 
 	}
 
 	fsize = sd->sd_data.d_size;
-	if (type != SHT_NOBITS && valid_type(sd->sd_data.d_type)) {
+	if (fsize && type != SHT_NOBITS && valid_type(sd->sd_data.d_type)) {
 	    if (elf->e_class == ELFCLASS32) {
 		fsize = _elf32_xltsize(&sd->sd_data, v, ELFDATA2LSB, 1);
 	    }
@@ -170,7 +170,7 @@ _elf32_layout(Elf *elf, unsigned *flag) {
 
 	elf_assert(scn->s_index == shnum);
 
-	*flag |= scn->s_scn_flags | scn->s_shdr_flags;
+	*flag |= scn->s_scn_flags;
 
 	if (scn->s_index == SHN_UNDEF) {
 	    rewrite(shdr->sh_entsize, 0, scn->s_shdr_flags);
@@ -179,9 +179,11 @@ _elf32_layout(Elf *elf, unsigned *flag) {
 		rewrite(shdr->sh_size, 0, scn->s_shdr_flags);
 		rewrite(shdr->sh_addralign, 0, scn->s_shdr_flags);
 	    }
+	    *flag |= scn->s_shdr_flags;
 	    continue;
 	}
 	if (shdr->sh_type == SHT_NULL) {
+	    *flag |= scn->s_shdr_flags;
 	    continue;
 	}
 
@@ -190,9 +192,14 @@ _elf32_layout(Elf *elf, unsigned *flag) {
 	    return -1;
 	}
 
-	entsize = scn_entsize(elf, version, shdr->sh_type);
-	if (entsize > 1) {
-	    rewrite(shdr->sh_entsize, entsize, scn->s_shdr_flags);
+	/*
+	 * Never override the program's choice.
+	 */
+	if (shdr->sh_entsize == 0) {
+	    entsize = scn_entsize(elf, version, shdr->sh_type);
+	    if (entsize > 1) {
+		rewrite(shdr->sh_entsize, entsize, scn->s_shdr_flags);
+	    }
 	}
 
 	if (layout) {
@@ -240,6 +247,7 @@ _elf32_layout(Elf *elf, unsigned *flag) {
 		off = end1;
 	    }
 	}
+	*flag |= scn->s_shdr_flags;
     }
 
     if (shnum) {
@@ -259,6 +267,15 @@ _elf32_layout(Elf *elf, unsigned *flag) {
 	if (layout) {
 	    rewrite(ehdr->e_shoff, 0, elf->e_ehdr_flags);
 	}
+    }
+    if (shnum >= SHN_LORESERVE) {
+	Elf_Scn *scn = elf->e_scn_1;
+	Elf32_Shdr *shdr = &scn->s_shdr32;
+
+	elf_assert(scn->s_index == 0);
+	rewrite(shdr->sh_size, shnum, scn->s_shdr_flags);
+	*flag |= scn->s_shdr_flags;
+	shnum = 0;
     }
     rewrite(ehdr->e_shnum, shnum, elf->e_ehdr_flags);
     rewrite(ehdr->e_shentsize, entsize, elf->e_ehdr_flags);
@@ -343,7 +360,7 @@ _elf64_layout(Elf *elf, unsigned *flag) {
 
 	elf_assert(scn->s_index == shnum);
 
-	*flag |= scn->s_scn_flags | scn->s_shdr_flags;
+	*flag |= scn->s_scn_flags;
 
 	if (scn->s_index == SHN_UNDEF) {
 	    rewrite(shdr->sh_entsize, 0, scn->s_shdr_flags);
@@ -352,9 +369,11 @@ _elf64_layout(Elf *elf, unsigned *flag) {
 		rewrite(shdr->sh_size, 0, scn->s_shdr_flags);
 		rewrite(shdr->sh_addralign, 0, scn->s_shdr_flags);
 	    }
+	    *flag |= scn->s_shdr_flags;
 	    continue;
 	}
 	if (shdr->sh_type == SHT_NULL) {
+	    *flag |= scn->s_shdr_flags;
 	    continue;
 	}
 
@@ -363,9 +382,14 @@ _elf64_layout(Elf *elf, unsigned *flag) {
 	    return -1;
 	}
 
-	entsize = scn_entsize(elf, version, shdr->sh_type);
-	if (entsize > 1) {
-	    rewrite(shdr->sh_entsize, entsize, scn->s_shdr_flags);
+	/*
+	 * Never override the program's choice.
+	 */
+	if (shdr->sh_entsize == 0) {
+	    entsize = scn_entsize(elf, version, shdr->sh_type);
+	    if (entsize > 1) {
+		rewrite(shdr->sh_entsize, entsize, scn->s_shdr_flags);
+	    }
 	}
 
 	if (layout) {
@@ -413,6 +437,7 @@ _elf64_layout(Elf *elf, unsigned *flag) {
 		off = end1;
 	    }
 	}
+	*flag |= scn->s_shdr_flags;
     }
 
     if (shnum) {
@@ -432,6 +457,15 @@ _elf64_layout(Elf *elf, unsigned *flag) {
 	if (layout) {
 	    rewrite(ehdr->e_shoff, 0, elf->e_ehdr_flags);
 	}
+    }
+    if (shnum >= SHN_LORESERVE) {
+	Elf_Scn *scn = elf->e_scn_1;
+	Elf64_Shdr *shdr = &scn->s_shdr64;
+
+	elf_assert(scn->s_index == 0);
+	rewrite(shdr->sh_size, shnum, scn->s_shdr_flags);
+	*flag |= scn->s_shdr_flags;
+	shnum = 0;
     }
     rewrite(ehdr->e_shnum, shnum, elf->e_ehdr_flags);
     rewrite(ehdr->e_shentsize, entsize, elf->e_ehdr_flags);
