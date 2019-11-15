@@ -1,6 +1,6 @@
 /*
 getarhdr.c - implementation of the elf_getarhdr(3) function.
-Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -18,6 +18,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include <private.h>
+
+#ifndef lint
+static const char rcsid[] = "@(#) $Id: getarhdr.c,v 1.3 1998/06/12 19:42:23 michael Exp $";
+#endif /* lint */
 
 Elf_Arhdr*
 elf_getarhdr(Elf *elf) {

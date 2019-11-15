@@ -1,6 +1,6 @@
 /*
 libelf.h - public header file for libelf.
-Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -17,6 +17,8 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+/* @(#) $Id: libelf.h,v 1.5 1998/06/01 19:47:18 michael Exp $ */
+
 #ifndef _LIBELF_H
 #define _LIBELF_H
 
@@ -24,21 +26,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #if __LIBELF_INTERNAL__
 #include <sys_elf.h>
-#else
+#else /* __LIBELF_INTERNAL__ */
 #include <libelf/sys_elf.h>
-#endif
+#endif /* __LIBELF_INTERNAL__ */
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 #ifndef __P
 # if __STDC__ || defined(__cplusplus)
 #  define __P(args) args
-# else
+# else /* __STDC__ || defined(__cplusplus) */
 #  define __P(args) ()
-# endif
-#endif
+# endif /* __STDC__ || defined(__cplusplus) */
+#endif /* __P */
 
 /*
  * Commands
@@ -89,6 +91,15 @@ typedef enum {
     ELF_T_SWORD,
     ELF_T_SYM,
     ELF_T_WORD,
+    /*
+     * New stuff for 64-bit.
+     *
+     * Most implementations add ELF_T_SXWORD after ELF_T_SWORD
+     * which breaks binary compatibility with earlier versions.
+     * If this causes problems for you, contact me.
+     */
+    ELF_T_SXWORD,
+    ELF_T_XWORD,
     ELF_T_NUM		/* must be last */
 } Elf_Type;
 
@@ -140,6 +151,7 @@ typedef struct {
  * Function declarations
  */
 extern Elf *elf_begin __P((int __fd, Elf_Cmd __cmd, Elf *__ref));
+extern Elf *elf_memory __P((char *__image, size_t __size));
 extern int elf_cntl __P((Elf *__elf, Elf_Cmd __cmd));
 extern int elf_end __P((Elf *__elf));
 extern const char *elf_errmsg __P((int __err));
@@ -188,6 +200,24 @@ extern Elf_Data *elf32_xlatetof __P((Elf_Data *__dst, const Elf_Data *__src,
 extern Elf_Data *elf32_xlatetom __P((Elf_Data *__dst, const Elf_Data *__src,
 	unsigned __encode));
 
+#if __LIBELF64
+/*
+ * 64-bit ELF functions
+ * Not available on all platforms
+ */
+extern Elf64_Ehdr *elf64_getehdr __P((Elf *__elf));
+extern Elf64_Ehdr *elf64_newehdr __P((Elf *__elf));
+extern Elf64_Phdr *elf64_getphdr __P((Elf *__elf));
+extern Elf64_Phdr *elf64_newphdr __P((Elf *__elf, size_t __count));
+extern Elf64_Shdr *elf64_getshdr __P((Elf_Scn *__scn));
+extern size_t elf64_fsize __P((Elf_Type __type, size_t __count,
+	unsigned __ver));
+extern Elf_Data *elf64_xlatetof __P((Elf_Data *__dst, const Elf_Data *__src,
+	unsigned __encode));
+extern Elf_Data *elf64_xlatetom __P((Elf_Data *__dst, const Elf_Data *__src,
+	unsigned __encode));
+#endif /* __LIBELF64 */
+
 /*
  * More function declarations
  * These functions are NOT available
@@ -197,6 +227,6 @@ extern size_t elf_delscn __P((Elf *__elf, Elf_Scn *__scn));
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* _LIBELF_H */

@@ -1,6 +1,6 @@
 /*
 strptr.c - implementation of the elf_strptr(3) function.
-Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -18,6 +18,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include <private.h>
+
+#ifndef lint
+static const char rcsid[] = "@(#) $Id: strptr.c,v 1.4 1998/06/12 19:42:38 michael Exp $";
+#endif /* lint */
 
 char*
 elf_strptr(Elf *elf, size_t section, size_t offset) {
@@ -38,8 +42,9 @@ elf_strptr(Elf *elf, size_t section, size_t offset) {
     if (offset >= 0 && offset < scn->s_size) {
 	sd = NULL;
 	while ((sd = elf_getdata(scn, sd))) {
-	    if (sd->d_buf && offset >= (size_t)sd->d_off
-			  && offset < (size_t)sd->d_off + sd->d_size) {
+	    if (sd->d_buf
+	     && offset >= (size_t)sd->d_off
+	     && offset < (size_t)sd->d_off + sd->d_size) {
 		return (char*)sd->d_buf + (offset - sd->d_off);
 	    }
 	}

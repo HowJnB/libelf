@@ -1,6 +1,6 @@
 /*
-32.getshdr.c - implementation of the elf32_getshdr(3) function.
-Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
+32.getshdr.c - implementation of the elf{32,64}_getshdr(3) functions.
+Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -19,15 +19,40 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <private.h>
 
+#ifndef lint
+static const char rcsid[] = "@(#) $Id: 32.getshdr.c,v 1.6 1998/08/22 13:57:46 michael Exp $";
+#endif /* lint */
+
 Elf32_Shdr*
 elf32_getshdr(Elf_Scn *scn) {
-    if (scn) {
-	elf_assert(scn->s_magic == SCN_MAGIC);
-	elf_assert(scn->s_elf);
-	if (scn->s_elf->e_class == ELFCLASS32) {
-	    return &scn->s_shdr32;
-	}
-	seterr(ERROR_CLASSMISMATCH);
+    if (!scn) {
+	return NULL;
     }
+    elf_assert(scn->s_magic == SCN_MAGIC);
+    elf_assert(scn->s_elf);
+    elf_assert(scn->s_elf->e_magic == ELF_MAGIC);
+    if (scn->s_elf->e_class == ELFCLASS32) {
+	return &scn->s_shdr32;
+    }
+    seterr(ERROR_CLASSMISMATCH);
     return NULL;
 }
+
+#if __LIBELF64
+
+Elf64_Shdr*
+elf64_getshdr(Elf_Scn *scn) {
+    if (!scn) {
+	return NULL;
+    }
+    elf_assert(scn->s_magic == SCN_MAGIC);
+    elf_assert(scn->s_elf);
+    elf_assert(scn->s_elf->e_magic == ELF_MAGIC);
+    if (scn->s_elf->e_class == ELFCLASS64) {
+	return &scn->s_shdr64;
+    }
+    seterr(ERROR_CLASSMISMATCH);
+    return NULL;
+}
+
+#endif /* __LIBELF64 */

@@ -1,6 +1,6 @@
 /*
-32.getehdr.c - implementation of the elf32_getehdr(3) function.
-Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
+32.getehdr.c - implementation of the elf{32,64}_getehdr(3) functions.
+Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -19,8 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <private.h>
 
-Elf32_Ehdr*
-elf32_getehdr(Elf *elf) {
+#ifndef lint
+static const char rcsid[] = "@(#) $Id: 32.getehdr.c,v 1.5 1998/06/12 19:42:12 michael Exp $";
+#endif /* lint */
+
+char*
+_elf_getehdr(Elf *elf, unsigned cls) {
     if (!elf) {
 	return NULL;
     }
@@ -28,11 +32,25 @@ elf32_getehdr(Elf *elf) {
     if (elf->e_kind != ELF_K_ELF) {
 	seterr(ERROR_NOTELF);
     }
-    else if (elf->e_class != ELFCLASS32) {
+    else if (elf->e_class != cls) {
 	seterr(ERROR_CLASSMISMATCH);
     }
     else if (elf->e_ehdr || _elf_cook(elf)) {
-	return (Elf32_Ehdr*)elf->e_ehdr;
+	return elf->e_ehdr;
     }
     return NULL;
 }
+
+Elf32_Ehdr*
+elf32_getehdr(Elf *elf) {
+    return (Elf32_Ehdr*)_elf_getehdr(elf, ELFCLASS32);
+}
+
+#if __LIBELF64
+
+Elf64_Ehdr*
+elf64_getehdr(Elf *elf) {
+    return (Elf64_Ehdr*)_elf_getehdr(elf, ELFCLASS64);
+}
+
+#endif /* __LIBELF64 */

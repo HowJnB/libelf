@@ -36,6 +36,48 @@
 /* Define if Elf32_Dyn is declared in <link.h> */
 #undef NEED_LINK_H
 
+/* Define to `<elf.h>' or `<sys/elf.h>' if one of them is present */
+#undef __LIBELF_HEADER_ELF_H
+
+/* Define if you want 64-bit support (and your system supports it) */
+#undef __LIBELF64
+
+/* Define if you want 64-bit support, and are running IRIX */
+#undef __LIBELF64_IRIX
+
+/* Define if you want 64-bit support, and are running Linux */
+#undef __LIBELF64_LINUX
+
+/* Define to a 64-bit signed integer type if one exists */
+#undef __libelf_i64_t
+
+/* Define to a 64-bit unsigned integer type if one exists */
+#undef __libelf_u64_t
+
+/* Define to a 32-bit signed integer type if one exists */
+#undef __libelf_i32_t
+
+/* Define to a 32-bit unsigned integer type if one exists */
+#undef __libelf_u32_t
+
+/* Define to a 16-bit signed integer type if one exists */
+#undef __libelf_i16_t
+
+/* Define to a 16-bit unsigned integer type if one exists */
+#undef __libelf_u16_t
+
+/* The number of bytes in a int.  */
+#undef SIZEOF_INT
+
+/* The number of bytes in a long.  */
+#undef SIZEOF_LONG
+
+/* The number of bytes in a long long.  */
+#undef SIZEOF_LONG_LONG
+
+/* The number of bytes in a short.  */
+#undef SIZEOF_SHORT
+
 /* Define if you have the ftruncate function.  */
 #undef HAVE_FTRUNCATE
 
@@ -51,8 +93,14 @@
 /* Define if you have the memmove function.  */
 #undef HAVE_MEMMOVE
 
-/* Define if you have the valloc function.  */
-#undef HAVE_VALLOC
+/* Define if you have the memset function.  */
+#undef HAVE_MEMSET
+
+/* Define if you have the <elf.h> header file.  */
+#undef HAVE_ELF_H
+
+/* Define if you have the <sys/elf.h> header file.  */
+#undef HAVE_SYS_ELF_H
 
 /* Define if you have the <unistd.h> header file.  */
 #undef HAVE_UNISTD_H

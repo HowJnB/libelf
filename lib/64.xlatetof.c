@@ -1,5 +1,5 @@
 /*
-32.xlatetof.c - implementation of the elf32_xlateto[fm](3) functions.
+64.xlatetof.c - implementation of the elf64_xlateto[fm](3) functions.
 Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
@@ -22,8 +22,56 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <byteswap.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.6 1998/08/25 15:22:23 michael Exp $";
+static const char rcsid[] = "@(#) $Id: 64.xlatetof.c,v 1.3 1998/08/25 15:22:24 michael Exp $";
 #endif /* lint */
+
+static __libelf_u64_t
+__load_u64L(const unsigned char *from) {
+    return ((__libelf_u64_t)__load_u32L(from + 4) << 32) | (__libelf_u64_t)__load_u32L(from);
+}
+
+static __libelf_u64_t
+__load_u64M(const unsigned char *from) {
+    return ((__libelf_u64_t)__load_u32M(from) << 32) | (__libelf_u64_t)__load_u32M(from + 4);
+}
+
+static __libelf_i64_t
+__load_i64L(const unsigned char *from) {
+    return ((__libelf_i64_t)__load_i32L(from + 4) << 32) | (__libelf_u64_t)__load_u32L(from);
+}
+
+static __libelf_i64_t
+__load_i64M(const unsigned char *from) {
+    return ((__libelf_u64_t)__load_u32M(from) << 32) | (__libelf_i64_t)__load_i32M(from + 4);
+}
+
+static void
+__store_u64L(unsigned char *to, __libelf_u64_t v) {
+    __store_u32L(to, (unsigned long)v);
+    v >>= 32;
+    __store_u32L(to + 4, (unsigned long)v);
+}
+
+static void
+__store_u64M(unsigned char *to, __libelf_u64_t v) {
+    __store_u32M(to + 4, (unsigned long)v);
+    v >>= 32;
+    __store_u32M(to, (unsigned long)v);
+}
+
+static void
+__store_i64L(unsigned char *to, __libelf_u64_t v) {
+    __store_u32L(to, (unsigned long)v);
+    v >>= 32;
+    __store_i32L(to + 4, (unsigned long)v);
+}
+
+static void
+__store_i64M(unsigned char *to, __libelf_u64_t v) {
+    __store_u32M(to + 4, (unsigned long)v);
+    v >>= 32;
+    __store_i32M(to, (unsigned long)v);
+}
 
 /*
  * Ugly, ugly
@@ -101,11 +149,13 @@ static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.6 1998/08/25 15:22:23 m
  * structure member copying (direction independent)
  */
 #define copy_byte(e,io,mb)	to->mb = from->mb;
-#define copy_addr(e,io,mb)	Ex2(copy_,io,mb,u32,e)
+#define copy_addr(e,io,mb)	Ex2(copy_,io,mb,u64,e)
 #define copy_half(e,io,mb)	Ex2(copy_,io,mb,u16,e)
-#define copy_off(e,io,mb)	Ex2(copy_,io,mb,u32,e)
+#define copy_off(e,io,mb)	Ex2(copy_,io,mb,u64,e)
 #define copy_sword(e,io,mb)	Ex2(copy_,io,mb,i32,e)
+#define copy_sxword(e,io,mb)	Ex2(copy_,io,mb,i64,e)
 #define copy_word(e,io,mb)	Ex2(copy_,io,mb,u32,e)
+#define copy_xword(e,io,mb)	Ex2(copy_,io,mb,u64,e)
 #define copy_arr(e,io,mb)	\
     array_copy(to->mb, sizeof(to->mb), from->mb, sizeof(from->mb));
 
@@ -113,18 +163,20 @@ static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.6 1998/08/25 15:22:23 m
  * scalar copying (direction independent)
  * these macros are used as `copy' arguments to copy_type()
  */
-#define copy_addr_11(e,io,seq)	Ex1(copy_scalar_,io,u32,e)
+#define copy_addr_11(e,io,seq)	Ex1(copy_scalar_,io,u64,e)
 #define copy_half_11(e,io,seq)	Ex1(copy_scalar_,io,u16,e)
-#define copy_off_11(e,io,seq)	Ex1(copy_scalar_,io,u32,e)
+#define copy_off_11(e,io,seq)	Ex1(copy_scalar_,io,u64,e)
 #define copy_sword_11(e,io,seq)	Ex1(copy_scalar_,io,i32,e)
+#define copy_sxword_11(e,io,seq)Ex1(copy_scalar_,io,i64,e)
 #define copy_word_11(e,io,seq)	Ex1(copy_scalar_,io,u32,e)
+#define copy_xword_11(e,io,seq)	Ex1(copy_scalar_,io,u64,e)
 
 /*
  * structure copying (direction independent)
  * these macros are used as `copy' arguments to copy_type()
  */
 #define copy_dyn_11(e,io,seq)		\
-    seq(copy_sword(e,io,d_tag),		\
+    seq(copy_xword(e,io,d_tag),		\
     seq(copy_addr(e,io,d_un.d_ptr),	\
     /**/))
 #define copy_ehdr_11(e,io,seq)		\
@@ -145,42 +197,62 @@ static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.6 1998/08/25 15:22:23 m
     /**/))))))))))))))
 #define copy_phdr_11(e,io,seq)		\
     seq(copy_word(e,io,p_type),		\
+    seq(copy_word(e,io,p_flags),	\
     seq(copy_off(e,io,p_offset),	\
     seq(copy_addr(e,io,p_vaddr),	\
     seq(copy_addr(e,io,p_paddr),	\
-    seq(copy_word(e,io,p_filesz),	\
-    seq(copy_word(e,io,p_memsz),	\
-    seq(copy_word(e,io,p_flags),	\
-    seq(copy_word(e,io,p_align),	\
+    seq(copy_xword(e,io,p_filesz),	\
+    seq(copy_xword(e,io,p_memsz),	\
+    seq(copy_xword(e,io,p_align),	\
     /**/))))))))
+#if __LIBELF64_IRIX
 #define copy_rela_11(e,io,seq)		\
     seq(copy_addr(e,io,r_offset),	\
-    seq(copy_word(e,io,r_info),		\
-    seq(copy_sword(e,io,r_addend),	\
+    seq(copy_word(e,io,r_sym),		\
+    seq(copy_byte(e,io,r_ssym),		\
+    seq(copy_byte(e,io,r_type3),	\
+    seq(copy_byte(e,io,r_type2),	\
+    seq(copy_byte(e,io,r_type),		\
+    seq(copy_sxword(e,io,r_addend),	\
+    /**/)))))))
+#define copy_rel_11(e,io,seq)		\
+    seq(copy_addr(e,io,r_offset),	\
+    seq(copy_word(e,io,r_sym),		\
+    seq(copy_byte(e,io,r_ssym),		\
+    seq(copy_byte(e,io,r_type3),	\
+    seq(copy_byte(e,io,r_type2),	\
+    seq(copy_byte(e,io,r_type),		\
+    /**/))))))
+#else /* __LIBELF64_IRIX */
+#define copy_rela_11(e,io,seq)		\
+    seq(copy_addr(e,io,r_offset),	\
+    seq(copy_xword(e,io,r_info),	\
+    seq(copy_sxword(e,io,r_addend),	\
     /**/)))
 #define copy_rel_11(e,io,seq)		\
     seq(copy_addr(e,io,r_offset),	\
-    seq(copy_word(e,io,r_info),		\
+    seq(copy_xword(e,io,r_info),	\
     /**/))
+#endif /* __LIBELF64_IRIX */
 #define copy_shdr_11(e,io,seq)		\
     seq(copy_word(e,io,sh_name),	\
     seq(copy_word(e,io,sh_type),	\
-    seq(copy_word(e,io,sh_flags),	\
+    seq(copy_xword(e,io,sh_flags),	\
     seq(copy_addr(e,io,sh_addr),	\
     seq(copy_off(e,io,sh_offset),	\
-    seq(copy_word(e,io,sh_size),	\
+    seq(copy_xword(e,io,sh_size),	\
     seq(copy_word(e,io,sh_link),	\
     seq(copy_word(e,io,sh_info),	\
-    seq(copy_word(e,io,sh_addralign),	\
-    seq(copy_word(e,io,sh_entsize),	\
+    seq(copy_xword(e,io,sh_addralign),	\
+    seq(copy_xword(e,io,sh_entsize),	\
     /**/))))))))))
 #define copy_sym_11(e,io,seq)		\
     seq(copy_word(e,io,st_name),	\
-    seq(copy_addr(e,io,st_value),	\
-    seq(copy_word(e,io,st_size),	\
     seq(copy_byte(e,io,st_info),	\
     seq(copy_byte(e,io,st_other),	\
     seq(copy_half(e,io,st_shndx),	\
+    seq(copy_addr(e,io,st_value),	\
+    seq(copy_xword(e,io,st_size),	\
     /**/))))))
 
 static void
@@ -202,7 +274,7 @@ byte_copy(unsigned char *dst, const unsigned char *src, size_t n) {
 	/* continue with lower half */
 	n /= 2;
     }
-#endif /* HAVE_BROKEN_MEMMOVE */
+#endif
     memmove(dst, src, n);
 }
 
@@ -217,69 +289,75 @@ array_copy(unsigned char *dst, size_t dlen, const unsigned char *src, size_t sle
 /*
  * instantiate copy functions
  */
-copy_type(addr_32,_,Elf32_Addr,copy_addr_11)
-copy_type(half_32,_,Elf32_Half,copy_half_11)
-copy_type(off_32,_,Elf32_Off,copy_off_11)
-copy_type(sword_32,_,Elf32_Sword,copy_sword_11)
-copy_type(word_32,_,Elf32_Word,copy_word_11)
-copy_type(dyn_32,11,Elf32_Dyn,copy_dyn_11)
-copy_type(ehdr_32,11,Elf32_Ehdr,copy_ehdr_11)
-copy_type(phdr_32,11,Elf32_Phdr,copy_phdr_11)
-copy_type(rela_32,11,Elf32_Rela,copy_rela_11)
-copy_type(rel_32,11,Elf32_Rel,copy_rel_11)
-copy_type(shdr_32,11,Elf32_Shdr,copy_shdr_11)
-copy_type(sym_32,11,Elf32_Sym,copy_sym_11)
+copy_type(addr_64,_,Elf64_Addr,copy_addr_11)
+copy_type(half_64,_,Elf64_Half,copy_half_11)
+copy_type(off_64,_,Elf64_Off,copy_off_11)
+copy_type(sword_64,_,Elf64_Sword,copy_sword_11)
+copy_type(sxword_64,_,Elf64_Sxword,copy_sxword_11)
+copy_type(word_64,_,Elf64_Word,copy_word_11)
+copy_type(xword_64,_,Elf64_Xword,copy_xword_11)
+copy_type(dyn_64,11,Elf64_Dyn,copy_dyn_11)
+copy_type(ehdr_64,11,Elf64_Ehdr,copy_ehdr_11)
+copy_type(phdr_64,11,Elf64_Phdr,copy_phdr_11)
+copy_type(rela_64,11,Elf64_Rela,copy_rela_11)
+copy_type(rel_64,11,Elf64_Rel,copy_rel_11)
+copy_type(shdr_64,11,Elf64_Shdr,copy_shdr_11)
+copy_type(sym_64,11,Elf64_Sym,copy_sym_11)
 
 typedef void (*xlator)(unsigned char*, const unsigned char*, size_t);
 typedef xlator xltab[ELF_T_NUM][2];
 
 /*
- * translation table (32-bit, version 1 -> version 1)
+ * translation table (64-bit, version 1 -> version 1)
  */
 static const xltab
-xlate32_11[/*encoding*/] = {
+xlate64_11[/*encoding*/] = {
     {
 	{ byte_copy,	    byte_copy	    },
-	{ addr_32L__tom,    addr_32L__tof   },
-	{ dyn_32L11_tom,    dyn_32L11_tof   },
-	{ ehdr_32L11_tom,   ehdr_32L11_tof  },
-	{ half_32L__tom,    half_32L__tof   },
-	{ off_32L__tom,	    off_32L__tof    },
-	{ phdr_32L11_tom,   phdr_32L11_tof  },
-	{ rela_32L11_tom,   rela_32L11_tof  },
-	{ rel_32L11_tom,    rel_32L11_tof   },
-	{ shdr_32L11_tom,   shdr_32L11_tof  },
-	{ sword_32L__tom,   sword_32L__tof  },
-	{ sym_32L11_tom,    sym_32L11_tof   },
-	{ word_32L__tom,    word_32L__tof   },
+	{ addr_64L__tom,    addr_64L__tof   },
+	{ dyn_64L11_tom,    dyn_64L11_tof   },
+	{ ehdr_64L11_tom,   ehdr_64L11_tof  },
+	{ half_64L__tom,    half_64L__tof   },
+	{ off_64L__tom,	    off_64L__tof    },
+	{ phdr_64L11_tom,   phdr_64L11_tof  },
+	{ rela_64L11_tom,   rela_64L11_tof  },
+	{ rel_64L11_tom,    rel_64L11_tof   },
+	{ shdr_64L11_tom,   shdr_64L11_tof  },
+	{ sword_64L__tom,   sword_64L__tof  },
+	{ sym_64L11_tom,    sym_64L11_tof   },
+	{ word_64L__tom,    word_64L__tof   },
+	{ sxword_64L__tom,  sxword_64L__tof },
+	{ xword_64L__tom,   xword_64L__tof  },
     },
     {
 	{ byte_copy,	    byte_copy	    },
-	{ addr_32M__tom,    addr_32M__tof   },
-	{ dyn_32M11_tom,    dyn_32M11_tof   },
-	{ ehdr_32M11_tom,   ehdr_32M11_tof  },
-	{ half_32M__tom,    half_32M__tof   },
-	{ off_32M__tom,	    off_32M__tof    },
-	{ phdr_32M11_tom,   phdr_32M11_tof  },
-	{ rela_32M11_tom,   rela_32M11_tof  },
-	{ rel_32M11_tom,    rel_32M11_tof   },
-	{ shdr_32M11_tom,   shdr_32M11_tof  },
-	{ sword_32M__tom,   sword_32M__tof  },
-	{ sym_32M11_tom,    sym_32M11_tof   },
-	{ word_32M__tom,    word_32M__tof   },
+	{ addr_64M__tom,    addr_64M__tof   },
+	{ dyn_64M11_tom,    dyn_64M11_tof   },
+	{ ehdr_64M11_tom,   ehdr_64M11_tof  },
+	{ half_64M__tom,    half_64M__tof   },
+	{ off_64M__tom,	    off_64M__tof    },
+	{ phdr_64M11_tom,   phdr_64M11_tof  },
+	{ rela_64M11_tom,   rela_64M11_tof  },
+	{ rel_64M11_tom,    rel_64M11_tof   },
+	{ shdr_64M11_tom,   shdr_64M11_tof  },
+	{ sword_64M__tom,   sword_64M__tof  },
+	{ sym_64M11_tom,    sym_64M11_tof   },
+	{ word_64M__tom,    word_64M__tof   },
+	{ sxword_64M__tom,  sxword_64M__tof },
+	{ xword_64M__tom,   xword_64M__tof  },
     },
 };
 
 /*
- * main translation table (32-bit)
+ * main translation table (64-bit)
  */
 static const xltab *const
-xlate32[EV_CURRENT - EV_NONE][EV_CURRENT - EV_NONE] = {
-    { xlate32_11, },
+xlate64[EV_CURRENT - EV_NONE][EV_CURRENT - EV_NONE] = {
+    { xlate64_11, },
 };
 
 #define translator(sv,dv,enc,type,d)	\
-    (xlate32[(sv) - EV_NONE - 1]	\
+    (xlate64[(sv) - EV_NONE - 1]	\
 	    [(dv) - EV_NONE - 1]	\
 	    [(enc) - ELFDATA2LSB]	\
 	    [(type) - ELF_T_BYTE]	\
@@ -289,7 +367,7 @@ xlate32[EV_CURRENT - EV_NONE][EV_CURRENT - EV_NONE] = {
  * direction-independent translation
  */
 static Elf_Data*
-elf32_xlate(Elf_Data *dst, const Elf_Data *src, unsigned encode, int tof) {
+elf64_xlate(Elf_Data *dst, const Elf_Data *src, unsigned encode, int tof) {
     size_t ssize, dsize, count;
     Elf_Type type;
     int sv, dv;
@@ -317,8 +395,8 @@ elf32_xlate(Elf_Data *dst, const Elf_Data *src, unsigned encode, int tof) {
 	seterr(ERROR_UNKNOWN_TYPE);
 	return NULL;
     }
-    ssize = _fmsize(ELFCLASS32, sv, type, 1 - tof);
-    dsize = _fmsize(ELFCLASS32, dv, type, tof);
+    ssize = _fmsize(ELFCLASS64, sv, type, 1 - tof);
+    dsize = _fmsize(ELFCLASS64, dv, type, tof);
     op = translator(sv, dv, encode, type, tof);
     if (!ssize || !dsize || !op) {
 	seterr(ERROR_UNKNOWN_TYPE);
@@ -341,11 +419,12 @@ elf32_xlate(Elf_Data *dst, const Elf_Data *src, unsigned encode, int tof) {
  * finally, the "official" translation functions
  */
 Elf_Data*
-elf32_xlatetom(Elf_Data *dst, const Elf_Data *src, unsigned encode) {
-    return elf32_xlate(dst, src, encode, 0);
+elf64_xlatetom(Elf_Data *dst, const Elf_Data *src, unsigned encode) {
+    return elf64_xlate(dst, src, encode, 0);
 }
 
 Elf_Data*
-elf32_xlatetof(Elf_Data *dst, const Elf_Data *src, unsigned encode) {
-    return elf32_xlate(dst, src, encode, 1);
+elf64_xlatetof(Elf_Data *dst, const Elf_Data *src, unsigned encode) {
+    return elf64_xlate(dst, src, encode, 1);
 }
+

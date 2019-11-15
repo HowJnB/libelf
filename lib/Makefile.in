@@ -1,5 +1,5 @@
 # lib/Makefile for libelf.
-# Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
+# Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU Library General Public
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+# @(#) $Id: Makefile.in,v 1.5 1998/08/23 16:43:30 michael Exp $
 
 prefix = @prefix@
 exec_prefix = @exec_prefix@
@@ -37,6 +39,7 @@ CPPFLAGS = @CPPFLAGS@
 DEFS = -DHAVE_CONFIG_H
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
+DEPSHLIBS = @DEPSHLIBS@
 
 DO_SHLIB = @DO_SHLIB@
 PICFLAGS = @PICFLAGS@
@@ -106,8 +109,12 @@ OBJS4 = nlist.o
 SRCS5 = opt.delscn.c
 OBJS5 = opt.delscn.o
 
-SRCS = $(SRCS1) $(SRCS2) $(SRCS3) $(SRCS4) $(SRCS5)
-OBJS = $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4) $(OBJS5)
+# 64-bit sources
+SRCS64 = 64.xlatetof.c
+OBJS64 = @OBJS64@
+
+SRCS = $(SRCS1) $(SRCS2) $(SRCS3) $(SRCS4) $(SRCS5) $(SRCS64)
+OBJS = $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4) $(OBJS5) $(OBJS64)
 
 # missing functions
 LIBSRCS = memset.c
@@ -122,7 +129,7 @@ AUXHDRS = sys_elf.h
 # private header files
 PRIVHDRS = byteswap.h errors.h ext_types.h private.h elf_repl.h
 
-DISTFILES = $(SRCS) $(LIBSRCS) $(HDRS) $(PRIVHDRS) Makefile.in
+DISTFILES = $(SRCS) $(LIBSRCS) $(HDRS) $(PRIVHDRS) Makefile.in sys_elf.h.in
 
 all: $(picdir) libelf.a shared-$(DO_SHLIB)
 
@@ -136,7 +143,8 @@ libelf.a: $(OBJS) $(LIBOBJS)
 
 $(SHLIB): $(picdir) $(OBJS) $(LIBOBJS)
 	@$(RM) $(SHLIB)
-	cd $(picdir) && $(LINK_SHLIB) -o $(back)/$(SHLIB) $(OBJS) $(LIBOBJS)
+	cd $(picdir) && \
+	  $(LINK_SHLIB) -o $(back)/$(SHLIB) $(OBJS) $(LIBOBJS) $(DEPSHLIBS)
 	if test "$(SONAME)" = "$(SHLIB)"; then true; else \
 	  $(RM) $(SONAME) && $(LN_S) $(SHLIB) $(SONAME); \
 	fi
@@ -159,7 +167,7 @@ installdirs: $(top_srcdir)/mkinstalldirs
 install-data:
 	$(INSTALL_DATA) libelf.a $(libdir)
 	-cd $(libdir) && $(RANLIB) libelf.a
-	for file in $(HDRS) $(AUXHDRS); do \
+	for file in $(HDRS) $(AUXHDRS) elf_repl.h; do \
 	  if test -r $$file; then \
 	    $(INSTALL_DATA) $$file $(includedir)/libelf; \
 	  else \
@@ -220,6 +228,11 @@ dist: $(DISTFILES)
 Makefile: Makefile.in $(topdir)/config.status
 	cd $(topdir) && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= ./config.status
 
+sys_elf.h: stamp-h
+stamp-h: sys_elf.h.in $(topdir)/config.status
+	cd $(topdir) && CONFIG_FILES= CONFIG_HEADERS=$(subdir)/sys_elf.h ./config.status
+	$(RM) stamp-h && echo timestamp > stamp-h
+
 # Tell versions [3.59,3.63) of GNU make not to export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
@@ -228,6 +241,7 @@ Makefile: Makefile.in $(topdir)/config.status
 $(OBJS): private.h $(topdir)/config.h libelf.h errors.h $(AUXHDRS)
 32.fsize.o: ext_types.h
 32.xlatetof.o: byteswap.h ext_types.h
+64.xlatetof.o: byteswap.h ext_types.h
 getarsym.o: byteswap.h
 memset.o: $(topdir)/config.h
 nlist.o: nlist.h

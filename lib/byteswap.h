@@ -17,6 +17,8 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+/* @(#) $Id: byteswap.h,v 1.2 1996/10/22 16:45:54 michael Exp $ */
+
 #ifndef _BYTESWAP_H
 #define _BYTESWAP_H
 

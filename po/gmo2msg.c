@@ -17,6 +17,10 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#ifndef lint
+static const char rcsid[] = "@(#) $Id: gmo2msg.c,v 1.2 1996/10/22 16:49:25 michael Exp $";
+#endif /* lint */
+
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>

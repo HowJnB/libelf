@@ -1,4 +1,4 @@
-This is the public release of libelf-0.6.4, a free ELF object
+This is the public release of libelf-0.7.0, a free ELF object
 file access library. If you have problems with applications
 that use libelf and work with the commercial (SVR4, Solaris)
 version but not with this one, please contact me.
@@ -9,11 +9,18 @@ have a file .../include/elf.h that contains the single line
 configure.
 
 Installation is straightforward - the package is autoconf'ed.
-Just do ``cd libelf-<version>; ./configure; make; make install''.
+Just do ``cd libelf-0.7.0; ./configure; make; make install''.
 Header files will be installed in .../include/libelf/.  If your
 system does not provide its own version of libelf.h or nlist.h,
 you may want to run ``make install-compat'' to install them. I
 recommend that you use ``-I.../include/libelf'' instead.
+
+If you are running Linux with libc 5.* as the default C library,
+and you plan to use the 64-bit functions, you must either use
+``-I.../include/libelf'', or remove /usr/include/libelf.h and
+run ``make install-compat''. Libc 6.* (aka glibc2) doesn't have
+its own <libelf.h> or <nlist.h>, so ``make install-compat''
+alone will be sufficient.
 
 You need an ANSI C compiler to build libelf. Gcc is optimal.
 
@@ -22,6 +29,17 @@ library. To do this, pass ``--enable-shared'' to configure.
 Another configure option, ``--enable-debug'', adds debugging
 code to libelf; if you don't run into problems, you will
 probably not need it.
+
+If you build a shared library and want it to be installed as
+``libelf-0.7.0.so'' rather than ``libelf.so.0.7.0'', please use
+``./configure --enable-shared --enable-gnu-names''. Other files,
+e.g. ``libelf.so'' and ``libelf.so.0'' are NOT affected.
+
+When creating an ELF shared library, it is possible to add references
+to other shared libraries in the DYNAMIC section of the resulting
+file. The make variable DEPSHLIBS contains a list of libraries to add.
+It is set to ``-lc'' on Linux systems, and empty otherwise. To
+override this setting, use something like ``make DEPSHLIBS="-la -lb"''.
 
 NLS is available and enabled by default (although there are
 no message catalogs included in the distribution (yet)). To
@@ -34,7 +52,8 @@ will look for catgets.  If you have gettext in a separate
 library and want to use it, you should pass the library's name
 to configure, e.g. ``LIBS=-lintl ./configure''. Note that you
 MUST link your libelf-based applications with -lintl then,
-which is probably not what you want.
+which is probably not what you want, or change the DEPSHLIBS variable
+described above (in case you're building a shared library).
 
 If you have GNU gettext installed on your system, and if GNU
 gettext runs on top of the catgets interface (Linux systems),
@@ -50,6 +69,27 @@ it (which is IMHO a good idea in general in this case):
 After that, return to the libelf build directory, remove
 config.cache, and start over.
 
+*** 64-bit support ***
+
+Starting with libelf-0.7.0, libelf also supports 64-bit ELF files.
+This is enabled by default unless your system (or your compiler) does
+not support 64-bit integers, or lacks 64-bit declarations in <elf.h>.
+If you have problems building with 64-bit support, please do
+
+    ./configure --disable-elf64
+
+for the moment, and contact me. Please note that I haven't tested
+64-bit support (I still don't have access to any 64-bit systems).
+There are still some unresolved problems, e.g. IRIX uses different
+Elf64_Rel and Elf64_Rela structures (they replaced the r_info member),
+and the enumeration values for Elf_Type differ from the commercial
+(SVR4) implementation of libelf - they broke binary compatibility for
+no good reason, and I'm not willing to follow their footsteps. The
+result is that libelf-0.7.0 ist upward compatible with libelf-0.6.4
+(as it should be) but INCOMPATIBLE WITH SVR4 LIBELF. If you have both
+versions installed, you'd better make sure that you link with the
+library that matches the <libelf.h> you're #include'ing.
+
 Missing things:
 
 	* There is no documentation.
@@ -57,7 +97,15 @@ Missing things:
 	* nlist(3) is incomplete; the n_type and n_sclass
 	  members of struct nl are set to zero even if type
 	  information is available.
-	* Libelf does not support 64bit ELF files (yet).
+
+Changes since 0.6.4:
+
+	* Fixed configure for IRIX systems
+	* Added check for truncated archive members
+	* Added check for misaligned SHDR/PHDR tables
+	* Support for building libelf together with GNU libc
+	* Added elf_memory(3)
+	* Added 64-bit support
 
 Changes since 0.5.2:
 
@@ -75,9 +123,8 @@ Changes since 0.5.2:
 Where to get libelf:
 
 	ftp://sunsite.unc.edu/pub/Linux/libs/
-	ftp://ifwsn4.ifw.uni-hannover.de/private/linux/
+	ftp://ftp.stud.uni-hannover.de/pub/users/michael/
 	http://www.stud.uni-hannover.de/~michael/software/
 
 Michael "Tired" Riepe
 <michael@stud.uni-hannover.de>
-<riepe@ifwsn4.ifw.uni-hannover.de>

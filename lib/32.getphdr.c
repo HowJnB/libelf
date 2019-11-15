@@ -1,6 +1,6 @@
 /*
-32.getphdr.c - implementation of the elf32_getphdr(3) function.
-Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
+32.getphdr.c - implementation of the elf{32,64}_getphdr(3) functions.
+Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -19,8 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <private.h>
 
-Elf32_Phdr*
-elf32_getphdr(Elf *elf) {
+#ifndef lint
+static const char rcsid[] = "@(#) $Id: 32.getphdr.c,v 1.5 1998/06/12 19:42:13 michael Exp $";
+#endif /* lint */
+
+static char*
+_elf_getphdr(Elf *elf, unsigned cls) {
     if (!elf) {
 	return NULL;
     }
@@ -28,11 +32,25 @@ elf32_getphdr(Elf *elf) {
     if (elf->e_kind != ELF_K_ELF) {
 	seterr(ERROR_NOTELF);
     }
-    else if (elf->e_class != ELFCLASS32) {
+    else if (elf->e_class != cls) {
 	seterr(ERROR_CLASSMISMATCH);
     }
     else if (elf->e_ehdr || _elf_cook(elf)) {
-	return (Elf32_Phdr*)elf->e_phdr;
+	return elf->e_phdr;
     }
     return NULL;
 }
+
+Elf32_Phdr*
+elf32_getphdr(Elf *elf) {
+    return (Elf32_Phdr*)_elf_getphdr(elf, ELFCLASS32);
+}
+
+#if __LIBELF64
+
+Elf64_Phdr*
+elf64_getphdr(Elf *elf) {
+    return (Elf64_Phdr*)_elf_getphdr(elf, ELFCLASS64);
+}
+
+#endif /* __LIBELF64 */

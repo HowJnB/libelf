@@ -1,6 +1,6 @@
 /*
-memset.c - dumb and inefficient replacement for memset(3).
-Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
+memset.c - replacement for memset(3), using duff's device.
+Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -19,31 +19,34 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #if HAVE_CONFIG_H
 # include <config.h>
-#endif
+#endif /* HAVE_CONFIG_H */
+
+#ifndef lint
+static const char rcsid[] = "@(#) $Id: memset.c,v 1.5 1998/11/27 21:25:19 michael Exp $";
+#endif /* lint */
 
 #include <sys/types.h>
 
-#if STDC_HEADERS
-# include <stdlib.h>
-# include <string.h>
-#else
-extern void bcopy();
-extern void *memcpy();
-#endif
-
-#if !HAVE_MEMCPY
-# define memcpy(d,s,n)	bcopy(s,d,n)
-#endif
-
 void*
-__memset(void *s, int c, size_t n) {
-    if (n > 64) {
-	__memset((char*)s + n / 2, c, n - n / 2);
-	memcpy(s, (char*)s + n / 2, n / 2);
-    }
-    else {
-	while (n > 0) {
-	    ((char*)s)[--n] = c;
+_elf_memset(void *s, int c, size_t n) {
+    char *t = (char*)s;
+
+    if (n) {
+	switch (n % 8u) {
+	    do {
+		n -= 8;
+		default:
+		case 0: *t++ = (char)c;
+		case 7: *t++ = (char)c;
+		case 6: *t++ = (char)c;
+		case 5: *t++ = (char)c;
+		case 4: *t++ = (char)c;
+		case 3: *t++ = (char)c;
+		case 2: *t++ = (char)c;
+		case 1: *t++ = (char)c;
+	    }
+	    while (n > 8);
 	}
     }
+    return s;
 }

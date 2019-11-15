@@ -1,6 +1,6 @@
 /*
 end.c - implementation of the elf_end(3) function.
-Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -19,9 +19,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <private.h>
 
+#ifndef lint
+static const char rcsid[] = "@(#) $Id: end.c,v 1.5 1998/06/12 19:42:20 michael Exp $";
+#endif /* lint */
+
 #if HAVE_MMAP
 #include <sys/mman.h>
-#endif
+#endif /* HAVE_MMAP */
 
 static void
 _elf_free(void *ptr) {
@@ -92,8 +96,8 @@ elf_end(Elf *elf) {
     else if (elf->e_unmap_data) {
 	munmap(elf->e_data, elf->e_size);
     }
-#endif
-    else {
+#endif /* HAVE_MMAP */
+    else if (!elf->e_memory) {
 	_elf_free(elf->e_data);
     }
     _elf_free_scns(elf, elf->e_scn_1);

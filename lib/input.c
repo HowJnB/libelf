@@ -1,6 +1,6 @@
 /*
 input.c - low-level input for libelf.
-Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -19,9 +19,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <private.h>
 
+#ifndef lint
+static const char rcsid[] = "@(#) $Id: input.c,v 1.5 1998/06/12 19:42:28 michael Exp $";
+#endif /* lint */
+
 #if HAVE_MMAP
 #include <sys/mman.h>
-#endif
+#endif /* HAVE_MMAP */
 
 void*
 _elf_read(Elf *elf, void *buffer, size_t off, size_t len) {
@@ -35,7 +39,7 @@ _elf_read(Elf *elf, void *buffer, size_t off, size_t len) {
     }
     else if (len) {
 	off += elf->e_base;
-	if (lseek(elf->e_fd, off, 0) != (off_t)off) {
+	if (lseek(elf->e_fd, (off_t)off, 0) != (off_t)off) {
 	    seterr(ERROR_IO_SEEK);
 	}
 	else if (!(tmp = buffer) && !(tmp = malloc(len))) {
@@ -72,6 +76,6 @@ _elf_mmap(Elf *elf) {
 	    return tmp;
 	}
     }
-#endif
+#endif /* HAVE_MMAP */
     return NULL;
 }

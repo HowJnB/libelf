@@ -1,6 +1,6 @@
 /*
 elf_repl.h - public header file for systems that lack it.
-Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -17,27 +17,51 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+/* @(#) $Id: elf_repl.h,v 1.4 1998/06/04 17:14:01 michael Exp $ */
+
+/*
+ * NEVER INCLUDE THIS FILE DIRECTLY - USE <libelf.h> INSTEAD!
+ */
+
 #ifndef _ELF_REPL_H
 #define _ELF_REPL_H
 
 #ifdef	__cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /*
  * Scalar data types
  */
-typedef unsigned long	Elf32_Addr;
-typedef unsigned short	Elf32_Half;
-typedef unsigned long	Elf32_Off;
-typedef long		Elf32_Sword;
-typedef unsigned long	Elf32_Word;
+typedef __libelf_u32_t		Elf32_Addr;
+typedef __libelf_u16_t		Elf32_Half;
+typedef __libelf_u32_t		Elf32_Off;
+typedef __libelf_i32_t		Elf32_Sword;
+typedef __libelf_u32_t		Elf32_Word;
 
-#define ELF32_FSZ_ADDR	4
-#define ELF32_FSZ_HALF	2
-#define ELF32_FSZ_OFF	4
-#define ELF32_FSZ_SWORD	4
-#define ELF32_FSZ_WORD	4
+#define ELF32_FSZ_ADDR		4
+#define ELF32_FSZ_HALF		2
+#define ELF32_FSZ_OFF		4
+#define ELF32_FSZ_SWORD		4
+#define ELF32_FSZ_WORD		4
+
+#if __LIBELF64
+typedef __libelf_u64_t		Elf64_Addr;
+typedef __libelf_u16_t		Elf64_Half;
+typedef __libelf_u64_t		Elf64_Off;
+typedef __libelf_i32_t		Elf64_Sword;
+typedef __libelf_i64_t		Elf64_Sxword;
+typedef __libelf_u32_t		Elf64_Word;
+typedef __libelf_u64_t		Elf64_Xword;
+
+#define ELF64_FSZ_ADDR		8
+#define ELF64_FSZ_HALF		2
+#define ELF64_FSZ_OFF		8
+#define ELF64_FSZ_SWORD		4
+#define ELF64_FSZ_SXWORD	8
+#define ELF64_FSZ_WORD		4
+#define ELF64_FSZ_XWORD		8
+#endif /* __LIBELF64 */
 
 /*
  * ELF header
@@ -60,6 +84,25 @@ typedef struct {
     Elf32_Half		e_shnum;
     Elf32_Half		e_shstrndx;
 } Elf32_Ehdr;
+
+#if __LIBELF64
+typedef struct {
+    unsigned char	e_ident[EI_NIDENT];
+    Elf64_Half		e_type;
+    Elf64_Half		e_machine;
+    Elf64_Word		e_version;
+    Elf64_Addr		e_entry;
+    Elf64_Off		e_phoff;
+    Elf64_Off		e_shoff;
+    Elf64_Word		e_flags;
+    Elf64_Half		e_ehsize;
+    Elf64_Half		e_phentsize;
+    Elf64_Half		e_phnum;
+    Elf64_Half		e_shentsize;
+    Elf64_Half		e_shnum;
+    Elf64_Half		e_shstrndx;
+} Elf64_Ehdr;
+#endif /* __LIBELF64 */
 
 /*
  * e-ident
@@ -139,6 +182,21 @@ typedef struct {
     Elf32_Word		sh_entsize;
 } Elf32_Shdr;
 
+#if __LIBELF64
+typedef struct {
+    Elf64_Word		sh_name;
+    Elf64_Word		sh_type;
+    Elf64_Xword		sh_flags;
+    Elf64_Addr		sh_addr;
+    Elf64_Off		sh_offset;
+    Elf64_Xword		sh_size;
+    Elf64_Word		sh_link;
+    Elf64_Word		sh_info;
+    Elf64_Xword		sh_addralign;
+    Elf64_Xword		sh_entsize;
+} Elf64_Shdr;
+#endif /* __LIBELF64 */
+
 /*
  * Special section indices
  */
@@ -191,6 +249,17 @@ typedef struct {
     Elf32_Half		st_shndx;
 } Elf32_Sym;
 
+#if __LIBELF64
+typedef struct {
+    Elf64_Word		st_name;
+    unsigned char	st_info;
+    unsigned char	st_other;
+    Elf64_Half		st_shndx;
+    Elf64_Addr		st_value;
+    Elf64_Xword		st_size;
+} Elf64_Sym;
+#endif /* __LIBELF64 */
+
 /*
  * Special symbol indices
  */
@@ -239,6 +308,19 @@ typedef struct {
     Elf32_Sword		r_addend;
 } Elf32_Rela;
 
+#if __LIBELF64
+typedef struct {
+    Elf64_Addr		r_offset;
+    Elf64_Xword		r_info;
+} Elf64_Rel;
+
+typedef struct {
+    Elf64_Addr		r_offset;
+    Elf64_Xword		r_info;
+    Elf64_Sxword	r_addend;
+} Elf64_Rela;
+#endif /* __LIBELF64 */
+
 /*
  * Macros for manipulating r_info
  */
@@ -254,6 +336,14 @@ typedef struct {
     Elf32_Word		n_descsz;	/* descriptor size */
     Elf32_Word		n_type;		/* descriptor type */
 } Elf32_Nhdr;
+
+#if __LIBELF64 && 0	/* I don't know if this is correct */
+typedef struct {
+    Elf64_Word		n_namesz;	/* name size */
+    Elf64_Word		n_descsz;	/* descriptor size */
+    Elf64_Word		n_type;		/* descriptor type */
+} Elf64_Nhdr;
+#endif /* __LIBELF64 */
 
 /*
  * Well-known descriptor types for ET_CORE files
@@ -275,6 +365,19 @@ typedef struct {
     Elf32_Word		p_flags;
     Elf32_Word		p_align;
 } Elf32_Phdr;
+
+#if __LIBELF64
+typedef struct {
+    Elf64_Word		p_type;
+    Elf64_Word		p_flags;
+    Elf64_Off		p_offset;
+    Elf64_Addr		p_vaddr;
+    Elf64_Addr		p_paddr;
+    Elf64_Xword		p_filesz;
+    Elf64_Xword		p_memsz;
+    Elf64_Xword		p_align;
+} Elf64_Phdr;
+#endif /* __LIBELF64 */
 
 /*
  * p_type
@@ -309,6 +412,16 @@ typedef struct {
     } d_un;
 } Elf32_Dyn;
 
+#if __LIBELF64
+typedef struct {
+    Elf64_Sxword	d_tag;
+    union {
+	Elf64_Xword	d_val;
+	Elf64_Addr	d_ptr;
+    } d_un;
+} Elf64_Dyn;
+#endif /* __LIBELF64 */
+
 /*
  * Dynamic array tags
  */
@@ -342,6 +455,6 @@ typedef struct {
 
 #ifdef	__cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* _ELF_REPL_H */

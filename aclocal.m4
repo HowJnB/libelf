@@ -1,7 +1,9 @@
 # Local additions to Autoconf macros.
-# Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
+# Copyright (C) 1995 - 1998 Michael Riepe <michael@stud.uni-hannover.de>
 
-AC_PREREQ(2.10)
+# @(#) $Id: aclocal.m4,v 1.8 1998/08/25 15:22:22 michael Exp $
+
+AC_PREREQ(2.12)
 
 AC_DEFUN(mr_ENABLE_NLS, [
   AC_PROVIDE([$0])
@@ -140,9 +142,44 @@ AC_DEFUN(mr_ENABLE_NLS, [
   AC_SUBST(POSUB)
 ])
 
+AC_DEFUN(mr_TARGET_ELF, [
+  AC_PROVIDE([$0])
+  AC_CACHE_CHECK([for native ELF system],
+    mr_cv_target_elf,
+    [AC_TRY_RUN(changequote(<<, >>)dnl
+<<#include <stdio.h>
+int
+main(int argc, char **argv) {
+  char buf[BUFSIZ];
+  FILE *fp;
+  int n;
+
+  if ((fp = fopen(*argv, "r")) == NULL) {
+    exit(1);
+  }
+  n = fread(buf, 1, sizeof(buf), fp);
+  if (n >= 52
+   && buf[0] == '\177'
+   && buf[1] == 'E'
+   && buf[2] == 'L'
+   && buf[3] == 'F') {
+    exit(0);
+  }
+  exit(1);
+}>>, changequote([, ])dnl
+      mr_cv_target_elf=yes,
+      mr_cv_target_elf=no,
+      mr_cv_target_elf=no)])])
+
 AC_DEFUN(mr_ENABLE_SHARED, [
   AC_PROVIDE([$0])
+  PICFLAGS=
   SHLIB=_shlib_dummy_
+  SHLINK=
+  SONAME=
+  LINK_SHLIB=
+  INSTALL_SHLIB=
+  DEPSHLIBS=
   AC_MSG_CHECKING([whether to build a shared library])
   AC_ARG_ENABLE(shared,
     [  --enable-shared         build shared library],
@@ -150,18 +187,55 @@ AC_DEFUN(mr_ENABLE_SHARED, [
     [mr_enable_shared=no])
   AC_MSG_RESULT($mr_enable_shared)
   if test "$mr_enable_shared" = yes; then
+    AC_MSG_CHECKING([whether GNU naming conventions are requested])
+    AC_ARG_ENABLE(gnu_names,
+      [  --enable-gnu-names      use GNU naming conventions for shared library],
+      [mr_enable_gnu_names="$enableval"],
+      [mr_enable_gnu_names=no])
+    AC_MSG_RESULT($mr_enable_gnu_names)
     AC_REQUIRE([AC_CANONICAL_HOST])
     AC_REQUIRE([AC_PROG_CC])
     AC_PATH_PROG(LD, ld, ld)
     case "$host" in
+      *-linux*)
+	if test "$GCC" = yes; then
+	  mr_TARGET_ELF
+	  if test "$mr_cv_target_elf" = yes; then
+	    PICFLAGS='-fPIC'
+	    if test "$mr_enable_gnu_names" = yes
+	    then
+	      SHLIB='$(PACKAGE)-$(VERSION).so'
+	    else
+	      SHLIB='$(PACKAGE).so.$(VERSION)'
+	    fi
+	    SHLINK='$(PACKAGE).so'
+	    SONAME='$(PACKAGE).so.$(MAJOR)'
+	    LINK_SHLIB='$(CC) -shared -Wl,-soname,$(SONAME)'
+	    INSTALL_SHLIB='$(INSTALL_PROGRAM)'
+	    DEPSHLIBS='-lc'
+	  else
+	    AC_MSG_WARN([shared libraries not supported for $host])
+	    mr_enable_shared=no
+	  fi
+	else
+	  AC_MSG_WARN([GNU CC required for building shared libraries])
+	  mr_enable_shared=no
+	fi
+	;;
       i?86-*-linux)
 	if test "$GCC" = yes; then
 	  PICFLAGS='-fPIC'
-	  SHLIB='$(PACKAGE).so.$(VERSION)'
+	  if test "$mr_enable_gnu_names" = yes
+	  then
+	    SHLIB='$(PACKAGE)-$(VERSION).so'
+	  else
+	    SHLIB='$(PACKAGE).so.$(VERSION)'
+	  fi
 	  SHLINK='$(PACKAGE).so'
 	  SONAME='$(PACKAGE).so.$(MAJOR)'
 	  LINK_SHLIB='$(CC) -shared -Wl,-soname,$(SONAME)'
 	  INSTALL_SHLIB='$(INSTALL_PROGRAM)'
+	  DEPSHLIBS='-lc'
 	else
 	  AC_MSG_WARN([GNU CC required for building shared libraries])
 	  mr_enable_shared=no
@@ -173,14 +247,19 @@ AC_DEFUN(mr_ENABLE_SHARED, [
 	else
 	  PICFLAGS='-K PIC'
 	fi
-	SHLIB='$(PACKAGE).so.$(MAJOR)'
+	if test "$mr_enable_gnu_names" = yes
+	then
+	  SHLIB='$(PACKAGE)-$(MAJOR).so'
+	else
+	  SHLIB='$(PACKAGE).so.$(MAJOR)'
+	fi
+	SONAME='$(PACKAGE).so.$(MAJOR)'
 	SHLINK='$(PACKAGE).so'
-	SONAME='$(SHLIB)'
 	LINK_SHLIB='$(LD) -G -z text -h $(SONAME)'
 	INSTALL_SHLIB='$(INSTALL_PROGRAM)'
 	;;
       *)
-	AC_MSG_WARN([shared libraries not supported for $host target])
+	AC_MSG_WARN([shared libraries not supported for $host])
 	mr_enable_shared=no
 	;;
     esac
@@ -193,6 +272,7 @@ AC_DEFUN(mr_ENABLE_SHARED, [
   AC_SUBST(SONAME)
   AC_SUBST(LINK_SHLIB)
   AC_SUBST(INSTALL_SHLIB)
+  AC_SUBST(DEPSHLIBS)
   DO_SHLIB="$mr_enable_shared"
   AC_SUBST(DO_SHLIB)
 ])
