@@ -1,6 +1,6 @@
 /*
 nlist.c - implementation of the nlist(3) function.
-Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <nlist.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: nlist.c,v 1.6 2001/10/15 21:37:36 michael Exp $";
+static const char rcsid[] = "@(#) $Id: nlist.c,v 1.7 2002/06/11 18:53:55 michael Exp $";
 #endif /* lint */
 
 #if HAVE_FCNTL_H
@@ -31,6 +31,12 @@ static const char rcsid[] = "@(#) $Id: nlist.c,v 1.6 2001/10/15 21:37:36 michael
 #ifndef O_RDONLY
 #define O_RDONLY	0
 #endif /* O_RDONLY */
+
+#ifndef O_BINARY
+#define O_BINARY	0
+#endif /* O_BINARY */
+
+#define FILE_OPEN_MODE	(O_RDONLY | O_BINARY)
 
 #define PRIME	217
 
@@ -224,7 +230,7 @@ nlist(const char *filename, struct nlist *nl) {
     int fd;
 
     if ((oldver = elf_version(EV_CURRENT)) != EV_NONE) {
-	if ((fd = open(filename, O_RDONLY)) != -1) {
+	if ((fd = open(filename, FILE_OPEN_MODE)) != -1) {
 	    if ((elf = elf_begin(fd, ELF_C_READ, NULL))) {
 		result = _elf_nlist(elf, nl);
 		elf_end(elf);

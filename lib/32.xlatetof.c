@@ -1,6 +1,6 @@
 /*
 32.xlatetof.c - implementation of the elf32_xlateto[fm](3) functions.
-Copyright (C) 1995 - 2001 Michael Riepe <michael@stud.uni-hannover.de>
+Copyright (C) 1995 - 2002 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <byteswap.h>
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.12 2001/10/08 15:05:11 michael Exp $";
+static const char rcsid[] = "@(#) $Id: 32.xlatetof.c,v 1.14 2002/06/11 18:53:22 michael Exp $";
 #endif /* lint */
 
 /*
@@ -199,7 +199,7 @@ byte_copy(unsigned char *dst, const unsigned char *src, size_t n) {
 	    memcpy(dst, src, n);
 	}
 	else if (dst < src) {
-	    for (i = 0; i < n i++) {
+	    for (i = 0; i < n; i++) {
 		dst[i] = src[i];
 	    }
 	}

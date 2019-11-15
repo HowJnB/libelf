@@ -1,4 +1,4 @@
-This is the public release of libelf-0.8.0, a free ELF object
+This is the public release of libelf-0.8.2, a free ELF object
 file access library. If you have problems with applications
 that use libelf and work with the commercial (SVR4, Solaris)
 version but not with this one, please contact me.
@@ -9,7 +9,7 @@ have a file .../include/elf.h that contains the single line
 configure.
 
 Installation is straightforward - the package is autoconf'ed.  Just do
-``cd libelf-0.8.0; ./configure; make; make install''.  Header files
+``cd libelf-0.8.2; ./configure; make; make install''.  Header files
 will be installed in .../include/libelf/.  If your system does not
 provide its own versions of libelf.h, nlist.h or gelf.h, ``make
 install'' will add the missing headers.  If you prefer not to have
@@ -32,7 +32,7 @@ code to libelf; if you don't run into problems, you will
 probably not need it.
 
 If you build a shared library and want it to be installed as
-``libelf-0.8.0.so'' rather than ``libelf.so.0.8.0'', please use
+``libelf-0.8.2.so'' rather than ``libelf.so.0.8.2'', please use
 ``./configure --enable-shared --enable-gnu-names''. Other files,
 e.g. ``libelf.so'' and ``libelf.so.0'' are NOT affected.
 
@@ -127,6 +127,13 @@ to turn off versioning translation support.
 
 	* Libelf does not support Solaris' `Move' and `Syminfo'
 	  sections.
+
+Changes since 0.8.0:
+
+	* Corrected typo in lib/{32,64}.xlatetof.c that sometimes
+	  caused a compilation failure.
+
+	* Use open(name, O_RDONLY|O_BINARY) in lib/nlist.c.
 
 Changes since 0.7.0:
 
