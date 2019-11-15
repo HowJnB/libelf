@@ -1,0 +1,257 @@
+# Makefile for libelf.
+# Copyright (C) 1995 Michael Riepe <riepe@ifwsn4.ifw.uni-hannover.de>
+# 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+# 
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = $(exec_prefix)/bin
+libdir = $(exec_prefix)/lib
+datadir = $(prefix)/share
+localedir = $(datadir)/locale
+includedir = $(prefix)/include
+mandir = $(prefix)/man/man$(manext)
+manext = 3
+installdirs = $(libdir) $(includedir) $(includedir)/libelf
+
+CC = @CC@
+AR = ar
+MV = mv -f
+RM = rm -f
+LN_S = @LN_S@
+RANLIB = @RANLIB@
+GENCAT = @GENCAT@
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@
+DEFS = -DHAVE_CONFIG_H
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+
+COMPILE = $(CC) -c $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(XCFLAGS)
+
+# no user serviceable parts below
+
+PACKAGE = @PACKAGE@
+VERSION = @VERSION@
+MAJOR = @MAJOR@
+
+SHELL = /bin/sh
+@SET_MAKE@
+
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+SUBDIRS = shared support
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+.c.o:
+	@$(RM) $@
+	$(COMPILE) $<
+
+INCLUDES = -I. -I$(srcdir)
+
+# generic sources
+SRCS1 = begin.c cntl.c end.c errmsg.c errno.c fill.c flag.c getarhdr.c \
+	getarsym.c getbase.c getdata.c getident.c getscn.c hash.c kind.c \
+	ndxscn.c newdata.c newscn.c next.c nextscn.c rand.c rawdata.c \
+	rawfile.c strptr.c update.c version.c
+OBJS1 = begin.o cntl.o end.o errmsg.o errno.o fill.o flag.o getarhdr.o \
+	getarsym.o getbase.o getdata.o getident.o getscn.o hash.o kind.o \
+	ndxscn.o newdata.o newscn.o next.o nextscn.o rand.o rawdata.o \
+	rawfile.o strptr.o update.o version.o
+
+# 32-bit sources
+SRCS2 = 32.fsize.c 32.getehdr.c 32.getphdr.c 32.getshdr.c 32.newehdr.c \
+	32.newphdr.c 32.xlatetof.c
+OBJS2 = 32.fsize.o 32.getehdr.o 32.getphdr.o 32.getshdr.o 32.newehdr.o \
+	32.newphdr.o 32.xlatetof.o
+
+# support
+SRCS3 = cook.c data.c input.c
+OBJS3 = cook.o data.o input.o
+
+# nlist
+SRCS4 = nlist.c
+OBJS4 = nlist.o
+
+SRCS = $(SRCS1) $(SRCS2) $(SRCS3) $(SRCS4)
+OBJS = $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4)
+
+# missing functions
+LIBSRCS = memset.c
+LIBOBJS = @LIBOBJS@
+
+# header files to be installed
+HDRS = libelf.h nlist.h
+AUXHDRS = @install_headers@
+
+DISTFILES = $(SRCS) $(LIBSRCS) byteswap.h errors.h private.h nlist.h \
+	ext_types.h configure Makefile.in config.h.in libelf.h.in \
+	stamp-h.in install-sh mkinstalldirs mkmsgs configure.in \
+	aclocal.m4 acconfig.h COPYING.LIB INSTALL README
+
+all: $(HDRS) $(AUXHDRS) libelf.a
+
+shared: $(HDRS) $(AUXHDRS) shared/libelf.so.$(MAJOR)
+shared/libelf.so.$(MAJOR):
+	cd shared && $(MAKE) all
+
+libelf.h: libelf.h.in config.status
+	CONFIG_FILES=$@ CONFIG_HEADERS= ./config.status
+
+$(AUXHDRS):
+	@$(RM) $@
+	$(LN_S) $(srcdir)/support/$@ $@
+
+libelf.a: $(OBJS) $(LIBOBJS)
+	@$(RM) $@
+	$(AR) rcv $@ $(OBJS) $(LIBOBJS)
+	$(RANLIB) $@
+
+install: all installdirs install-exec install-data
+
+installdirs: mkinstalldirs
+	$(SHELL) $(srcdir)/mkinstalldirs $(installdirs)
+
+install-exec:
+	$(INSTALL_DATA) libelf.a $(libdir)
+	-cd $(libdir) && $(RANLIB) libelf.a
+
+install-data:
+	for file in $(HDRS); do \
+	  $(INSTALL_DATA) $(srcdir)/$$file $(includedir)/libelf || exit 1; \
+	  if [ ! -f $(includedir)/$$file ]; then \
+	    echo "#include <libelf/$$file>" > $(includedir)/$$file; \
+	  fi; \
+	done
+	for file in .. $(AUXHDRS); do \
+	  if [ x"$$file" = x".." ]; then true; else \
+	    $(INSTALL_DATA) $$file $(includedir)/libelf || exit 1; \
+	    if [ ! -f $(includedir)/$$file ]; then \
+	      echo "#include <libelf/$$file>" > $(includedir)/$$file; \
+	    fi; \
+	  fi; \
+	done
+
+install-shared:
+	cd shared && $(MAKE) install
+
+uninstall: uninstall-shared
+	$(RM) $(libdir)/libelf.a
+	$(RM) -r $(includedir)/libelf
+
+uninstall-shared:
+	cd shared && $(MAKE) uninstall
+
+mostlyclean: mostlyclean-recursive mostlyclean-local
+clean: clean-recursive clean-local
+distclean: distclean-recursive distclean-local
+maintainer-clean: maintainer-clean-recursive maintainer-clean-local
+
+clean-recursive distclean-recursive \
+mostlyclean-recursive maintainer-clean-recursive:
+	for subdir in $(SUBDIRS); do \
+	  target=`echo $@|sed 's/-recursive//'`; \
+	  echo making $$target in $$subdir; \
+	  (cd $$subdir && $(MAKE) $$target) || exit 1; \
+	done
+
+mostlyclean-local:
+	$(RM) *~ core a.out errlist Log
+
+clean-local: mostlyclean-local
+	$(RM) *.[oa] *.m *.cat config.log
+
+distclean-local: clean-local
+	$(RM) Makefile config.cache config.h config.status libelf.h stamp-h $(AUXHDRS)
+
+maintainer-clean-local: distclean-local
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+	$(RM) configure config.h.in stamp-dist
+	$(RM) -r $(distdir)
+
+.SUFFIXES: .m .cat
+.m.cat:
+	@$(RM) $@
+	$(GENCAT) $@ $<
+
+libelf.m: errors.h mkmsgs
+	@$(RM) $@
+	$(SHELL) $(srcdir)/mkmsgs < $(srcdir)/errors.h > $@
+
+distdir = $(PACKAGE)-$(VERSION)
+dist: stamp-dist
+stamp-dist: $(DISTFILES)
+	$(RM) -r $(distdir)
+	mkdir $(distdir)
+	for file in $(DISTFILES); do \
+	  ln $(srcdir)/$$file $(distdir) || \
+	    cp -p $(srcdir)/$$file $(distdir) || exit 1; \
+	done
+	for subdir in $(SUBDIRS); do \
+	  mkdir $(distdir)/$$subdir || exit 1; \
+	  (cd $$subdir && $(MAKE) dist) || exit 1; \
+	done
+	-$(RM) $(distdir).tar.gz.bak $(PACKAGE).tar.gz
+	-$(MV) $(distdir).tar.gz $(distdir).tar.gz.bak
+	tar cvfz $(distdir).tar.gz $(distdir)
+	$(LN_S) $(distdir).tar.gz $(PACKAGE).tar.gz
+	$(RM) stamp-dist && echo timestamp > stamp-dist
+
+# For the justification of the following Makefile rules, see node
+# `Automatic Remaking' in GNU Autoconf documentation.
+
+configure: configure.in aclocal.m4
+	cd $(srcdir) && autoconf
+
+config.h.in: stamp-h.in
+stamp-h.in: configure.in acconfig.h
+	cd $(srcdir) && autoheader
+	cd $(srcdir) && rm -f stamp-h.in && echo timestamp > stamp-h.in
+
+config.h: stamp-h
+stamp-h: config.h.in config.status
+	CONFIG_FILES= CONFIG_HEADERS=config.h ./config.status
+	rm -f stamp-h && echo timestamp > stamp-h
+
+Makefile: Makefile.in config.status
+	CONFIG_FILES=$@ CONFIG_HEADERS= ./config.status
+
+shared/Makefile: shared/Makefile.in config.status
+	CONFIG_FILES=$@ CONFIG_HEADERS= ./config.status
+
+support/Makefile: support/Makefile.in config.status
+	CONFIG_FILES=$@ CONFIG_HEADERS= ./config.status
+
+config.status: configure config.h.in
+	CFLAGS='$(CFLAGS)' ./config.status --recheck
+
+# Tell versions [3.59,3.63) of GNU make not to export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:
+
+# dependencies
+$(OBJS): private.h config.h libelf.h.in errors.h $(AUXHDRS)
+32.xlatetof.o: byteswap.h ext_types.h
+32.fsize.o: ext_types.h
+getarsym.o: byteswap.h
+nlist.o: nlist.h
+$(LIBOBJS): config.h
