@@ -1,37 +1,83 @@
-This is the first alpha release if libelf, a free ELF object file
-access library.
+This is the public release of libelf-0.6.4, a free ELF object
+file access library. If you have problems with applications
+that use libelf and work with the commercial (SVR4, Solaris)
+version but not with this one, please contact me.
 
-This code is far from being perfect. If you have problems with
-applications that use libelf and work with the commercial (SVR4,
-Solaris) version but not with this one, please contact me. The one
-most people asked for (elk-2.2) works fine, I'm using it myself.
+IMPORTANT NOTE: If you have libelf-0.5.2 installed, you probably
+have a file .../include/elf.h that contains the single line
+``#include <libelf/elf.h>''. REMOVE THIS FILE BEFORE YOU RUN
+configure.
 
 Installation is straightforward - the package is autoconf'ed.
-Just do "cd libelf-<version>; ./configure; make; make install".
-Header files will be installed in .../include/libelf. If your system
-does not provide its own version of libelf.h, nlist.h or elf.h,
-these headers are installed in .../include, too. "make install" may
-overwrite your system's version of libelf, though - be careful!
+Just do ``cd libelf-<version>; ./configure; make; make install''.
+Header files will be installed in .../include/libelf/.  If your
+system does not provide its own version of libelf.h or nlist.h,
+you may want to run ``make install-compat'' to install them. I
+recommend that you use ``-I.../include/libelf'' instead.
 
-If you are running an ELF Linux system, you can build and install the
-shared version of libelf by running "make shared; make install-shared".
-Other systems will require changes in .../shared/Makefile.in. The
-static version of the library compiles on Linux (ELF and a.out),
-Solaris and SunOS (GCC required).
+You need an ANSI C compiler to build libelf. Gcc is optimal.
 
-This package supports XPG3 style message catalogs, but there are no
-message files included in the distribution (yet). You can create an
-english message file suitable for gencat(1) by running "make libelf.m".
-It is meant as a starting point for translators and is not installed.
-You can turn off NLS support by passing "--disable-nls" to configure.
+On some systems you can build and install a shared libelf
+library. To do this, pass ``--enable-shared'' to configure.
+Another configure option, ``--enable-debug'', adds debugging
+code to libelf; if you don't run into problems, you will
+probably not need it.
+
+NLS is available and enabled by default (although there are
+no message catalogs included in the distribution (yet)). To
+turn it off, pass the ``--disable-nls'' option to configure.
+
+Libelf can use gettext or catgets for accessing message
+catalogs.  If gettext is available AND is part of libc (i.e. not
+in a separate library), it will be used. Otherwise, configure
+will look for catgets.  If you have gettext in a separate
+library and want to use it, you should pass the library's name
+to configure, e.g. ``LIBS=-lintl ./configure''. Note that you
+MUST link your libelf-based applications with -lintl then,
+which is probably not what you want.
+
+If you have GNU gettext installed on your system, and if GNU
+gettext runs on top of the catgets interface (Linux systems),
+configure will refuse to use it and use catgets instead. If
+you absolutely want to use GNU gettext, go ahead and rebuild
+it (which is IMHO a good idea in general in this case):
+
+	cd .../gettext-0.10
+	ac_cv_func_catgets=no ac_cv_func_gettext=no ./configure
+	make
+	make install
+
+After that, return to the libelf build directory, remove
+config.cache, and start over.
 
 Missing things:
-- There is no documentation.
-- The COFF file format is not understood (see elf_kind(3)).
-- nlist(3) is incomplete; the n_type and n_sclass members of struct nl
-  are set to zero even if type information is available.
-- Unlike the commercial version, this library does not use mmap(2).
 
-Michael Riepe
+	* There is no documentation.
+	* The COFF file format is not understood.
+	* nlist(3) is incomplete; the n_type and n_sclass
+	  members of struct nl are set to zero even if type
+	  information is available.
+	* Libelf does not support 64bit ELF files (yet).
+
+Changes since 0.5.2:
+
+	* some bug fixes
+	* mmap support
+	* new directory layout
+	* There is a new function, elf_delscn(), that deletes
+	  a section from an ELF file. It also adjusts the
+	  sh_link and sh_info members in the section header
+	  table, if (and ONLY if) the ELF standard indicates
+	  that these values are section indices. References
+	  to the deleted section will be cleared, so be careful.
+	* my email address has changed ;)
+
+Where to get libelf:
+
+	ftp://sunsite.unc.edu/pub/Linux/libs/
+	ftp://ifwsn4.ifw.uni-hannover.de/private/linux/
+	http://www.stud.uni-hannover.de/~michael/software/
+
+Michael "Tired" Riepe
+<michael@stud.uni-hannover.de>
 <riepe@ifwsn4.ifw.uni-hannover.de>
-<michael@tribble.ifw.uni-hannover.de>

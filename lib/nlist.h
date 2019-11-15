@@ -1,5 +1,5 @@
 /*
-Special definitions for libelf, processed by autoheader.
+nlist.h - public header file for nlist(3).
 Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
@@ -17,24 +17,30 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* Define if you want to include extra debugging code */
-#undef ENABLE_DEBUG
+#ifndef _NLIST_H
+#define _NLIST_H
 
-/* Define if memmove() does not copy overlapping arrays correctly */
-#undef HAVE_BROKEN_MEMMOVE
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/* Define if you have the catgets function. */
-#undef HAVE_CATGETS
+struct nlist {
+    char*		n_name;
+    long		n_value;
+    short		n_scnum;
+    unsigned short	n_type;
+    char		n_sclass;
+    char		n_numaux;
+};
 
-/* Define if you have the gettext function. */
-#undef HAVE_GETTEXT
+#if __STDC__ || defined(__cplusplus)
+extern int nlist(const char *__filename, struct nlist *__nl);
+#else
+extern int nlist();
+#endif
 
-/* Define if you have the memset function.  */
-#undef HAVE_MEMSET
+#ifdef __cplusplus
+}
+#endif
 
-/* Define if struct nlist is declared in <elf.h> or <sys/elf.h> */
-#undef HAVE_STRUCT_NLIST_DECLARATION
-
-/* Define if Elf32_Dyn is declared in <link.h> */
-#undef NEED_LINK_H
-
+#endif /* _NLIST_H */

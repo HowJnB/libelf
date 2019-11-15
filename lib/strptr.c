@@ -1,5 +1,5 @@
 /*
-Special definitions for libelf, processed by autoheader.
+strptr.c - implementation of the elf_strptr(3) function.
 Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
@@ -17,24 +17,33 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* Define if you want to include extra debugging code */
-#undef ENABLE_DEBUG
+#include <private.h>
 
-/* Define if memmove() does not copy overlapping arrays correctly */
-#undef HAVE_BROKEN_MEMMOVE
+char*
+elf_strptr(Elf *elf, size_t section, size_t offset) {
+    Elf_Scn *scn;
+    Elf_Data *sd;
 
-/* Define if you have the catgets function. */
-#undef HAVE_CATGETS
-
-/* Define if you have the gettext function. */
-#undef HAVE_GETTEXT
-
-/* Define if you have the memset function.  */
-#undef HAVE_MEMSET
-
-/* Define if struct nlist is declared in <elf.h> or <sys/elf.h> */
-#undef HAVE_STRUCT_NLIST_DECLARATION
-
-/* Define if Elf32_Dyn is declared in <link.h> */
-#undef NEED_LINK_H
-
+    if (!elf) {
+	return NULL;
+    }
+    elf_assert(elf->e_magic == ELF_MAGIC);
+    if (!(scn = elf_getscn(elf, section))) {
+	return NULL;
+    }
+    if (scn->s_type != SHT_STRTAB) {
+	seterr(ERROR_NOSTRTAB);
+	return NULL;
+    }
+    if (offset >= 0 && offset < scn->s_size) {
+	sd = NULL;
+	while ((sd = elf_getdata(scn, sd))) {
+	    if (sd->d_buf && offset >= (size_t)sd->d_off
+			  && offset < (size_t)sd->d_off + sd->d_size) {
+		return (char*)sd->d_buf + (offset - sd->d_off);
+	    }
+	}
+    }
+    seterr(ERROR_BADSTROFF);
+    return NULL;
+}

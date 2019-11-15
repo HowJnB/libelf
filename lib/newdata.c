@@ -1,5 +1,5 @@
 /*
-Special definitions for libelf, processed by autoheader.
+newdata.c - implementation of the elf_newdata(3) function.
 Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
@@ -17,24 +17,36 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* Define if you want to include extra debugging code */
-#undef ENABLE_DEBUG
+#include <private.h>
 
-/* Define if memmove() does not copy overlapping arrays correctly */
-#undef HAVE_BROKEN_MEMMOVE
+Elf_Data*
+elf_newdata(Elf_Scn *scn) {
+    Scn_Data *sd;
 
-/* Define if you have the catgets function. */
-#undef HAVE_CATGETS
-
-/* Define if you have the gettext function. */
-#undef HAVE_GETTEXT
-
-/* Define if you have the memset function.  */
-#undef HAVE_MEMSET
-
-/* Define if struct nlist is declared in <elf.h> or <sys/elf.h> */
-#undef HAVE_STRUCT_NLIST_DECLARATION
-
-/* Define if Elf32_Dyn is declared in <link.h> */
-#undef NEED_LINK_H
-
+    if (!scn) {
+	return NULL;
+    }
+    elf_assert(scn->s_magic == SCN_MAGIC);
+    if (scn->s_index == SHN_UNDEF) {
+	seterr(ERROR_NULLSCN);
+    }
+    else if (!(sd = (Scn_Data*)malloc(sizeof(*sd)))) {
+	seterr(ERROR_MEM_SCNDATA);
+    }
+    else {
+	*sd = _elf_data_init;
+	sd->sd_scn = scn;
+	sd->sd_data_flags = ELF_F_DIRTY;
+	sd->sd_freeme = 1;
+	sd->sd_data.d_version = _elf_version;
+	if (scn->s_data_n) {
+	    scn->s_data_n->sd_link = sd;
+	}
+	else {
+	    scn->s_data_1 = sd;
+	}
+	scn->s_data_n = sd;
+	return (Elf_Data*)sd;
+    }
+    return NULL;
+}

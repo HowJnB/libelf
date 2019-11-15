@@ -1,5 +1,5 @@
 /*
-Special definitions for libelf, processed by autoheader.
+kind.c - implementation of the elf_kind(3) function.
 Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
@@ -17,24 +17,13 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* Define if you want to include extra debugging code */
-#undef ENABLE_DEBUG
+#include <private.h>
 
-/* Define if memmove() does not copy overlapping arrays correctly */
-#undef HAVE_BROKEN_MEMMOVE
-
-/* Define if you have the catgets function. */
-#undef HAVE_CATGETS
-
-/* Define if you have the gettext function. */
-#undef HAVE_GETTEXT
-
-/* Define if you have the memset function.  */
-#undef HAVE_MEMSET
-
-/* Define if struct nlist is declared in <elf.h> or <sys/elf.h> */
-#undef HAVE_STRUCT_NLIST_DECLARATION
-
-/* Define if Elf32_Dyn is declared in <link.h> */
-#undef NEED_LINK_H
-
+Elf_Kind
+elf_kind(Elf *elf) {
+    if (!elf) {
+	return ELF_K_NONE;
+    }
+    elf_assert(elf->e_magic == ELF_MAGIC);
+    return elf->e_kind;
+}

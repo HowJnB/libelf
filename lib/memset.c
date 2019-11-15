@@ -1,5 +1,5 @@
 /*
-Special definitions for libelf, processed by autoheader.
+memset.c - dumb and inefficient replacement for memset(3).
 Copyright (C) 1995, 1996 Michael Riepe <michael@stud.uni-hannover.de>
 
 This library is free software; you can redistribute it and/or
@@ -17,24 +17,33 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* Define if you want to include extra debugging code */
-#undef ENABLE_DEBUG
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-/* Define if memmove() does not copy overlapping arrays correctly */
-#undef HAVE_BROKEN_MEMMOVE
+#include <sys/types.h>
 
-/* Define if you have the catgets function. */
-#undef HAVE_CATGETS
+#if STDC_HEADERS
+# include <stdlib.h>
+# include <string.h>
+#else
+extern void bcopy();
+extern void *memcpy();
+#endif
 
-/* Define if you have the gettext function. */
-#undef HAVE_GETTEXT
+#if !HAVE_MEMCPY
+# define memcpy(d,s,n)	bcopy(s,d,n)
+#endif
 
-/* Define if you have the memset function.  */
-#undef HAVE_MEMSET
-
-/* Define if struct nlist is declared in <elf.h> or <sys/elf.h> */
-#undef HAVE_STRUCT_NLIST_DECLARATION
-
-/* Define if Elf32_Dyn is declared in <link.h> */
-#undef NEED_LINK_H
-
+void*
+__memset(void *s, int c, size_t n) {
+    if (n > 64) {
+	__memset((char*)s + n / 2, c, n - n / 2);
+	memcpy(s, (char*)s + n / 2, n / 2);
+    }
+    else {
+	while (n > 0) {
+	    ((char*)s)[--n] = c;
+	}
+    }
+}

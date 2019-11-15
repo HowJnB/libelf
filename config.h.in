@@ -3,6 +3,9 @@
 /* Define to empty if the keyword does not work.  */
 #undef const
 
+/* Define if you have a working `mmap' system call.  */
+#undef HAVE_MMAP
+
 /* Define to `long' if <sys/types.h> doesn't define.  */
 #undef off_t
 
@@ -12,14 +15,20 @@
 /* Define if you have the ANSI C header files.  */
 #undef STDC_HEADERS
 
+/* Define if you want to include extra debugging code */
+#undef ENABLE_DEBUG
+
 /* Define if memmove() does not copy overlapping arrays correctly */
 #undef HAVE_BROKEN_MEMMOVE
 
+/* Define if you have the catgets function. */
+#undef HAVE_CATGETS
+
+/* Define if you have the gettext function. */
+#undef HAVE_GETTEXT
+
 /* Define if you have the memset function.  */
 #undef HAVE_MEMSET
-
-/* Define if NLS is available and you want to include it */
-#undef HAVE_NLS
 
 /* Define if struct nlist is declared in <elf.h> or <sys/elf.h> */
 #undef HAVE_STRUCT_NLIST_DECLARATION
@@ -30,6 +39,9 @@
 /* Define if you have the ftruncate function.  */
 #undef HAVE_FTRUNCATE
 
+/* Define if you have the getpagesize function.  */
+#undef HAVE_GETPAGESIZE
+
 /* Define if you have the memcmp function.  */
 #undef HAVE_MEMCMP
 
@@ -38,6 +50,9 @@
 
 /* Define if you have the memmove function.  */
 #undef HAVE_MEMMOVE
+
+/* Define if you have the valloc function.  */
+#undef HAVE_VALLOC
 
 /* Define if you have the <unistd.h> header file.  */
 #undef HAVE_UNISTD_H
